@@ -58,7 +58,7 @@ export function normalizeCard(c: Raw, painel: Painel, agentes: Map<string, strin
     interesse: asText(cf(f, "interesse")), potencial: asText(cf(f, "potencial-de-venda")),
     mesFechamento: titleCase(asText(cf(f, "m-s-de-fechamento"))),
     contatoIds: c.contactIds ?? [],
-    etiquetas: (c.tagIds as string[]).map((id) => painel.etiquetas[id]).filter(Boolean),
+    etiquetas: (c.tagIds as string[]).map((id) => painel.etiquetas[id]?.trim()).filter(Boolean),
   };
 }
 

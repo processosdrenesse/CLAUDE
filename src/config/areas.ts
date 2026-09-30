@@ -12,8 +12,8 @@ export const AREA_KEYS = Object.keys(AREAS) as AreaKey[];
 /** Fases que contam como venda (títulos normalizados). Definido pela gestão. */
 export const ETAPAS_VENDA = ["convertidos", "convertidos avulsos", "reativados com venda"];
 
-/** Etiquetas que identificam parcerias. */
-export const ETIQUETA_PARCERIA = "parceria";
+/** Parcerias = cards do funil SDRs; o recorte é feito pelo filtro de Etiquetas (igual ao Lever). */
+export const AREA_PARCERIAS: AreaKey = "sdr";
 
 /** Equipe oficial de agendamento (Reativação + SDR) — vídeo de referência. */
 export const EQUIPE_OFICIAL = [

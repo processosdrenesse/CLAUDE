@@ -42,5 +42,5 @@ src/services (normalização) → src/domain (regras/indicadores) → src/pages 
 
 1. **Data de Inclusão** não existe na API do Belle (só está no relatório do BI). O filtro está desabilitado até o Belle expor o campo (`Agendamento.dataInclusao`).
 2. **Data de fechamento no Lever** = última movimentação do card (`updatedAt`); a API não expõe a data em que entrou na fase de venda.
-3. Parcerias = cards com etiqueta contendo "Parceria" (`ETIQUETA_PARCERIA`).
+3. Parcerias = cards do funil SDRs, recortados pelo filtro de Etiquetas (as 24 etiquetas do painel, como no Lever).
 4. Equipe oficial de agendamento em `src/config/areas.ts` (`EQUIPE_OFICIAL`).
