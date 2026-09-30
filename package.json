@@ -8,9 +8,10 @@
     "dev:api": "tsx watch server/index.ts",
     "dev:web": "vite",
     "build": "tsc --noEmit && vite build",
-    "start": "NODE_ENV=production tsx server/index.ts",
+    "start": "tsx server/index.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test src/lib/__tests__/*.test.ts"
+    "test": "tsx --test src/lib/__tests__/*.test.ts",
+    "app": "npm run build && npm start"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.0",

@@ -1,5 +1,6 @@
 import express from "express";
 import compression from "compression";
+import fs from "node:fs";
 import path from "node:path";
 import { env } from "./env.ts";
 import { clearCache, cacheEpoch } from "./cache.ts";
@@ -46,8 +47,9 @@ app.get("/api/lever/panels/:id/cards", wrap("lever", (q) => lever.cards(String(q
 app.get("/api/lever/agents", wrap("lever", (q) => lever.agents(force(q))));
 app.post("/api/lever/contacts", wrap("lever", (q) => lever.contacts(q.body.ids ?? [])));
 
-if (process.env.NODE_ENV === "production") {
-  const dist = path.resolve("dist");
+// Serve o frontend compilado (npm run build) quando existir — funciona igual no Windows/Mac/Linux.
+const dist = path.resolve("dist");
+if (fs.existsSync(path.join(dist, "index.html"))) {
   app.use(express.static(dist));
   app.get(/^(?!\/api).*/, (_q, r) => r.sendFile(path.join(dist, "index.html")));
 }
