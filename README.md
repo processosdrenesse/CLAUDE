@@ -44,3 +44,11 @@ src/services (normalização) → src/domain (regras/indicadores) → src/pages 
 2. **Data de fechamento no Lever** = última movimentação do card (`updatedAt`); a API não expõe a data em que entrou na fase de venda.
 3. Parcerias = cards do funil SDRs, recortados pelo filtro de Etiquetas (as 24 etiquetas do painel, como no Lever).
 4. Equipe oficial de agendamento em `src/config/areas.ts` (`EQUIPE_OFICIAL`).
+
+## Publicar na Vercel
+
+1. Vercel → **Add New → Project** → importe o repositório `processosdrenesse/CLAUDE` (branch `claude/bold-feynman-5l91wk`). O `vercel.json` já configura build, frontend (`dist`) e a API (`api/index.ts`, `maxDuration` 300 s).
+2. Em **Environment Variables** cadastre: `BELLE_API_URL`, `BELLE_API_TOKEN`, `LEVER_API_URL`, `LEVER_API_TOKEN` e **`DASHBOARD_PASSWORD`** (senha de acesso; sem ela o endereço fica aberto a qualquer pessoa).
+3. Deploy. Ao abrir, o navegador pede usuário (qualquer) e a senha.
+
+Atenção: em serverless o cache é por instância; a 1ª carga de cada página pode levar dezenas de segundos e há limite de tempo por função conforme o plano da Vercel.
