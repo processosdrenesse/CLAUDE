@@ -22,14 +22,13 @@ export const emptyAgFilters = (agendamento: Partial<DateRange> = {}): AgFilters 
 const has = (sel: string[], v: string) => sel.length === 0 || sel.includes(v);
 
 /**
- * Regra de negócio: a Data de Agendamento dentro do período é o que torna o registro elegível.
- * `cadastroIds` = clientes cadastrados no intervalo de "Data de Cadastro" (resolvido no Belle).
+ * Regra de negócio: a Data de Agendamento dentro do período torna o registro elegível.
+ * Data de Inclusão e Data de Cadastro (do BI do Belle) filtram de forma independente;
+ * registro sem a data fica fora quando o filtro correspondente está ativo.
  */
-export function filtrarAgendamentos(items: Agendamento[], f: AgFilters, cadastroIds: Set<number> | null): Agendamento[] {
+export function filtrarAgendamentos(items: Agendamento[], f: AgFilters): Agendamento[] {
   const base = items.filter((a) =>
-    inRange(a.data, f.agendamento) &&
-    (!f.inclusao.from && !f.inclusao.to || inRange(a.dataInclusao, f.inclusao)) &&
-    (!cadastroIds || cadastroIds.has(a.clienteId)) &&
+    inRange(a.data, f.agendamento) && inRange(a.dataInclusao, f.inclusao) && inRange(a.dataCadastro, f.cadastro) &&
     has(f.colaborador, a.colaborador) && has(f.unidade, a.unidade) && has(f.status, a.statusBruto) &&
     has(f.tipo, a.tipo) && has(f.servico, a.servico),
   );

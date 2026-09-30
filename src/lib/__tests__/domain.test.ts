@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { removerDuplicidades, filtrarAgendamentos, emptyAgFilters, kpisAgendamentos } from "../../domain/agendamentos.ts";
-import { conciliar, nomeCompativel } from "../../domain/conciliacao.ts";
 import { inRange } from "../dates.ts";
 import { normalizeUnit } from "../units.ts";
 import { classificarEtapa } from "../../services/lever/normalize.ts";
@@ -27,7 +26,7 @@ test("datas inclusivas até o último dia", () => {
 
 test("regra: inclusão 18/09, agendamento 22/09, filtro 21–26/09 => elegível", () => {
   const f = emptyAgFilters({ from: "2026-09-21", to: "2026-09-26" });
-  assert.equal(filtrarAgendamentos([ag({ data: "2026-09-22" }), ag({ id: 2, data: "2026-09-30" })], f, null).length, 1);
+  assert.equal(filtrarAgendamentos([ag({ data: "2026-09-22" }), ag({ id: 2, data: "2026-09-30" })], f).length, 1);
 });
 
 test("duplicidades: prevalece atendido mais recente; senão o mais recente", () => {
@@ -53,28 +52,17 @@ test("classificação de etapas do Lever", () => {
   assert.equal(classificarEtapa("Pré-AV"), "agendado");
 });
 
-test("nomes: Lever curto x Belle completo", () => {
-  assert.ok(nomeCompativel("Patricia Franco", "Patrícia Franco da Silva Oliveira"));
-  assert.ok(!nomeCompativel("Maria Silva", "Maria Santos"));
-});
-
-const lado = (id: string, cliente: string, o: object = {}) => ({ id, cliente, unidade: "Lagoa Nova" as const, data: "2026-09-22", valor: 2000, ...o });
-test("conciliação: status e divergências", () => {
-  const belle = [lado("1", "Ana Souza"), lado("2", "Bia Lima", { valor: 3000 }), lado("3", "Caio Reis"), lado("4", "Duda Melo", { unidade: "Petrópolis" })];
-  const lever = [lado("L1", "Ana Souza"), lado("L2", "Bia Lima", { valor: 2500 }), lado("L5", "Eva Nunes"), lado("L4", "Duda Melo")];
-  const r = conciliar(belle, lever, new Set(["L1", "L2", "L5", "L4"]));
-  const st = Object.fromEntries(r.map((x) => [x.belle?.cliente ?? x.lever?.cliente, x.status]));
-  assert.equal(st["Ana Souza"], "Conciliado");
-  assert.equal(st["Bia Lima"], "Divergência de valor");
-  assert.equal(st["Caio Reis"], "Somente Belle");
-  assert.equal(st["Duda Melo"], "Divergência de unidade");
-  assert.equal(st["Eva Nunes"], "Somente Lever");
-});
-test("conciliação: ambíguo vai para revisão; telefone tem prioridade sobre nome", () => {
-  const r = conciliar([lado("1", "Ana Souza")], [lado("L1", "Ana Souza", { unidade: "Zona Norte" }), lado("L2", "Ana Souza", { unidade: "Capim Macio" })], new Set(["L1", "L2"]));
-  assert.equal(r[0].status, "Correspondência para revisão");
-  const r2 = conciliar([lado("1", "Maria A", { phone: "(84) 99999-1111" })], [lado("L1", "Outra Pessoa", { phone: "84999991111" })], new Set(["L1"]));
-  assert.equal(r2[0].status, "Conciliado"); assert.equal(r2[0].criterio, "Telefone");
+test("Data de Inclusão e Data de Cadastro filtram de forma independente (dados do BI)", () => {
+  const ls = [
+    ag({ id: 1, data: "2026-09-22", dataInclusao: "2026-09-18", dataCadastro: "2026-01-10" }),  // inclusão 18/09, agendado 22/09
+    ag({ id: 2, data: "2026-09-22", dataInclusao: "2026-08-01", dataCadastro: "2026-09-20" }),
+    ag({ id: 3, data: "2026-09-22" }),                                                            // sem datas do BI
+  ];
+  const base = emptyAgFilters({ from: "2026-09-21", to: "2026-09-26" });
+  assert.equal(filtrarAgendamentos(ls, base).length, 3);
+  assert.deepEqual(filtrarAgendamentos(ls, { ...base, inclusao: { from: "2026-09-15", to: "2026-09-18" } }).map((a) => a.id), [1]);
+  assert.deepEqual(filtrarAgendamentos(ls, { ...base, cadastro: { from: "2026-09-01", to: "2026-09-30" } }).map((a) => a.id), [2]);
+  assert.equal(filtrarAgendamentos(ls, { ...base, inclusao: { from: "2026-09-15", to: "2026-09-18" }, cadastro: { from: "2026-09-01", to: "2026-09-30" } }).length, 0);
 });
 
 // ---------- Lever: datas, filtros combinados e taxa de conversão ----------

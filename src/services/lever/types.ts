@@ -17,4 +17,3 @@ export interface Lead {
   contatoIds: string[]; etiquetas: string[];
 }
 export interface Agente { id: string; userId: string; name: string }
-export interface Contato { id: string; name: string; phone: string; email: string; tagNames: string[] }

@@ -16,22 +16,7 @@ export interface Agendamento {
   profissional: string;
   colaborador: string; // usuário que incluiu o agendamento
   colaboradorId: string;
-  /** A API do Belle não expõe a data de inclusão por agendamento (ver README). */
+  /** Vindos do relatório do BI do Belle (só existem com BELLE_BI_TOKEN). ISO. */
   dataInclusao?: string;
+  dataCadastro?: string;
 }
-
-export interface VendaPlano {
-  id: string;
-  orcamento: number;
-  clienteId: number;
-  cliente: string;
-  unidade: Unit;
-  data: string; // ISO — data da venda
-  valor: number;
-  status: string;
-  plano: string;
-  vendedor: string;
-}
-
-export interface ClienteCadastro { codCliente: number; unidade: string; dtCadastro: string }
-export interface ClienteDetalhe { codCliente: number; cpf: string; celular: string; email: string; nome: string }

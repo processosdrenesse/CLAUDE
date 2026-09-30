@@ -69,19 +69,3 @@ export function Lines({ data, x, series, fmt = fmtInt, height = 280, xFmt }: { d
     </ResponsiveContainer>
   );
 }
-
-export function BarsGrouped({ data, x, series, fmt = fmtInt, height = 300 }: { data: Record<string, any>[]; x: string; series: { key: string; name: string; color: string }[]; fmt?: (n: number) => string; height?: number }) {
-  if (!data.length) return <Empty />;
-  return (
-    <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
-        <CartesianGrid vertical={false} stroke="#f5ebe8" />
-        <XAxis dataKey={x} tick={{ fontSize: 11 }} interval={0} />
-        <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => (fmt === fmtBrl ? compactBrl(v) : fmtInt(v))} />
-        <Tooltip {...tip} formatter={(v, n) => [fmt(Number(v)), n]} cursor={{ fill: "#fdeae6" }} />
-        <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
-        {series.map((s) => <Bar key={s.key} dataKey={s.key} name={s.name} fill={s.color} radius={[6, 6, 0, 0]} />)}
-      </BarChart>
-    </ResponsiveContainer>
-  );
-}

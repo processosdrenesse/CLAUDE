@@ -1,5 +1,5 @@
 import { env } from "./env.ts";
-import { Limiter, requestJson, pool } from "./http.ts";
+import { Limiter, requestJson, pool, UpstreamError } from "./http.ts";
 import { memo } from "./cache.ts";
 import { fmtBr, monthsBetween, parseBr } from "./dates.ts";
 
@@ -34,14 +34,15 @@ export async function units(force = false): Promise<UnitRef[]> {
 
 type Row = Record<string, unknown>;
 
-async function monthly(kind: string, path: string, params: Record<string, string>, dateField: string, from: Date, to: Date, force: boolean) {
+type Month = ReturnType<typeof monthsBetween>[number];
+
+async function monthly(kind: string, fetchMonth: (u: UnitRef, m: Month) => Promise<Row[]>, dateField: string, from: Date, to: Date, force: boolean) {
   const us = await units(force);
   const months = monthsBetween(from, to);
   const jobs = us.flatMap((u) => months.map((m) => ({ u, m })));
   const chunks = await pool(jobs, 1, ({ u, m }) =>
     memo(`belle:${kind}:${u.cod}:${m.key}`, m.current ? 10 * 60_000 : 6 * HOUR, async () => {
-      const rows = await get<Row[]>(path, { ...params, codEstab: u.cod, dtInicio: fmtBr(m.start), dtFim: fmtBr(m.end) });
-      if (!Array.isArray(rows)) throw new Error(`Resposta inesperada de ${path}`);
+      const rows = await fetchMonth(u, m);
       return rows.map((r): Row => ({ ...r, codEstab: u.cod, unidade: u.name }));
     }, force),
   );
@@ -55,61 +56,73 @@ async function monthly(kind: string, path: string, params: Record<string, string
 }
 
 /** relatorios/relatorio_atendimentos — um chamado por unidade/mês (o retorno não traz a unidade). */
-export const agendamentos = (from: Date, to: Date, force = false) =>
-  monthly("ag", "relatorios/relatorio_atendimentos", {}, "dataAgendamento", from, to, force);
+const agendamentosApi = (from: Date, to: Date, force: boolean) =>
+  monthly("ag", async (u, m) => {
+    const rows = await get<Row[]>("relatorios/relatorio_atendimentos", { codEstab: u.cod, dtInicio: fmtBr(m.start), dtFim: fmtBr(m.end) });
+    if (!Array.isArray(rows)) throw new Error("Resposta inesperada de relatorio_atendimentos");
+    return rows;
+  }, "dataAgendamento", from, to, force);
 
-/** venda_planos (tipoPeriodo=DataVenda). */
-export const vendasPlanos = (from: Date, to: Date, force = false) =>
-  monthly("vp", "venda_planos", { tipoPeriodo: "DataVenda" }, "dataVenda", from, to, force);
+// ---- BI do Belle: relatório "Atendimentos Inclusos por Período - Duplicar AGENDA" ----
+// É o único lugar com Data de Inclusão e Data de Cadastro. Exige o token do BI (≠ token de integração).
+const BI_REPORT_ID = 241251330;
+const BI_FILTER = { inclusao: "338681851", agendamento: "338681862" } as const; // ids dos filtros do relatório
+const biLimiter = new Limiter(400);
+const iso3 = (d: Date) => `${d.toISOString().slice(0, 10)}T03:00:00.000Z`;
+const isoToBr = (s: unknown) => (typeof s === "string" && /^\d{4}-\d{2}-\d{2}/.test(s) ? `${s.slice(8, 10)}/${s.slice(5, 7)}/${s.slice(0, 4)}` : "");
 
-/**
- * Clientes cadastrados no intervalo. `clientes?pagina=N` vem ordenado por código e
- * dtCadastro é monotônico ao código, então localizamos a 1ª página por busca binária.
- */
-export async function clientesCadastrados(from: Date, to: Date, force = false) {
-  const us = await units(force);
-  const page = (cod: number, p: number) =>
-    memo(`belle:cli:${cod}:${p}`, 6 * HOUR, () => get<Row[]>("clientes", { pagina: p, codEstab: cod }), force);
-  const iso = (d: Date) => d.toISOString().slice(0, 10);
-  const [a, b] = [iso(from), iso(to)];
-  const out: { codCliente: number; unidade: string; dtCadastro: string }[] = [];
-  for (const u of us) {
-    let hi = 1;
-    while ((await page(u.cod, hi)).length > 0 && hi < 4096) hi *= 2;
-    let lo = 1;
-    hi = Math.min(hi, 4096);
-    while (lo < hi) {
-      const mid = (lo + hi) >> 1;
-      const rows = await page(u.cod, mid);
-      const last = rows.length ? String(rows[rows.length - 1].dtCadastro) : "9999-12-31";
-      if (last < a) lo = mid + 1; else hi = mid;
-    }
-    for (let p = lo; ; p++) {
-      const rows = await page(u.cod, p);
-      if (!rows.length) break;
-      let past = false;
-      for (const r of rows) {
-        const d = String(r.dtCadastro);
-        if (d > b) { past = true; break; }
-        if (d >= a) out.push({ codCliente: Number(r.codigo), unidade: u.name, dtCadastro: d });
-      }
-      if (past) break;
-    }
-  }
-  return out;
+async function biPage(estab: number, m: Month, offset: number, perPage: number) {
+  const emptyFilters = ["338681863", "338681860", "338681859", "338681858", "338681857", "338681855", "338681853", "338681852"].map((id) => ({ id, value: "" }));
+  const body = {
+    reportId: BI_REPORT_ID, sortColumn: "0", sortOrder: 1, recordsPerPage: perPage, estab: String(estab), offsetRecords: offset, ignoreRecords: false,
+    filters: [...emptyFilters, { id: BI_FILTER.inclusao, value: "" },
+      { id: BI_FILTER.agendamento, value: iso3(m.start) }, { id: BI_FILTER.agendamento, value2: iso3(m.end) }, { id: BI_FILTER.agendamento, range: false }],
+  };
+  return requestJson<{ record_count: number; data: unknown[][] }>(`${env.BELLE_BI_URL}/report/build?estabGeral=1`, {
+    source: "belle", limiter: biLimiter, method: "POST", body, headers: { Authorization: env.BELLE_BI_TOKEN, "Content-Type": "text/plain" },
+  });
 }
 
-/** Dados de contato de clientes (cpf, celular, e-mail) para o matching. */
-export async function clientesDetalhe(ids: number[], force = false) {
-  const us = await units();
-  const out = await pool(ids.slice(0, 80), 1, (id) =>
-    memo(`belle:cliente:${id}`, 24 * HOUR, async () => {
-      for (const u of us) {
-        const r = await get<Row[]>("cliente/listar", { id, codEstab: u.cod });
-        if (Array.isArray(r) && r[0]) return { codCliente: id, cpf: r[0].cpf ?? "", celular: r[0].celular ?? "", email: r[0].email ?? "", nome: r[0].nome ?? "" };
-      }
-      return { codCliente: id, cpf: "", celular: "", email: "", nome: "" };
-    }, force),
-  );
-  return out;
+/** Colunas do relatório: ID, Cadastro, Inclusão, Usuário, Cliente("id-nome"), Data agend., Hora, Status, Profissional, Sala, Tipo, Serviço("cod-nome"). */
+async function biMonth(u: UnitRef, m: Month): Promise<Row[]> {
+  const per = 4000, all: unknown[][] = [];
+  for (let off = 0; ; off += per) {
+    const r = await biPage(u.cod, m, off, per);
+    if (!Array.isArray(r.data)) throw new UpstreamError("belle", 502, "Resposta inesperada do BI");
+    all.push(...r.data);
+    if (all.length >= r.record_count || r.data.length === 0) break;
+  }
+  // "Duplicar AGENDA": agendamentos com vários serviços vêm em várias linhas — agrupa por ID
+  const byId = new Map<number, Row>();
+  for (const c of all) {
+    const [id, cad, inc, usuario, cliente, dt, hora, status, prof, , tipo, servico] = c as [number, string, string, string, string, string, string, string, string, unknown, string, string];
+    const cli = /^\s*(\d+)\s*-\s*(.*)$/.exec(cliente ?? ""), sv = /^\s*\d+\s*-\s*(.*)$/.exec(servico ?? "");
+    const nomeServico = (sv ? sv[1] : servico ?? "").trim();
+    const prev = byId.get(id);
+    if (prev) { if (nomeServico && !String(prev.nomeServico).includes(nomeServico)) prev.nomeServico = `${prev.nomeServico} + ${nomeServico}`.replace(/^ \+ /, ""); continue; }
+    byId.set(id, {
+      idAgendamento: id, dataAgendamento: isoToBr(dt), horarioAgendamento: hora ?? "", codigoCliente: cli ? Number(cli[1]) : 0,
+      nomeCliente: cli ? cli[2] : cliente, nomeServico, tipoAgendamento: tipo ?? "", statusAgendamento: status ?? "", nomeProfissional: prof ?? "",
+      nomeUsuarioInclusao: usuario ?? "", usuarioInclusao: "", dataInclusao: isoToBr(inc), dataCadastro: isoToBr(cad),
+    });
+  }
+  return [...byId.values()];
+}
+
+const agendamentosBi = (from: Date, to: Date, force: boolean) => monthly("agbi", biMonth, "dataAgendamento", from, to, force);
+
+/**
+ * Agendamentos: usa o BI (com Data de Inclusão/Cadastro) quando há token; se o token faltar ou for
+ * recusado, cai para a API de integração (sem essas duas datas) e devolve um aviso.
+ */
+export async function agendamentos(from: Date, to: Date, force = false): Promise<{ rows: Row[]; warning?: string }> {
+  if (!env.BELLE_BI_TOKEN) return { rows: await agendamentosApi(from, to, force), warning: "BELLE_BI_TOKEN não configurado: Data de Inclusão e Data de Cadastro indisponíveis." };
+  try {
+    return { rows: await agendamentosBi(from, to, force) };
+  } catch (e) {
+    const status = e instanceof UpstreamError ? e.status : 0;
+    const why = status === 401 || status === 403 ? "token do BI inválido ou expirado" : "falha ao consultar o BI";
+    console.error("[belle:bi]", why, (e as Error).message);
+    return { rows: await agendamentosApi(from, to, force), warning: `Data de Inclusão e Data de Cadastro indisponíveis: ${why}. Atualize BELLE_BI_TOKEN.` };
+  }
 }

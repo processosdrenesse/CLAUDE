@@ -5,7 +5,7 @@ import { FilterCard, DateRangeField, MultiSelect } from "@/components/ui/filters
 import { ChartCard, KpiCard, Loading, Notice, Section, SourceError, Toggle, Card } from "@/components/ui/primitives";
 import { BarsH, BarsV, C, Donut, Lines, STATUS_COLOR } from "@/components/ui/charts";
 import { DataTable, type Col } from "@/components/ui/DataTable";
-import { useAgendamentos, useCadastrados } from "@/hooks/queries";
+import { useAgendamentos } from "@/hooks/queries";
 import { agrupar, emptyAgFilters, ehEquipeOficial, evolucao, filtrarAgendamentos, kpisAgendamentos, opcoes, porStatus, porUnidade, type AgFilters, type Granularidade } from "@/domain/agendamentos";
 import { firstOfMonth, isoToBr, lastOfMonth, ymLabel } from "@/lib/dates";
 import { fmtInt, fmtPct } from "@/lib/format";
@@ -26,12 +26,10 @@ export default function Agendamentos() {
   // A janela de busca no Belle é a Data de Agendamento (ou o mês atual se vazia).
   const from = f.agendamento.from || firstOfMonth(), to = f.agendamento.to || lastOfMonth();
   const q = useAgendamentos(from, to);
-  const cad = useCadastrados(f.cadastro.from, f.cadastro.to);
-  const cadIds = useMemo(() => (f.cadastro.from && f.cadastro.to && cad.data ? new Set(cad.data.map((c) => c.codCliente)) : null), [cad.data, f.cadastro]);
 
   const todos = q.data?.items ?? [];
   const universo = useMemo(() => (soOficial ? todos.filter((a) => ehEquipeOficial(a.colaborador, EQUIPE_OFICIAL)) : todos), [todos, soOficial]);
-  const linhas = useMemo(() => filtrarAgendamentos(universo, { ...f, agendamento: { from, to } }, cadIds), [universo, f, cadIds, from, to]);
+  const linhas = useMemo(() => filtrarAgendamentos(universo, { ...f, agendamento: { from, to } }), [universo, f, from, to]);
 
   const k = useMemo(() => kpisAgendamentos(linhas), [linhas]);
   const porColab = useMemo(() => agrupar(linhas, (a) => a.colaborador, "taxa"), [linhas]);
@@ -42,7 +40,9 @@ export default function Agendamentos() {
   const servicos = useMemo(() => agrupar(linhas, (a) => a.servico).slice(0, 10).reverse(), [linhas]);
 
   const opt = (pick: (a: Agendamento) => string) => opcoes(universo, pick);
-  const inputsBloqueados = cad.isLoading && !!f.cadastro.from && !!f.cadastro.to;
+  // Inclusão e Cadastro vêm do BI do Belle; sem o token do BI ficam indisponíveis (nunca substituídas por outra data)
+  const temDatasBi = todos.some((a) => a.dataInclusao || a.dataCadastro);
+  const semBi = q.data?.warning ?? "Data indisponível na API do Belle.";
 
   const colsUnidade: Col<(typeof unidades)[number]>[] = [
     { key: "u", header: "Unidade", value: (r) => r.nome },
@@ -61,6 +61,8 @@ export default function Agendamentos() {
   const colsDet: Col<Agendamento>[] = [
     { key: "id", header: "ID", value: (r) => r.id },
     { key: "d", header: "Data agend.", value: (r) => r.data, render: (r) => `${isoToBr(r.data)} ${r.hora}` },
+    { key: "di", header: "Data de inclusão", value: (r) => r.dataInclusao ?? "", render: (r) => isoToBr(r.dataInclusao ?? "") },
+    { key: "dc", header: "Data de cadastro", value: (r) => r.dataCadastro ?? "", render: (r) => isoToBr(r.dataCadastro ?? "") },
     { key: "c", header: "Cliente", value: (r) => `${r.clienteId} - ${r.cliente}` },
     { key: "u", header: "Unidade", value: (r) => r.unidade },
     { key: "col", header: "Colaborador", value: (r) => r.colaborador },
@@ -76,9 +78,8 @@ export default function Agendamentos() {
         actions={<Toggle checked={f.removerDuplicidades} onChange={(v) => set("removerDuplicidades", v)} label="Remover duplicidades" tip={DEDUPE_TIP} />} />
 
       <FilterCard onClear={() => { setF(defaults()); setSoOficial(true); }}>
-        <DateRangeField label="Data de Cadastro" value={f.cadastro} onChange={(v) => set("cadastro", v)} disabled={inputsBloqueados}
-          hint={cad.isLoading ? "Localizando cadastros no Belle..." : undefined} />
-        <DateRangeField label="Data de Inclusão" value={f.inclusao} onChange={(v) => set("inclusao", v)} disabled hint="Indisponível: a API do Belle não expõe a data de inclusão do agendamento." />
+        <DateRangeField label="Data de Cadastro" value={f.cadastro} onChange={(v) => set("cadastro", v)} disabled={!temDatasBi} hint={temDatasBi ? "Data de cadastro do cliente (BI do Belle)" : semBi} />
+        <DateRangeField label="Data de Inclusão" value={f.inclusao} onChange={(v) => set("inclusao", v)} disabled={!temDatasBi} hint={temDatasBi ? "Data de inclusão do agendamento (BI do Belle)" : semBi} />
         <DateRangeField label="Data de Agendamento" value={f.agendamento} onChange={(v) => set("agendamento", v)} />
         <MultiSelect label="Colaborador" options={opt((a) => a.colaborador)} value={f.colaborador} onChange={(v) => set("colaborador", v)} />
         <MultiSelect label="Unidade" options={[...UNITS]} value={f.unidade} onChange={(v) => set("unidade", v)} />
@@ -93,7 +94,7 @@ export default function Agendamentos() {
 
       {q.isLoading && <Loading label="Buscando agendamentos no Belle (4 unidades)..." />}
       {q.error && <SourceError error={q.error} onRetry={() => q.refetch()} />}
-      {cad.error && <SourceError error={cad.error} onRetry={() => cad.refetch()} />}
+      {q.data?.warning && <Notice>{q.data.warning}</Notice>}
 
       {q.data && (
         <>

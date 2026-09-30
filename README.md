@@ -1,15 +1,15 @@
 # Drenesse — Dashboard de Performance (Belle × Lever)
 
-Dashboard executivo que **não usa mais Google Sheets**: operação vem da API do **Belle** e o comercial da API do **Lever**; o dashboard é a camada de análise e **conciliação** entre os dois.
+Dashboard executivo que **não usa mais Google Sheets**: operação vem do **Belle** (API de integração + relatório do BI) e o comercial da API do **Lever**.
 
 ## Rodar
 
 ```bash
-cp .env.example .env      # preencher BELLE_API_TOKEN e LEVER_API_TOKEN (só no servidor)
+cp .env.example .env      # preencher BELLE_API_TOKEN, LEVER_API_TOKEN e (opcional) BELLE_BI_TOKEN — só no servidor
 npm install
 npm run dev               # API em :8787 + Vite em :5173
 npm run build && npm start   # produção: tudo em :8787
-npm test                  # regras de negócio (filtros, duplicidades, conciliação)
+npm test                  # regras de negócio (filtros, datas, duplicidades, funil)
 ```
 
 ## Arquitetura
@@ -26,21 +26,19 @@ src/services (normalização) → src/domain (regras/indicadores) → src/pages 
 
 ## Endpoints usados
 
-**Belle** (`Authorization: <token>`, 40 req/min): `estabelecimento` (unidades), `relatorios/relatorio_atendimentos` (1 chamada por unidade × mês — a resposta não traz a unidade), `venda_planos?tipoPeriodo=DataVenda`, `clientes?pagina` (Data de Cadastro, busca binária pois é ordenado por código), `cliente/listar` (CPF/telefone/e-mail p/ matching).
+**Belle** (`Authorization: <token>`, 40 req/min): `estabelecimento` (unidades), `relatorios/relatorio_atendimentos` (fallback; 1 chamada por unidade × mês — a resposta não traz a unidade), `BI/v1.0/report/build` (opcional, relatório 241251330: Data de Inclusão e Data de Cadastro; unidade via `estab`, paginado por `offsetRecords`, mesmo ID de agendamento da API).
 
-**Lever** (`Authorization: Bearer`): o Lever não publica documentação; as rotas foram lidas do próprio app web. `crm/v1/panel` (funis; `?includeDetails=Steps|Tags`), `crm/v1/panel/card?panelId&pageNumber&pageSize=100&includeDetails=CustomFields` (⚠ paginar com **`pageNumber`** — `page` é ignorado), `core/v1/agent`, `core/v1/contact/{id}`.
+**Lever** (`Authorization: Bearer`): o Lever não publica documentação; as rotas foram lidas do próprio app web. `crm/v1/panel` (funis; `?includeDetails=Steps|Tags`), `crm/v1/panel/card?panelId&pageNumber&pageSize=100&includeDetails=CustomFields` (⚠ paginar com **`pageNumber`** — `page` é ignorado), `core/v1/agent`.
 
 ## Regras de negócio
 
 - **Data de Agendamento** dentro do período torna o registro elegível (inclusão 18/09, agendamento 22/09, filtro 21–26/09 ⇒ incluído). Datas inclusivas até 23:59:59.
 - **Remover duplicidades**: um cliente por mês; havendo "Atendido", prevalece o mais recente atendido; senão o mais recente. `idAgendamento` é a chave estrutural.
 - **Funil** e **faturamento Lever**: só Lever. Venda = fases *Convertidos*, *Convertidos avulsos* e (Reativação) *Reativados com venda* (`src/config/areas.ts`). Duplicados não contam como lead.
-- **Belle × Lever**: matching por ID → CPF → telefone → e-mail → nome+unidade → nome+data; ambíguos = "Correspondência para revisão". Status: Conciliado, Somente Belle/Lever, Divergência de valor/data/unidade.
-- Vendas de plano com valor R$ 0 (cortesias) ficam fora da conciliação.
 
 ## Limitações conhecidas
 
-1. **Data de Inclusão** não existe na API do Belle (só está no relatório do BI). Investigado: nenhum endpoint documentado de agendamento traz o campo; `cliente/{id}/auditar` é log por cliente (1 chamada por cliente, limite de 40/min) e falhou no teste; `atendimentos_detalhado` retorna sem permissão. Nenhuma data substituta é usada: o filtro fica desabilitado até o Belle expor o campo (`Agendamento.dataInclusao`).
+1. **Data de Inclusão / Data de Cadastro** só existem no relatório do BI do Belle ("Atendimentos Inclusos por Período - Duplicar AGENDA"), que exige o **`BELLE_BI_TOKEN`** (o token de integração recebe 401 nesse endpoint). Sem o token, ou se ele expirar, a tela mostra um aviso, os dois filtros ficam desabilitados e os agendamentos vêm da API de integração — nenhuma data substituta é usada.
 2. **Data de Fechamento no Lever** = última movimentação do card (`updatedAt`). Investigado: o histórico do card (`track-log`) e a auditoria (`core/v1/audit`) retornam 404/403 com a chave de integração, e não há campo de data de fechamento no card (só o mês, em "Mês de Fechamento"). O filtro está rotulado explicitamente na tela.
 3. Parcerias = cards do funil SDRs, recortados pelo filtro de Etiquetas (as 24 etiquetas do painel, como no Lever).
 4. Equipe oficial de agendamento em `src/config/areas.ts` (`EQUIPE_OFICIAL`).
@@ -48,7 +46,7 @@ src/services (normalização) → src/domain (regras/indicadores) → src/pages 
 ## Publicar na Vercel
 
 1. Vercel → **Add New → Project** → importe o repositório `processosdrenesse/CLAUDE` (branch `claude/bold-feynman-5l91wk`). O `vercel.json` já configura build, frontend (`dist`) e a API (`api/index.ts`, `maxDuration` 300 s).
-2. Em **Environment Variables** cadastre (Production): `BELLE_API_TOKEN`, `LEVER_API_TOKEN` e **`DASHBOARD_PASSWORD`** (as URLs já têm padrão). Depois faça **Redeploy** — variáveis novas só valem em um novo deploy. Confira em `/api/config`.
+2. Em **Environment Variables** cadastre (Production): `BELLE_API_TOKEN`, `LEVER_API_TOKEN`, `BELLE_BI_TOKEN` e **`DASHBOARD_PASSWORD`** (as URLs já têm padrão). Depois faça **Redeploy** — variáveis novas só valem em um novo deploy. Confira em `/api/config`.
 3. Deploy. Ao abrir, o navegador pede usuário (qualquer) e a senha.
 
 Atenção: em serverless o cache é por instância; a 1ª carga de cada página pode levar dezenas de segundos e há limite de tempo por função conforme o plano da Vercel.
@@ -61,5 +59,5 @@ Atenção: em serverless o cache é por instância; a 1ª carga de cada página 
 | Data de Avaliação | campo manual do card (`data-avalia-o` no SDR, `data-de-avalia-o-*` nos demais) | leads sem o campo ficam fora do filtro e a tela avisa quantos |
 | Data de Fechamento | `updatedAt` do card em fase de venda | rotulada como "última movimentação" |
 
-**Faturamento Comercial** usa somente o Lever. A conciliação Belle × Lever continua disponível (fora do menu) em `/conciliacao-belle-lever`.
+**Faturamento Comercial** usa somente o Lever (a conciliação Belle × Lever foi removida).
 **Taxa de conversão** = convertidos ÷ leads válidos (sem duplicados) nos mesmos filtros, exceto Data de Fechamento e Situação; a tela mostra a quantidade e a base.

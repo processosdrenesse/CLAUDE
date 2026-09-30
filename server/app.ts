@@ -23,10 +23,13 @@ if (process.env.DASHBOARD_PASSWORD) {
 app.use(compression());
 app.use(express.json({ limit: "1mb" }));
 
+/** O handler devolve os dados ou { data, warning } (aviso não-fatal exibido na tela). */
 type H = (req: express.Request) => Promise<unknown>;
 const wrap = (source: "belle" | "lever", fn: H): express.RequestHandler => async (req, res) => {
   try {
-    res.json({ data: await fn(req), fetchedAt: new Date().toISOString(), epoch: cacheEpoch() });
+    const out = (await fn(req)) as { __warn?: true; data?: unknown; warning?: string } | unknown;
+    const w = out && typeof out === "object" && (out as { __warn?: true }).__warn ? (out as { data: unknown; warning?: string }) : null;
+    res.json({ data: w ? w.data : out, warning: w?.warning, fetchedAt: new Date().toISOString(), epoch: cacheEpoch() });
   } catch (e) {
     const err = e instanceof UpstreamError ? e : new UpstreamError(source, 500, String((e as Error).message ?? e));
     console.error(`[${source}]`, err.status, err.message);
@@ -48,16 +51,15 @@ app.get("/api/config", (_q, r) => r.json(configStatus()));
 app.post("/api/refresh", (_q, r) => { clearCache(); r.json({ ok: true, epoch: cacheEpoch() }); });
 
 app.get("/api/belle/units", wrap("belle", (q) => belle.units(force(q))));
-app.get("/api/belle/agendamentos", wrap("belle", (q) => belle.agendamentos(...range(q), force(q))));
-app.get("/api/belle/vendas-planos", wrap("belle", (q) => belle.vendasPlanos(...range(q), force(q))));
-app.get("/api/belle/clientes-cadastrados", wrap("belle", (q) => belle.clientesCadastrados(...range(q), force(q))));
-app.post("/api/belle/clientes-detalhe", wrap("belle", (q) => belle.clientesDetalhe((q.body.ids ?? []).map(Number))));
+app.get("/api/belle/agendamentos", wrap("belle", async (q) => {
+  const { rows, warning } = await belle.agendamentos(...range(q), force(q));
+  return { __warn: true, data: rows, warning };
+}));
 
 app.get("/api/lever/panels", wrap("lever", (q) => lever.panels(force(q))));
 app.get("/api/lever/panels/:id", wrap("lever", (q) => lever.panelDetail(String(q.params.id), force(q))));
 app.get("/api/lever/panels/:id/cards", wrap("lever", (q) => lever.cards(String(q.params.id), force(q))));
 app.get("/api/lever/agents", wrap("lever", (q) => lever.agents(force(q))));
-app.post("/api/lever/contacts", wrap("lever", (q) => lever.contacts(q.body.ids ?? [])));
 
 // Serve o frontend compilado (npm run build) quando existir — funciona igual no Windows/Mac/Linux.
 const dist = path.resolve("dist");

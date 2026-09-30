@@ -1,8 +1,7 @@
 import { brToIso } from "@/lib/dates";
-import { parseBrMoney } from "@/lib/format";
 import { normText } from "@/lib/text";
 import { normalizeUnit } from "@/lib/units";
-import type { Agendamento, StatusNorm, VendaPlano } from "./types";
+import type { Agendamento, StatusNorm } from "./types";
 
 type Raw = Record<string, any>;
 
@@ -33,24 +32,7 @@ export function normalizeAgendamento(r: Raw): Agendamento | null {
     profissional: String(r.nomeProfissional ?? "").trim(),
     colaborador: String(r.nomeUsuarioInclusao ?? "").trim() || "Não informado",
     colaboradorId: String(r.usuarioInclusao ?? ""),
-  };
-}
-
-export function normalizeVenda(r: Raw): VendaPlano | null {
-  const unidade = normalizeUnit(r.unidade);
-  const data = brToIso(r.dataVenda);
-  const m = /^\s*(\d+)\s*-\s*(.*)$/.exec(String(r.cliente ?? ""));
-  if (!unidade || !data) return null;
-  return {
-    id: String(r.idVenda),
-    orcamento: Number(r.codOrcamento),
-    clienteId: m ? Number(m[1]) : 0,
-    cliente: (m ? m[2] : String(r.cliente ?? "")).trim(),
-    unidade,
-    data,
-    valor: parseBrMoney(r.precoFinal),
-    status: String(r.statusPlano ?? "").trim(),
-    plano: String(r.nomePlano ?? "").trim(),
-    vendedor: String(r.vendedor ?? "").trim(),
+    dataInclusao: brToIso(r.dataInclusao) || undefined,
+    dataCadastro: brToIso(r.dataCadastro) || undefined,
   };
 }

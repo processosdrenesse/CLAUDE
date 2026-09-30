@@ -24,6 +24,3 @@ export const EQUIPE_OFICIAL = [
   "Maria Leanne Lopes Alves",
   "Thayane Luiza de Freitas Fernandes",
 ];
-
-/** Vendas aprovadas contam no faturamento do Belle. */
-export const STATUS_VENDA_VALIDA = ["aprovado"];

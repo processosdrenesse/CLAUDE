@@ -67,11 +67,3 @@ export const agents = (force = false) =>
     const list = await req<Any[]>("core/v1/agent", { params: { pageSize: 100 } });
     return list.map((a) => ({ id: a.id, userId: a.userId, name: a.name, email: a.email }));
   }, force);
-
-export const contacts = (ids: string[], force = false) =>
-  pool(ids.slice(0, 120), 6, (id) =>
-    memo(`lever:contact:${id}`, 12 * 60 * MIN, async () => {
-      const c = await req<Any>(`core/v1/contact/${id}`);
-      return { id: c.id, name: c.name, phone: c.phoneNumberFormatted ?? "", email: c.email ?? "", tagNames: c.tagNames ?? [] };
-    }, force).catch(() => ({ id, name: "", phone: "", email: "", tagNames: [] as string[] })),
-  );

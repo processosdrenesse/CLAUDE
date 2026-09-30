@@ -5,7 +5,7 @@ export class ApiError extends Error {
     return this.source === "belle" ? "Não foi possível atualizar os dados do Belle." : "Não foi possível atualizar os dados do Lever.";
   }
 }
-export interface Envelope<T> { data: T; fetchedAt: string; epoch: number }
+export interface Envelope<T> { data: T; fetchedAt: string; epoch: number; warning?: string }
 
 export async function api<T>(source: Source, path: string, body?: unknown): Promise<Envelope<T>> {
   let res: Response;
