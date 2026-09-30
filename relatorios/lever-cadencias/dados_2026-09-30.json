@@ -1,0 +1,3200 @@
+{
+ "coletado_em": "2026-09-30",
+ "fonte": "Lever API /chat/v1/sequence (includeDetails=Steps,StepsExecutionStats,StepsTemplates,ExecutionStats)",
+ "sequencias": [
+  {
+   "name": "Agendados / REATIV 7853",
+   "steps": 1,
+   "executing": 0,
+   "stats": {
+    "executionCount": 168,
+    "executionReadCount": 154,
+    "executionInteractionCount": 99,
+    "executionReadRate": 0.9166667,
+    "executionInteractionRate": 0.58928573
+   },
+   "updated": "2026-07-02"
+  },
+  {
+   "name": "Cadência Eventos- Social Selling- 7853",
+   "steps": 10,
+   "executing": 0,
+   "stats": {
+    "executionCount": 696,
+    "executionReadCount": 382,
+    "executionInteractionCount": 42,
+    "executionReadRate": 0.5488506,
+    "executionInteractionRate": 0.060344826
+   },
+   "updated": "2026-06-25"
+  },
+  {
+   "name": "Contato / SERVIÇOS AVULSOS 5852",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-17"
+  },
+  {
+   "name": "Contato / SERVIÇOS AVULSOS 7853",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 3,
+    "executionReadCount": 3,
+    "executionInteractionCount": 1,
+    "executionReadRate": 1,
+    "executionInteractionRate": 0.33333334
+   },
+   "updated": "2026-08-17"
+  },
+  {
+   "name": "Convertidos Avulsos 1727",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-10"
+  },
+  {
+   "name": "Convetidos Avulsos- 7853",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-10"
+  },
+  {
+   "name": "Falhou / REATIV 7853",
+   "steps": 1,
+   "executing": 2,
+   "stats": {
+    "executionCount": 62,
+    "executionReadCount": 43,
+    "executionInteractionCount": 19,
+    "executionReadRate": 0.6935484,
+    "executionInteractionRate": 0.30645162
+   },
+   "updated": "2026-07-02"
+  },
+  {
+   "name": "Falhou / SERVIÇOS AVULSOS 5852",
+   "steps": 2,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-17"
+  },
+  {
+   "name": "Falhou / SERVIÇOS AVULSOS 7853",
+   "steps": 2,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-25"
+  },
+  {
+   "name": "Faltou AV| SDR 1727",
+   "steps": 4,
+   "executing": 5,
+   "stats": {
+    "executionCount": 487,
+    "executionReadCount": 254,
+    "executionInteractionCount": 60,
+    "executionReadRate": 0.52156055,
+    "executionInteractionRate": 0.123203285
+   },
+   "updated": "2026-08-17"
+  },
+  {
+   "name": "Faltou AV| SDR 6554",
+   "steps": 4,
+   "executing": 0,
+   "stats": {
+    "executionCount": 75,
+    "executionReadCount": 75,
+    "executionInteractionCount": 9,
+    "executionReadRate": 1,
+    "executionInteractionRate": 0.12
+   },
+   "updated": "2026-05-15"
+  },
+  {
+   "name": "Faltou AV| SDR 7853",
+   "steps": 4,
+   "executing": 27,
+   "stats": {
+    "executionCount": 2419,
+    "executionReadCount": 1786,
+    "executionInteractionCount": 298,
+    "executionReadRate": 0.7383216,
+    "executionInteractionRate": 0.1231914
+   },
+   "updated": "2026-08-25"
+  },
+  {
+   "name": "Faltou AV / Social Selling 7853",
+   "steps": 4,
+   "executing": 2,
+   "stats": {
+    "executionCount": 21,
+    "executionReadCount": 13,
+    "executionInteractionCount": 1,
+    "executionReadRate": 0.61904764,
+    "executionInteractionRate": 0.04761905
+   },
+   "updated": "2026-08-20"
+  },
+  {
+   "name": "gvgrvr",
+   "steps": 0,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-05-13"
+  },
+  {
+   "name": "Leads frios| SDR 1727",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-17"
+  },
+  {
+   "name": "Leads frios| SDR 6554",
+   "steps": 10,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-05-26"
+  },
+  {
+   "name": "Leads frios| SDR 7853",
+   "steps": 3,
+   "executing": 1,
+   "stats": {
+    "executionCount": 19931,
+    "executionReadCount": 10745,
+    "executionInteractionCount": 681,
+    "executionReadRate": 0.53910995,
+    "executionInteractionRate": 0.03416788
+   },
+   "updated": "2026-08-25"
+  },
+  {
+   "name": "Leads Frios / SERVIÇOS AVULSOS 5852",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-17"
+  },
+  {
+   "name": "Leads Frios / SERVIÇOS AVULSOS 7853",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-17"
+  },
+  {
+   "name": "Leads Frios / Social Selling",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-20"
+  },
+  {
+   "name": "Negociação| SDR 1727",
+   "steps": 3,
+   "executing": 5,
+   "stats": {
+    "executionCount": 246,
+    "executionReadCount": 115,
+    "executionInteractionCount": 34,
+    "executionReadRate": 0.46747968,
+    "executionInteractionRate": 0.13821138
+   },
+   "updated": "2026-09-10"
+  },
+  {
+   "name": "Negociação| SDR 6554",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 41,
+    "executionReadCount": 41,
+    "executionInteractionCount": 4,
+    "executionReadRate": 1,
+    "executionInteractionRate": 0.09756097
+   },
+   "updated": "2026-05-15"
+  },
+  {
+   "name": "Negociação| SDR 7853",
+   "steps": 3,
+   "executing": 52,
+   "stats": {
+    "executionCount": 1359,
+    "executionReadCount": 904,
+    "executionInteractionCount": 169,
+    "executionReadRate": 0.665195,
+    "executionInteractionRate": 0.12435614
+   },
+   "updated": "2026-09-10"
+  },
+  {
+   "name": "Negociação / SERVIÇOS AVULSOS 7853",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 9,
+    "executionReadCount": 8,
+    "executionInteractionCount": 4,
+    "executionReadRate": 0.8888889,
+    "executionInteractionRate": 0.44444445
+   },
+   "updated": "2026-08-17"
+  },
+  {
+   "name": "Negociação / SERVIÇOS AVULSOS AVULSOS 5852",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-17"
+  },
+  {
+   "name": "Negociação / Social Selling 7853",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 21,
+    "executionReadCount": 11,
+    "executionInteractionCount": 3,
+    "executionReadRate": 0.52380955,
+    "executionInteractionRate": 0.14285715
+   },
+   "updated": "2026-08-20"
+  },
+  {
+   "name": "Pre agendados / SERVIÇOS AVULSOS 5852",
+   "steps": 2,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-19"
+  },
+  {
+   "name": "Pre agendados / SERVIÇOS AVULSOS 7853",
+   "steps": 2,
+   "executing": 0,
+   "stats": {
+    "executionCount": 7,
+    "executionReadCount": 3,
+    "executionInteractionCount": 1,
+    "executionReadRate": 0.42857143,
+    "executionInteractionRate": 0.14285715
+   },
+   "updated": "2026-08-19"
+  },
+  {
+   "name": "Pré AV SDR 1727",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 202,
+    "executionReadCount": 147,
+    "executionInteractionCount": 34,
+    "executionReadRate": 0.72772276,
+    "executionInteractionRate": 0.16831683
+   },
+   "updated": "2026-09-15"
+  },
+  {
+   "name": "Pré AV SDR 6554",
+   "steps": 4,
+   "executing": 0,
+   "stats": {
+    "executionCount": 37,
+    "executionReadCount": 37,
+    "executionInteractionCount": 6,
+    "executionReadRate": 1,
+    "executionInteractionRate": 0.16216215
+   },
+   "updated": "2026-06-12"
+  },
+  {
+   "name": "Pré AV SDR 7853",
+   "steps": 4,
+   "executing": 6,
+   "stats": {
+    "executionCount": 1371,
+    "executionReadCount": 1247,
+    "executionInteractionCount": 470,
+    "executionReadRate": 0.9095551,
+    "executionInteractionRate": 0.34281546
+   },
+   "updated": "2026-09-15"
+  },
+  {
+   "name": "Pré AV / Social Selling 7853",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 17,
+    "executionReadCount": 17,
+    "executionInteractionCount": 11,
+    "executionReadRate": 1,
+    "executionInteractionRate": 0.64705884
+   },
+   "updated": "2026-08-20"
+  },
+  {
+   "name": "Re-Contato",
+   "steps": 0,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-03-18"
+  },
+  {
+   "name": "Sem resposta / REATIV 7853",
+   "steps": 2,
+   "executing": 155,
+   "stats": {
+    "executionCount": 6196,
+    "executionReadCount": 3971,
+    "executionInteractionCount": 980,
+    "executionReadRate": 0.64089733,
+    "executionInteractionRate": 0.15816656
+   },
+   "updated": "2026-08-17"
+  },
+  {
+   "name": "Sem resposta | SDR 1727",
+   "steps": 5,
+   "executing": 31,
+   "stats": {
+    "executionCount": 405,
+    "executionReadCount": 154,
+    "executionInteractionCount": 31,
+    "executionReadRate": 0.3802469,
+    "executionInteractionRate": 0.07654321
+   },
+   "updated": "2026-08-17"
+  },
+  {
+   "name": "Sem resposta | SDR 6554",
+   "steps": 5,
+   "executing": 0,
+   "stats": {
+    "executionCount": 117,
+    "executionReadCount": 117,
+    "executionInteractionCount": 8,
+    "executionReadRate": 1,
+    "executionInteractionRate": 0.06837607
+   },
+   "updated": "2026-06-03"
+  },
+  {
+   "name": "Sem resposta | SDR 7853",
+   "steps": 4,
+   "executing": 628,
+   "stats": {
+    "executionCount": 26879,
+    "executionReadCount": 20101,
+    "executionInteractionCount": 2312,
+    "executionReadRate": 0.7478329,
+    "executionInteractionRate": 0.086015105
+   },
+   "updated": "2026-08-25"
+  },
+  {
+   "name": "Sem resposta / SERVIÇOS AVULSOS 5852",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-25"
+  },
+  {
+   "name": "Sem resposta / SERVIÇOS AVULSOS 7853",
+   "steps": 3,
+   "executing": 0,
+   "stats": {
+    "executionCount": 3,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-25"
+  },
+  {
+   "name": "Sem resposta / Social Selling 7853",
+   "steps": 4,
+   "executing": 8,
+   "stats": {
+    "executionCount": 24,
+    "executionReadCount": 20,
+    "executionInteractionCount": 2,
+    "executionReadRate": 0.8333333,
+    "executionInteractionRate": 0.083333336
+   },
+   "updated": "2026-08-20"
+  },
+  {
+   "name": "teste",
+   "steps": 0,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-05-26"
+  },
+  {
+   "name": "teste",
+   "steps": 0,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-08-18"
+  },
+  {
+   "name": "teste",
+   "steps": 0,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-09-02"
+  },
+  {
+   "name": "x",
+   "steps": 0,
+   "executing": 0,
+   "stats": {
+    "executionCount": 0,
+    "executionReadCount": 0,
+    "executionInteractionCount": 0,
+    "executionReadRate": 0,
+    "executionInteractionRate": 0
+   },
+   "updated": "2026-09-30"
+  }
+ ],
+ "passos": [
+  {
+   "seq": "Agendados / REATIV 7853",
+   "stage": "Pré AV",
+   "origem": "Reativação",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 168,
+   "rd": 154,
+   "it": 99,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "Teste Agendados [Mensagem de utilidade]",
+   "text": "Olá, [Nome]. Confirmamos que o seu horário de atendimento está reservado na Drenesse.\n\nOrientações importantes: Recomenda-se aumentar a ingestão de água antes e após o procedimento para otimização dos resultados.",
+   "created": "2026-05-28T16:10:16.991846Z",
+   "updated": "2026-07-02T13:06:27.83177Z"
+  },
+  {
+   "seq": "Cadência Eventos- Social Selling- 7853",
+   "stage": "Eventos",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "CADENCIA EVENTO 1",
+   "text": "Oi, [NOME]! 😊\n\nVocê esteve no evento VIVER e selecionamos apenas 10 pessoas para presentear com um *Glow Up Premium Drenesse* ✨\n\nÉ uma *experiência exclusiva* para você conhecer nosso método e sentir o resultado já na primeira sessão.\n\nTenho poucos horários disponíveis nos próximos dias.\n\nVocê prefere vir hoje ou amanhã?",
+   "created": "2026-06-17T15:28:27.486523Z",
+   "updated": "2026-06-25T11:48:57.406833Z"
+  },
+  {
+   "seq": "Cadência Eventos- Social Selling- 7853",
+   "stage": "Eventos",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    23,
+    "HOURS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "CADENCIA EVENTO 2",
+   "text": "Oi, [NOME]! 💖\nVi que ainda não consegui falar com você. Agora só restam 5 vagas, teria interesse?",
+   "created": "2026-06-17T15:28:27.474071Z",
+   "updated": "2026-06-25T11:48:57.393941Z"
+  },
+  {
+   "seq": "Cadência Eventos- Social Selling- 7853",
+   "stage": "Eventos",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    22,
+    "HOURS"
+   ],
+   "ex": 94,
+   "rd": 59,
+   "it": 10,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Cadencia evento 3",
+   "text": "Oii [NOME], passando para te avisar uma coisa importante 👇\n\nComo recebemos muitos cadastros nas nossas ações presenciais, as sessões experimentais possuem *quantidade limitada*.\n\nAinda tenho disponibilidade para você, mas não consigo garantir pelos próximos dias.\n\nQuer que eu reserve uma vaga sem compromisso?",
+   "created": "2026-06-17T15:28:27.462178Z",
+   "updated": "2026-06-25T11:48:57.381028Z"
+  },
+  {
+   "seq": "Cadência Eventos- Social Selling- 7853",
+   "stage": "Eventos",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 4,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 69,
+   "rd": 47,
+   "it": 3,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Cadencia evento 4",
+   "text": "Uma curiosidade [NOME]😊\nGrande parte das clientes que conheceram a Drenesse através das nossas ações presenciais acabaram retornando após ver o *resultado da primeira sessão*.\nSeu benefício continua disponível.\nQuer que eu veja os horários livres para esta semana?",
+   "created": "2026-06-17T15:28:27.443536Z",
+   "updated": "2026-06-25T11:48:57.367658Z"
+  },
+  {
+   "seq": "Cadência Eventos- Social Selling- 7853",
+   "stage": "Eventos",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 5,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 90,
+   "rd": 51,
+   "it": 4,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Cadencia evento 5",
+   "text": "Oi, [NOME]! 💖\nMuitas pessoas acabam deixando para depois porque acreditam que a sessão demora muito ou exige algum compromisso.\nNa verdade, é uma oportunidade para você conhecer o método, entender seu caso e avaliar se faz sentido para você.\nPosso te mostrar as opções de horário?",
+   "created": "2026-06-17T15:32:57.187152Z",
+   "updated": "2026-06-25T11:48:57.354717Z"
+  },
+  {
+   "seq": "Cadência Eventos- Social Selling- 7853",
+   "stage": "Eventos",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 6,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 75,
+   "rd": 45,
+   "it": 7,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Cadencia evento 6",
+   "text": "⚠️ [NOME], seu benefício está próximo do prazo final. Posso te enviar um áudio explicando?",
+   "created": "2026-06-17T15:32:57.169631Z",
+   "updated": "2026-06-25T11:48:57.341809Z"
+  },
+  {
+   "seq": "Cadência Eventos- Social Selling- 7853",
+   "stage": "Eventos",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 7,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 92,
+   "rd": 48,
+   "it": 8,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Cadencia evento 7",
+   "text": "Oi, [NOME]!\nTentei contato porque não queria que você perdesse a oportunidade que recebeu.\nSe ainda tiver interesse, me responde apenas com:\n1️⃣ Tenho interesse\n2️⃣ Não tenho interesse no momento\nAssim consigo te ajudar da melhor forma 😊",
+   "created": "2026-06-17T15:32:57.153205Z",
+   "updated": "2026-06-25T11:48:57.329235Z"
+  },
+  {
+   "seq": "Cadência Eventos- Social Selling- 7853",
+   "stage": "Eventos",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 8,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 93,
+   "rd": 46,
+   "it": 2,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Cadencia evento 8",
+   "text": "Posso te fazer uma pergunta [NOME]? \nDependendo da sua resposta consigo te orientar melhor.\nO que mais te incomoda hoje?",
+   "created": "2026-06-17T15:32:57.136494Z",
+   "updated": "2026-06-25T11:48:57.31662Z"
+  },
+  {
+   "seq": "Cadência Eventos- Social Selling- 7853",
+   "stage": "Eventos",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 9,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 92,
+   "rd": 44,
+   "it": 3,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Cadencia evento 9",
+   "text": "Oii [NOME], estou finalizando a lista de pessoas que receberam essa oportunidade.\nSeu cadastro ainda está ativo, mas provavelmente não conseguirei manter a reserva por muito mais tempo.\nQuer aproveitar antes do encerramento?",
+   "created": "2026-06-17T15:32:57.119722Z",
+   "updated": "2026-06-25T11:48:57.301849Z"
+  },
+  {
+   "seq": "Cadência Eventos- Social Selling- 7853",
+   "stage": "Eventos",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 10,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 91,
+   "rd": 42,
+   "it": 5,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Cadencia evento dia 10",
+   "text": "Oi, [NOME]!\nComo não tivemos retorno, vou encerrar seu atendimento por enquanto.\nCaso queira utilizar *sua sessão experimental* futuramente, basta me enviar uma mensagem por aqui que verificamos a disponibilidade vigente.\nFoi um prazer falar com você 💖",
+   "created": "2026-06-17T15:32:57.103417Z",
+   "updated": "2026-06-25T11:48:57.281321Z"
+  },
+  {
+   "seq": "Contato / SERVIÇOS AVULSOS 5852",
+   "stage": "Outros",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Leads avulsos - 1 Contato - cadencia",
+   "text": "Oii, [NOME], como você está? Fiquei curiosa para saber o que você achou do seu procedimento na Drenesse? 👀",
+   "created": "2026-08-14T14:22:24.259997Z",
+   "updated": "2026-08-17T15:39:08.523383Z"
+  },
+  {
+   "seq": "Contato / SERVIÇOS AVULSOS 5852",
+   "stage": "Outros",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 2,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "IMAGE",
+   "tname": "Leads avulsos - 2 Contato - cadencia",
+   "text": "Oii [NOME] ❤️\n\nSeparei uma condição especial pra você continuar se cuidando: sessão de Drenagem por apenas R$92,90 + Spa Face de brinde! ✨\n\nComo prefere? PIX ou no Cartão??",
+   "created": "2026-08-14T14:22:24.247569Z",
+   "updated": "2026-08-17T15:39:08.506638Z"
+  },
+  {
+   "seq": "Contato / SERVIÇOS AVULSOS 5852",
+   "stage": "Outros",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 3,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Leads Avulsos - 3 contato - cadencia",
+   "text": "Psiu, [NOME]! 👀 Sabia que a Drenesse tem muito mais procedimentos além do que você já conhece?\n\nTemos protocolos de Laser, Limpeza de Pele, Drenagem e outros — e essa semana estão com até 30% de desconto! ✨\n\nQuer saber qual combina com você?",
+   "created": "2026-08-14T14:22:24.23437Z",
+   "updated": "2026-08-17T15:39:08.493587Z"
+  },
+  {
+   "seq": "Contato / SERVIÇOS AVULSOS 7853",
+   "stage": "Outros",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 1,
+   "rd": 1,
+   "it": 0,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "Leads avulsos - 1 Contato - cadencia",
+   "text": "Oii, [NOME], como você está? Fiquei curiosa para saber o que você achou do seu procedimento na Drenesse? 👀",
+   "created": "2026-08-14T14:10:11.048927Z",
+   "updated": "2026-08-17T15:39:25.047604Z"
+  },
+  {
+   "seq": "Contato / SERVIÇOS AVULSOS 7853",
+   "stage": "Outros",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 1,
+   "rd": 1,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "IMAGE",
+   "tname": "Leads avulsos - 2 Contato - cadencia",
+   "text": "Oii [NOME] ❤️\n\nSeparei uma condição especial pra você continuar se cuidando: sessão de Drenagem por apenas R$92,90 + Spa Face de brinde! ✨\n\nComo prefere garantir a sua?",
+   "created": "2026-08-14T14:10:11.040626Z",
+   "updated": "2026-08-17T15:39:25.036405Z"
+  },
+  {
+   "seq": "Contato / SERVIÇOS AVULSOS 7853",
+   "stage": "Outros",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 1,
+   "rd": 1,
+   "it": 1,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Leads Avulsos - 3 contato - cadencia",
+   "text": "Psiu, [NOME]! 👀 Sabia que a Drenesse tem muito mais procedimentos além do que você já conhece?\n\nTemos protocolos de Laser, Limpeza de Pele, Drenagem e outros — e essa semana estão com até 30% de desconto! ✨\n\nQuer saber qual combina com você?",
+   "created": "2026-08-14T14:10:11.003999Z",
+   "updated": "2026-08-17T15:39:25.026705Z"
+  },
+  {
+   "seq": "Convertidos Avulsos 1727",
+   "stage": "Outros",
+   "origem": "Serviços Avulsos",
+   "num": "1727",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "CADENCIA AVULSOS 1",
+   "text": "OIIII [NOME]!! Vi que você foi até a clinica fazer o seu procedimento 😍 \n\nPassando aqui só pra saber: como você está se sentindo com o resultado até agora?🤩 (Muito satisfeito/ satifesito ou pouco satisfeito)",
+   "created": "2026-08-10T14:33:46.704223Z",
+   "updated": "2026-08-20T13:05:26.655953Z"
+  },
+  {
+   "seq": "Convertidos Avulsos 1727",
+   "stage": "Outros",
+   "origem": "Serviços Avulsos",
+   "num": "1727",
+   "pos": 2,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "CADENCIA AVULSO 3",
+   "text": "Oiiee [NOME], vi seu resultado e fiquei muito feliz por você 😍 \nNossa agenda está bem cheia essa semana, mas eu separei um espaço pra você continuar seu tratamento. Prefere vir *hoje ou amanhã*?",
+   "created": "2026-08-10T14:33:46.686501Z",
+   "updated": "2026-08-21T13:05:26.437661Z"
+  },
+  {
+   "seq": "Convertidos Avulsos 1727",
+   "stage": "Outros",
+   "origem": "Serviços Avulsos",
+   "num": "1727",
+   "pos": 3,
+   "off": [
+    2,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadencia avulso 4",
+   "text": "Oii [NOME], separei a condição especial 🚨\nÉ válida só até essa semana e foi pensada especialmente pra quem já é nossa cliente. Quer que eu te mande os detalhes agora?",
+   "created": "2026-08-10T14:33:46.665085Z",
+   "updated": "2026-08-24T13:05:26.802237Z"
+  },
+  {
+   "seq": "Convetidos Avulsos- 7853",
+   "stage": "Outros",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "CADENCIA AVULSOS 1",
+   "text": "OIIII [NOME]!! Vi que você foi até a clinica fazer o seu procedimento 😍 \nPassando aqui só pra saber: como você está se sentindo com o resultado até agora?🤩",
+   "created": "2026-08-10T14:27:22.099382Z",
+   "updated": "2026-09-07T15:38:45.280823Z"
+  },
+  {
+   "seq": "Convetidos Avulsos- 7853",
+   "stage": "Outros",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "CADENCIA AVULSO 3",
+   "text": "Oiiee [NOME], vi seu resultado e fiquei muito feliz por você 😍 \nNossa agenda está bem cheia essa semana, mas eu separei um espaço pra você continuar seu tratamento. Prefere vir hoje ou amanhã?",
+   "created": "2026-08-10T14:27:22.085119Z",
+   "updated": "2026-09-08T15:38:45.595321Z"
+  },
+  {
+   "seq": "Convetidos Avulsos- 7853",
+   "stage": "Outros",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    2,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "CADENCIA AVULSO 4",
+   "text": "Oii [NOME], separei a condição especial 🚨 \nÉ válida só até essa semana e foi pensada especialmente pra quem já é nossa cliente. Quer que eu te mande os detalhes agora?",
+   "created": "2026-08-10T14:27:22.069776Z",
+   "updated": "2026-09-10T15:38:45.592248Z"
+  },
+  {
+   "seq": "Falhou / REATIV 7853",
+   "stage": "Falhou",
+   "origem": "Reativação",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 60,
+   "rd": 43,
+   "it": 19,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "Teste Falhou [Mensagem de utilidade]",
+   "text": "Olá, [Nome]! ❤️\n\nEstou entrando em contato porque seu atendimento de ontem não foi realizado.\n\nAntes de reorganizar nossa agenda, gostaria de saber se você ainda deseja agendar seu procedimento. Temos horários disponíveis para hoje e amanhã.",
+   "created": "2026-05-28T16:08:30.542163Z",
+   "updated": "2026-07-02T13:08:25.894416Z"
+  },
+  {
+   "seq": "Falhou / SERVIÇOS AVULSOS 5852",
+   "stage": "Falhou",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 1,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Leads Avulsos - 1 falhou - cadencia",
+   "text": "Oii [NOME], aqui é a equipe da Drenesse! 😊\n\nPassando rapidinho porque separei um horário pra você — não queria que ficasse pra depois.\n\nConsigo te ajudar a encontrar um novo momento?",
+   "created": "2026-08-14T16:16:23.64063Z",
+   "updated": "2026-08-17T15:39:45.83141Z"
+  },
+  {
+   "seq": "Falhou / SERVIÇOS AVULSOS 5852",
+   "stage": "Falhou",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 2,
+   "off": [
+    3,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Leads Avulsos - 2 falhou - cadencia",
+   "text": "Estou sentindo sua falta [nome].. 🥰\n\nSei que imprevistos acontecem, e não quero que isso te afaste do seu cuidado.\n\nO que aconteceu? Não deu tempo, ou prefere remarcar pra um horário diferente?",
+   "created": "2026-08-14T16:16:23.615929Z",
+   "updated": "2026-08-17T15:39:45.820869Z"
+  },
+  {
+   "seq": "Falhou / SERVIÇOS AVULSOS 7853",
+   "stage": "Falhou",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Leads Avulsos - 1 falhou - cadencia",
+   "text": "Oiie [NOME], aqui é a equipe da Drenesse! 😊\n\nPassando rapidinho porque separei um horário pra você — não queria que ficasse pra depois.\n\nConsigo te ajudar a encontrar um novo momento?",
+   "created": "2026-08-14T16:14:24.910344Z",
+   "updated": "2026-08-25T13:06:49.726296Z"
+  },
+  {
+   "seq": "Falhou / SERVIÇOS AVULSOS 7853",
+   "stage": "Falhou",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    3,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Leads Avulsos - 2 falhou - cadencia",
+   "text": "Estou sentindo sua falta [nome].. 🥰\n\nSei que imprevistos acontecem, e não quero que isso te afaste do seu cuidado.\n\nO que aconteceu? Não deu tempo, ou prefere remarcar pra um horário diferente?",
+   "created": "2026-08-14T16:14:24.896433Z",
+   "updated": "2026-08-25T13:06:49.712897Z"
+  },
+  {
+   "seq": "Faltou AV| SDR 1727",
+   "stage": "Faltou AV",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 151,
+   "rd": 92,
+   "it": 29,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Faltou AV cadência 1",
+   "text": "Oi, [NOME]! ♥️\nPercebi que você tinha uma avaliação agendada com a gente e acabou não vindo!\nE olha, você perdeu a oportunidade de entender exatamente o que está te incomodando e como resolver isso da forma certa 👀\n\nMas calma, ainda consigo te encaixar novamente, qual dia fica melhor para você?",
+   "created": "2026-05-15T12:24:12.627485Z",
+   "updated": "2026-08-28T14:44:42.441295Z"
+  },
+  {
+   "seq": "Faltou AV| SDR 1727",
+   "stage": "Faltou AV",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 2,
+   "off": [
+    2,
+    "DAYS"
+   ],
+   "ex": 116,
+   "rd": 69,
+   "it": 11,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Faltou AV cadência 2",
+   "text": "Oi, [NOME]! 😊\nÀs vezes a correria faz a gente ir adiando aquilo que incomoda…\nMas ainda consigo te encaixar essa semana 💖\n\nQual período fica melhor pra você, manhã, tarde ou noite?",
+   "created": "2026-05-15T12:24:12.615917Z",
+   "updated": "2026-08-28T18:55:46.114037Z"
+  },
+  {
+   "seq": "Faltou AV| SDR 1727",
+   "stage": "Faltou AV",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 3,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 120,
+   "rd": 61,
+   "it": 12,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "07/08 CADENCIA FALTOU AV 3",
+   "text": "Oi, [NOME]! Consegui um presente especial pra você 🎁\nFizemos um sorteio entre nossas pacientes e você ganhou um *Spa Face gratuito* na sua avaliação ✨\nEssa é minha última tentativa de contato por aqui, depois disso não consigo mais garantir esse presente 🚨 \nQuer garantir?",
+   "created": "2026-05-15T12:24:12.603592Z",
+   "updated": "2026-08-28T14:55:55.885726Z"
+  },
+  {
+   "seq": "Faltou AV| SDR 1727",
+   "stage": "Faltou AV",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 4,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 100,
+   "rd": 32,
+   "it": 8,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "07/08 CADENCIA FALTOU AV 3",
+   "text": "Oi, [NOME]! Notei que ainda não conseguimos remarcar sua avaliação ❤️\nSei que a correria do dia a dia atrapalha, então já deixei dois dias separados pra você. É só escolher: hoje ou amanhã?",
+   "created": "2026-05-15T12:24:12.576615Z",
+   "updated": "2026-09-02T11:34:32.461743Z"
+  },
+  {
+   "seq": "Faltou AV| SDR 6554",
+   "stage": "Faltou AV",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 20,
+   "rd": 20,
+   "it": 6,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Faltou AV cadência 1",
+   "text": "Oi, [NOME]! ♥️\nPercebi que você tinha uma avaliação agendada com a gente e acabou não vindo!\nE olha, você perdeu a oportunidade de entender exatamente o que está te incomodando e como resolver isso da forma certa 👀\n\nMas calma, ainda consigo te encaixar novamente, qual dia fica melhor para você?",
+   "created": "2026-05-15T11:17:41.638153Z",
+   "updated": "2026-06-16T20:10:58.79241Z"
+  },
+  {
+   "seq": "Faltou AV| SDR 6554",
+   "stage": "Faltou AV",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 2,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 19,
+   "rd": 19,
+   "it": 1,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Faltou AV cadência 2",
+   "text": "Oi, [NOME]! 😊\nÀs vezes a correria faz a gente ir adiando aquilo que incomoda…\nMas ainda consigo te encaixar essa semana 💖\n\nQual período fica melhor pra você, manhã, tarde ou noite?",
+   "created": "2026-05-15T11:17:41.620075Z",
+   "updated": "2026-06-17T20:10:58.561183Z"
+  },
+  {
+   "seq": "Faltou AV| SDR 6554",
+   "stage": "Faltou AV",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 3,
+   "off": [
+    2,
+    "DAYS"
+   ],
+   "ex": 18,
+   "rd": 18,
+   "it": 1,
+   "cat": "s/ cat.",
+   "media": "IMAGE",
+   "tname": "Faltou AV cadência 3",
+   "text": "Oi, [NOME]! ♥️\n\nHoje me lembrei de você, uma cliente comentou aqui na clínica como se arrependeu de não ter começado antes, olhá o resultado dela!\nDepois do tratamento, ela voltou a se sentir muito mais segura ✨\n\nAinda faz sentido pra você resolver isso que está te incomodando?",
+   "created": "2026-05-15T11:20:58.855798Z",
+   "updated": "2026-06-12T18:35:07.138616Z"
+  },
+  {
+   "seq": "Faltou AV| SDR 6554",
+   "stage": "Faltou AV",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 4,
+   "off": [
+    2,
+    "DAYS"
+   ],
+   "ex": 18,
+   "rd": 18,
+   "it": 1,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Faltou AV cadência 4",
+   "text": "Oi, [NOME]! Consegui um presente para você🎁\nAquilo que te incomoda hoje não vai mudar sozinho 👀\nFizemos um sorteio e você ganhou um Spa face gratuito na sua avaliação!\nQual dia fica melhor para você?",
+   "created": "2026-05-15T11:26:55.458944Z",
+   "updated": "2026-06-15T18:35:34.584112Z"
+  },
+  {
+   "seq": "Faltou AV| SDR 7853",
+   "stage": "Faltou AV",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 675,
+   "rd": 538,
+   "it": 104,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "UTILIDADE FALTOU 1",
+   "text": "Olá, [Nome]! ❤️\n\nEstou entrando em contato porque seu atendimento não foi realizado.\n\nAntes de reorganizar nossa agenda, gostaria de saber se você ainda deseja agendar sua avaliação. Temos horários disponíveis para hoje e amanhã.",
+   "created": "2026-05-15T12:18:33.797269Z",
+   "updated": "2026-08-25T16:16:44.284836Z"
+  },
+  {
+   "seq": "Faltou AV| SDR 7853",
+   "stage": "Faltou AV",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    2,
+    "DAYS"
+   ],
+   "ex": 643,
+   "rd": 484,
+   "it": 90,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "UTILIDADE FALTOU AV 2",
+   "text": "Oi, [NOME]! Tudo bem?\n\nEstamos atualizando sua solicitação de atendimento e precisamos confirmar sua disponibilidade.\n\nQual período você prefere?",
+   "created": "2026-05-15T12:18:33.790549Z",
+   "updated": "2026-08-25T16:16:44.27711Z"
+  },
+  {
+   "seq": "Faltou AV| SDR 7853",
+   "stage": "Faltou AV",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 593,
+   "rd": 421,
+   "it": 40,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "CADENCIA FALTOU AV 24/08",
+   "text": "Oiee [NOME], notei que sua avaliação ainda ficou pendente 🥰\nMuitas clientes só precisam de um empurrãozinho pra dar esse primeiro passo. Posso te ajudar a remarcar agora?",
+   "created": "2026-05-15T12:18:33.78351Z",
+   "updated": "2026-08-25T16:16:44.269553Z"
+  },
+  {
+   "seq": "Faltou AV| SDR 7853",
+   "stage": "Faltou AV",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 4,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 508,
+   "rd": 343,
+   "it": 64,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Faltou AV cadência 4",
+   "text": "Oi, [NOME]! Consegui um presente para você🎁\nAquilo que te incomoda hoje não vai mudar sozinho 👀\nFizemos um sorteio e você ganhou um Spa face gratuito na sua avaliação!\n\nQual dia fica melhor para você?",
+   "created": "2026-05-15T12:18:33.7649Z",
+   "updated": "2026-08-25T16:16:44.255333Z"
+  },
+  {
+   "seq": "Faltou AV / Social Selling 7853",
+   "stage": "Faltou AV",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 6,
+   "rd": 4,
+   "it": 0,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "UTILIDADE FALTOU 1",
+   "text": "Olá, [Nome]! ❤️\n\nEstou entrando em contato porque seu atendimento não foi realizado.\n\nAntes de reorganizar nossa agenda, gostaria de saber se você ainda deseja agendar sua avaliação. Temos horários disponíveis para hoje e amanhã.",
+   "created": "2026-08-20T15:57:49.878501Z",
+   "updated": "2026-08-20T15:57:49.878501Z"
+  },
+  {
+   "seq": "Faltou AV / Social Selling 7853",
+   "stage": "Faltou AV",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    2,
+    "DAYS"
+   ],
+   "ex": 6,
+   "rd": 4,
+   "it": 0,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "UTILIDADE FALTOU AV 2",
+   "text": "Oi, [NOME]! Tudo bem?\n\nEstamos atualizando sua solicitação de atendimento e precisamos confirmar sua disponibilidade.\n\nQual período você prefere?",
+   "created": "2026-08-20T15:57:49.865623Z",
+   "updated": "2026-08-20T15:57:49.865623Z"
+  },
+  {
+   "seq": "Faltou AV / Social Selling 7853",
+   "stage": "Faltou AV",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 5,
+   "rd": 3,
+   "it": 1,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "07/08 CADENCIA FALTOU AVALIAÇÃO 3",
+   "text": "Oi, [NOME]! Notei que ainda não conseguimos remarcar sua avaliação ❤️\nSei que a correria do dia a dia atrapalha, então já deixei dois dias separados pra você. É só escolher:",
+   "created": "2026-08-20T15:57:49.851239Z",
+   "updated": "2026-08-20T15:57:49.851239Z"
+  },
+  {
+   "seq": "Faltou AV / Social Selling 7853",
+   "stage": "Faltou AV",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 4,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 4,
+   "rd": 2,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Faltou AV cadência 4",
+   "text": "Oi, [NOME]! Consegui um presente para você🎁\nAquilo que te incomoda hoje não vai mudar sozinho 👀\nFizemos um sorteio e você ganhou um Spa face gratuito na sua avaliação!\nQual dia fica melhor para você?",
+   "created": "2026-08-20T15:57:49.837711Z",
+   "updated": "2026-08-20T15:57:49.837711Z"
+  },
+  {
+   "seq": "Leads frios| SDR 1727",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 1,
+   "off": [
+    2,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "VIDEO",
+   "tname": "Cadência Leads frios 1",
+   "text": "Oi, [NOME]! \nConseguimos liberar alguns encaixes especiais essa semana para avaliação e as meninas já estão prontas pra receber você aqui na clínica 👀\n\nAinda consigo verificar uma condição diferenciada para você ❤️\nQuer que eu confira os horários disponíveis?",
+   "created": "2026-05-21T13:55:29.801914Z",
+   "updated": "2026-08-17T15:41:47.197596Z"
+  },
+  {
+   "seq": "Leads frios| SDR 1727",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 2,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "VIDEO",
+   "tname": "Cadência Leads frios 2",
+   "text": "Oi, [NOME]! \nNossa esteticista sênior gravou esse vídeo porque percebeu que muitas pessoas acabam adiando o tratamento mesmo estando incomodadas com algo há muito tempo…\nAchei importante te enviar ✨\nMe conta, se ainda faz sentido pra você cuidar disso?",
+   "created": "2026-05-21T13:55:29.788525Z",
+   "updated": "2026-08-17T15:41:47.185906Z"
+  },
+  {
+   "seq": "Leads frios| SDR 1727",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 3,
+   "off": [
+    6,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência Leads frios 3",
+   "text": "Oi, [NOME]! 😊\nMuitas pessoas passam meses adiando se cuidar…\nMas depois percebem que poderiam ter começado antes!\nTalvez agora seja o momento certo pra você também ❤️\nO que mais tem te impedindo de começar hoje? 👀",
+   "created": "2026-05-21T13:55:29.774925Z",
+   "updated": "2026-08-17T15:41:47.171037Z"
+  },
+  {
+   "seq": "Leads frios| SDR 6554",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 1,
+   "off": [
+    2,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "VIDEO",
+   "tname": "Cadência Leads frios 1",
+   "text": "Oi, [NOME]! \nConseguimos liberar alguns encaixes especiais essa semana para avaliação e as meninas já estão prontas pra receber você aqui na clínica 👀\n\nAinda consigo verificar uma condição diferenciada para você ❤️\nQuer que eu confira os horários disponíveis?",
+   "created": "2026-05-21T14:05:19.335397Z",
+   "updated": "2026-05-26T12:43:18.355665Z"
+  },
+  {
+   "seq": "Leads frios| SDR 6554",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 2,
+   "off": [
+    2,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "VIDEO",
+   "tname": "Cadência Leads frios 2",
+   "text": "Oi, [NOME]! \nNossa esteticista sênior gravou esse vídeo porque percebeu que muitas pessoas acabam adiando o tratamento mesmo estando incomodadas com algo há muito tempo…\nAchei importante te enviar ✨\nMe conta, se ainda faz sentido pra você cuidar disso?",
+   "created": "2026-05-21T14:05:19.325608Z",
+   "updated": "2026-05-26T12:43:18.345902Z"
+  },
+  {
+   "seq": "Leads frios| SDR 6554",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 3,
+   "off": [
+    3,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência Leads frios 3",
+   "text": "Oi, [NOME]! 😊\nMuitas pessoas passam meses adiando se cuidar…\nMas depois percebem que poderiam ter começado antes!\nTalvez agora seja o momento certo pra você também ❤️\nO que mais tem te impedindo de começar hoje? 👀",
+   "created": "2026-05-21T14:05:19.31552Z",
+   "updated": "2026-05-26T12:43:18.337591Z"
+  },
+  {
+   "seq": "Leads frios| SDR 6554",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 4,
+   "off": [
+    3,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "IMAGE",
+   "tname": "Cadência Leads frios 4",
+   "text": "Oi, [NOME]! ✨\nEssa pessoa também tinha muita insegurança com a região que mais incomodava ela…\nE olha como ela ficou depois do tratamento 👀\nÀs vezes a mudança começa com uma simples decisão ❤️\n\nVocê conseguiria se imaginar tendo esse resultado também? ✨",
+   "created": "2026-05-21T14:05:19.305408Z",
+   "updated": "2026-05-26T12:43:18.327478Z"
+  },
+  {
+   "seq": "Leads frios| SDR 6554",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 5,
+   "off": [
+    3,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência Leads frios 5",
+   "text": "Oi, [NOME]! \nPrometo que essa não é só mais uma mensagem automática kkk ❤️\nMas pensei em você porque vejo muita gente colocando todo mundo como prioridade… menos si mesma.\nE se agora fosse sua vez de se cuidar?✨\nQuer que eu te explique melhor como funciona nossa avaliação? 👀",
+   "created": "2026-05-21T14:05:19.293745Z",
+   "updated": "2026-05-26T12:43:18.315708Z"
+  },
+  {
+   "seq": "Leads frios| SDR 6554",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 6,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "VIDEO",
+   "tname": "Cadência Leads frios 6",
+   "text": "Oi, [NOME]! ❤️\nQuis te mostrar esse vídeo rapidinho porque muita gente imagina que os protocolos são super complicados ou agressivos… \nMas olha como funciona na prática ✨\nE o mais importante: cada tratamento é personalizado de acordo com aquilo que mais incomoda você!!\nVocê conseguiria se imaginar fazendo esse protocolo também? 👀",
+   "created": "2026-05-21T14:05:19.28338Z",
+   "updated": "2026-05-26T12:43:18.306328Z"
+  },
+  {
+   "seq": "Leads frios| SDR 6554",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 7,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência Leads frios 7",
+   "text": "Oi, [NOME] ❤️\nVocê já percebeu como algumas inseguranças começam pequenas…mas aos poucos vão afetando até nossa confiança no dia a dia? 👀\nTalvez esteja na hora de mudar isso ✨\nAinda faz sentido pra você resolver aquilo que te incomoda?",
+   "created": "2026-05-21T14:05:19.273463Z",
+   "updated": "2026-05-26T12:43:18.296389Z"
+  },
+  {
+   "seq": "Leads frios| SDR 6554",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 8,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência Leads frios 8",
+   "text": "Oi, [NOME] ❤️\nPosso te fazer uma pergunta?\nAquilo que te fez procurar a clínica ainda te incomoda hoje? 👀\nPorque normalmente quando algo começa a mexer com nossa autoestima, ignorar não faz desaparecer…\nVocê ainda pensa em resolver isso? ✨",
+   "created": "2026-05-21T14:05:19.263797Z",
+   "updated": "2026-05-26T12:43:18.286365Z"
+  },
+  {
+   "seq": "Leads frios| SDR 6554",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 9,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência Leads frios 9",
+   "text": "Oi, [NOME] ❤️\nO tempo vai passar de qualquer forma…\nA diferença é que daqui alguns meses você pode continuar se incomodando com isso ou já estar vendo resultado no espelho 👀✨\nNós podemos te ajudar, qual dessas opções você prefere viver?",
+   "created": "2026-05-21T14:05:19.253788Z",
+   "updated": "2026-05-26T12:43:18.27471Z"
+  },
+  {
+   "seq": "Leads frios| SDR 6554",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 10,
+   "off": [
+    6,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência Leads frios 10",
+   "text": "Oi, [NOME]! 👀\nEssa provavelmente vai ser minha última mensagem pra você ❤️\nMas antes disso, queria te lembrar que continuar adiando não vai fazer aquilo que te incomoda desaparecer…\nAinda consigo verificar uma condição especial caso queira começar agora✨\nQuer que eu confira um horário disponível pra você?",
+   "created": "2026-05-21T14:05:19.243262Z",
+   "updated": "2026-05-26T12:43:18.250312Z"
+  },
+  {
+   "seq": "Leads frios| SDR 7853",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 4102,
+   "rd": 2464,
+   "it": 140,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "CADENCIA LEADS FRIOS 24/08",
+   "text": "Oi, [NOME]! 😊\nFaz um tempinho que a gente não conversa por aqui.\nAinda pensa em cuidar de você? Me conta: sim, às vezes, ou não é prioridade agora?",
+   "created": "2026-05-21T14:56:46.076222Z",
+   "updated": "2026-08-25T16:14:55.350738Z"
+  },
+  {
+   "seq": "Leads frios| SDR 7853",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    6,
+    "DAYS"
+   ],
+   "ex": 3493,
+   "rd": 1998,
+   "it": 139,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "CADENCIA LEDAS FRIOS 2 25/08",
+   "text": "Oi, [NOME]! 😊\nSabia que mais de 60% das pessoas que nos procuram têm a mesma queixa: inchaço e retenção de líquido? 💫\nO Método Drenesse trabalha exatamente isso. Quer saber como funciona?",
+   "created": "2026-05-21T14:56:46.065137Z",
+   "updated": "2026-08-25T16:14:55.336418Z"
+  },
+  {
+   "seq": "Leads frios| SDR 7853",
+   "stage": "Leads frios",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 4094,
+   "rd": 1955,
+   "it": 213,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "UTILIDADE LEADS FRIOS 5",
+   "text": "Oii, [Nome]! Você prefere que a nossa equipe siga o contato por aqui ou por ligação?",
+   "created": "2026-05-21T14:56:46.029087Z",
+   "updated": "2026-08-25T16:14:55.322364Z"
+  },
+  {
+   "seq": "Leads Frios / SERVIÇOS AVULSOS 5852",
+   "stage": "Leads frios",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "IMAGE",
+   "tname": "Leads Avulsos - 1 leads frios - cadencia",
+   "text": "Oii [NOME] ❤️\n\nVocê pode iniciar hoje mesmo seu protocolo conosco!\n\n🔥 Oferta relâmpago Método Drenesse: 3 sessões de Drenagem por apenas R$77,90!\n\n⚠️ São só 6 vagas e a procura já começou. Não queria que você ficasse de fora dessa!\n\nPosso garantir a sua?",
+   "created": "2026-08-13T15:01:01.632452Z",
+   "updated": "2026-08-17T15:33:20.428378Z"
+  },
+  {
+   "seq": "Leads Frios / SERVIÇOS AVULSOS 5852",
+   "stage": "Leads frios",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 2,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Leads Avulsos - 2 leads frios - cadencia",
+   "text": "Oiee, [NOME]! ❤️\n\nSabia que a Drenesse trabalha com protocolos personalizados pra cada objetivo — emagrecimento, definição corporal, facial e muito mais?\n\nMuita gente não sabe, mas a gente monta o plano ideal conversando com você primeiro, sem cobrar nada por isso ❣️ \n\nQuer saber qual protocolo combina com você?🤔",
+   "created": "2026-08-13T15:01:01.617727Z",
+   "updated": "2026-08-17T15:33:20.414916Z"
+  },
+  {
+   "seq": "Leads Frios / SERVIÇOS AVULSOS 5852",
+   "stage": "Leads frios",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 3,
+   "off": [
+    6,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "IMAGE",
+   "tname": "Leads Avulsos - 3 leads frios - cadencia",
+   "text": "Vai deixar passar [NOME]? ❤️\n\nEssa é uma condição especial que separamos só pra quem já conhece a Drenesse!\n\n🔥 Laser Axila: 10 sessões por apenas R$150!\n\n⚠️ Restam poucas vagas e essa condição não vai se repetir tão cedo.\n\nPosso garantir a sua?",
+   "created": "2026-08-14T14:51:27.361223Z",
+   "updated": "2026-08-17T15:33:20.402218Z"
+  },
+  {
+   "seq": "Leads Frios / SERVIÇOS AVULSOS 7853",
+   "stage": "Leads frios",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Leads Avulsos - 1 leads frios - cadencia",
+   "text": "Oiie [NOME] ❤️\n\nVocê pode iniciar hoje mesmo seu protocolo conosco!\n\n🔥 Oferta relâmpago Método Drenesse: 3 sessões de Drenagem por apenas R$77,90!\n\n⚠️ São só 6 vagas e a procura já começou. Não queria que você ficasse de fora dessa!\n\nPosso garantir a sua?",
+   "created": "2026-08-14T14:48:05.230137Z",
+   "updated": "2026-08-17T15:33:03.396712Z"
+  },
+  {
+   "seq": "Leads Frios / SERVIÇOS AVULSOS 7853",
+   "stage": "Leads frios",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Leads Avulsos - 2 leads frios - cadencia",
+   "text": "Oieee, [NOME]! ❤️\n\nSabia que a Drenesse trabalha com protocolos personalizados pra cada objetivo — emagrecimento, definição corporal, facial e muito mais? \n\nMuita gente não sabe, mas a gente monta o plano ideal conversando com você primeiro, sem cobrar nada por isso 😊",
+   "created": "2026-08-14T14:48:05.220534Z",
+   "updated": "2026-08-17T15:33:03.381802Z"
+  },
+  {
+   "seq": "Leads Frios / SERVIÇOS AVULSOS 7853",
+   "stage": "Leads frios",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    6,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "IMAGE",
+   "tname": "Leads Avulsos - 3 leads frios - cadencia",
+   "text": "Vai deixar passar [NOME]?❤️\n\nEssa é uma condição especial que separamos só pra quem já conhece a Drenesse!\n\n🔥 Laser Axila: 10 sessões por apenas R$150!\n\n⚠️ Restam poucas vagas e essa condição não vai se repetir tão cedo.\n\nPosso garantir a sua?",
+   "created": "2026-08-14T14:48:05.205956Z",
+   "updated": "2026-08-17T15:33:03.362075Z"
+  },
+  {
+   "seq": "Leads Frios / Social Selling",
+   "stage": "Leads frios",
+   "origem": "Social Selling",
+   "num": "—",
+   "pos": 1,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "07/08 CADENCIA LEADS FRIOS 1",
+   "text": "Oi, [NOME]! 😊\nAinda tá naquela vontade de se cuidar? 💫\nMe conta rapidinho: manhã, tarde ou noite fica melhor pra você?",
+   "created": "2026-08-20T15:53:36.083397Z",
+   "updated": "2026-08-20T15:53:36.083397Z"
+  },
+  {
+   "seq": "Leads Frios / Social Selling",
+   "stage": "Leads frios",
+   "origem": "Social Selling",
+   "num": "—",
+   "pos": 2,
+   "off": [
+    6,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "UTILIDADE LEADS FRIOS 2",
+   "text": "Oie, [NOME], você me procurou e quero saber se ainda posso te ajudar",
+   "created": "2026-08-20T15:53:36.071302Z",
+   "updated": "2026-08-20T15:53:36.071302Z"
+  },
+  {
+   "seq": "Leads Frios / Social Selling",
+   "stage": "Leads frios",
+   "origem": "Social Selling",
+   "num": "—",
+   "pos": 3,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "UTILIDADE LEADS FRIOS 5",
+   "text": "Oii, [Nome]! Você prefere que a nossa equipe siga o contato por aqui ou por ligação?",
+   "created": "2026-08-20T15:53:36.05641Z",
+   "updated": "2026-08-20T15:53:36.056411Z"
+  },
+  {
+   "seq": "Negociação| SDR 1727",
+   "stage": "Negociação",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 92,
+   "rd": 52,
+   "it": 20,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Negociação cadência 1",
+   "text": "Oi, [NOME], tudo bem?\n\nVimos que você realizou sua avaliação com uma de nossas especialistas ♥️ \nSabemos que a rotina às vezes fica corrida, então passei aqui pra te perguntar…\n\nVocê ainda tem interesse em dar continuidade no seu protocolo?",
+   "created": "2026-05-15T12:06:34.401795Z",
+   "updated": "2026-09-10T11:40:20.365385Z"
+  },
+  {
+   "seq": "Negociação| SDR 1727",
+   "stage": "Negociação",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 2,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 73,
+   "rd": 34,
+   "it": 9,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Negociação cadência 2",
+   "text": "Oi, [NOME]! 😊\nMuitos clientes acabam adiando de se cuidar por conta da rotina, insegurança ou até dúvidas… mas quando iniciam conosco, ficam felizes por terem dado esse passo!\n\nMe conta uma coisa:\nO que está te impedindo de começar seu tratamento hoje?",
+   "created": "2026-05-15T12:06:34.385622Z",
+   "updated": "2026-09-16T11:04:52.186037Z"
+  },
+  {
+   "seq": "Negociação| SDR 1727",
+   "stage": "Negociação",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 3,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 81,
+   "rd": 29,
+   "it": 5,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência negociação 10/09",
+   "text": "Oiii, [Nome]! 💕\nQue bom que você veio à clínica!\n\nVi que você acabou não iniciando seu tratamento e queria entender melhor: o que aconteceu?\n\nMe conta, o que faltou para começarmos esse novo projeto? ✨",
+   "created": "2026-05-15T12:06:34.370686Z",
+   "updated": "2026-09-21T11:06:18.22626Z"
+  },
+  {
+   "seq": "Negociação| SDR 6554",
+   "stage": "Negociação",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 15,
+   "rd": 15,
+   "it": 3,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Negociação cadência 1",
+   "text": "Oi, [NOME], tudo bem?\n\nVimos que você realizou sua avaliação com uma de nossas especialistas ♥️ \nSabemos que a rotina às vezes fica corrida, então passei aqui pra te perguntar…\n\nVocê ainda tem interesse em dar continuidade no seu protocolo?",
+   "created": "2026-05-14T13:35:54.386001Z",
+   "updated": "2026-06-16T20:17:56.033646Z"
+  },
+  {
+   "seq": "Negociação| SDR 6554",
+   "stage": "Negociação",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 2,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 13,
+   "rd": 13,
+   "it": 1,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Negociação cadência 2",
+   "text": "Oi, [NOME]! 😊\nMuitos clientes acabam adiando de se cuidar por conta da rotina, insegurança ou até dúvidas… mas quando iniciam conosco, ficam felizes por terem dado esse passo!\n\nMe conta uma coisa:\nO que está te impedindo de começar seu tratamento hoje?",
+   "created": "2026-05-14T13:35:54.37233Z",
+   "updated": "2026-06-17T20:18:43.108271Z"
+  },
+  {
+   "seq": "Negociação| SDR 6554",
+   "stage": "Negociação",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 3,
+   "off": [
+    2,
+    "DAYS"
+   ],
+   "ex": 13,
+   "rd": 13,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "IMAGE",
+   "tname": "Negociação cadência 3",
+   "text": "Oi, [NOME]! ♥️\n\nHoje me lembrei de você, uma cliente comentou aqui na clínica como se arrependeu de não ter começado antes, olhá o resultado dela!\nDepois do tratamento, ela voltou a se sentir muito mais segura ✨\n\nAinda faz sentido pra você resolver isso que está te incomodando?",
+   "created": "2026-05-14T16:35:02.975215Z",
+   "updated": "2026-06-19T20:18:43.430498Z"
+  },
+  {
+   "seq": "Negociação| SDR 7853",
+   "stage": "Negociação",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 494,
+   "rd": 356,
+   "it": 111,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Cadência Negociação 10/09",
+   "text": "Oiii, [NOME]! 💕\nQue bom que você veio à clínica!\n\nVi que você acabou não iniciando seu tratamento e queria entender melhor: o que aconteceu?\n\nMe conta, o que faltou para começarmos esse novo projeto? ✨",
+   "created": "2026-05-15T12:09:33.545565Z",
+   "updated": "2026-09-10T11:39:30.240752Z"
+  },
+  {
+   "seq": "Negociação| SDR 7853",
+   "stage": "Negociação",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 457,
+   "rd": 297,
+   "it": 31,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Negociação cadência 2",
+   "text": "Oi, [NOME]! 😊\nMuitos clientes acabam adiando de se cuidar por conta da rotina, insegurança ou até dúvidas… mas quando iniciam conosco, ficam felizes por terem dado esse passo!\n\nMe conta uma coisa:\nO que está te impedindo de começar seu tratamento hoje?",
+   "created": "2026-05-15T12:09:33.527484Z",
+   "updated": "2026-09-10T11:39:30.226141Z"
+  },
+  {
+   "seq": "Negociação| SDR 7853",
+   "stage": "Negociação",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 408,
+   "rd": 251,
+   "it": 27,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "07/08 CADENCIA NEGOCIAÇÃO 3",
+   "text": "Oi, [NOME] 🥰 Só pra eu entender: o que falta hoje pra você dar o próximo passo com a gente?",
+   "created": "2026-05-15T12:09:33.50606Z",
+   "updated": "2026-09-10T11:39:30.200772Z"
+  },
+  {
+   "seq": "Negociação / SERVIÇOS AVULSOS 7853",
+   "stage": "Negociação",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 3,
+   "rd": 3,
+   "it": 1,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Leads Avulsos - 1 negociação - Cadencia",
+   "text": "Oii [NOME], toda decisão de cuidar de você merece ser bem pensada 🥰\n\nLembrando da sua sessão aqui na Drenesse — o que ainda ficou te deixando em dúvida pra fechar seu pacote?",
+   "created": "2026-08-13T15:18:01.139304Z",
+   "updated": "2026-08-17T15:31:16.271865Z"
+  },
+  {
+   "seq": "Negociação / SERVIÇOS AVULSOS 7853",
+   "stage": "Negociação",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 3,
+   "rd": 3,
+   "it": 2,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Leads Avulsos - 2 negociacao - cadencia",
+   "text": "Separei um mimo pra você [nome]🎁\n\nComo você já é cliente Drenesse, quero te dar prioridade antes de abrir pra mais gente.\n\nPosso te contar do que se trata?",
+   "created": "2026-08-13T15:18:01.121098Z",
+   "updated": "2026-08-17T15:31:16.257114Z"
+  },
+  {
+   "seq": "Negociação / SERVIÇOS AVULSOS 7853",
+   "stage": "Negociação",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 3,
+   "rd": 2,
+   "it": 1,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Leads Avulsos - 3 negociacao - cadencia",
+   "text": "Oi [NOME], sabia que várias clientes que fizeram só 1 sessão aqui na Drenesse estão voltando pra fechar o pacote completo? ✨\n\nFiquei pensando em você — separamos a mesma condição pra quem ainda não fechou: 3 sessões do Método Drenesse por R$77,90 cada.\n\nEssa é a última vez que consigo garantir esse valor pra você.",
+   "created": "2026-08-14T16:06:40.579309Z",
+   "updated": "2026-08-17T15:31:16.240457Z"
+  },
+  {
+   "seq": "Negociação / SERVIÇOS AVULSOS AVULSOS 5852",
+   "stage": "Negociação",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 1,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Leads Avulsos - 1 negociação - Cadencia",
+   "text": "Oii [NOME], toda decisão de cuidar de você merece ser bem pensada 🥰\n\nLembrando da sua sessão aqui na Drenesse — o que ainda ficou te deixando em dúvida pra fechar seu pacote?",
+   "created": "2026-08-14T16:10:04.282143Z",
+   "updated": "2026-08-17T15:30:57.819168Z"
+  },
+  {
+   "seq": "Negociação / SERVIÇOS AVULSOS AVULSOS 5852",
+   "stage": "Negociação",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 2,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Leads Avulsos - 2 negociacao - cadencia",
+   "text": "[NOME], separei um mimo pra você 🎁\n\nComo você já é cliente Drenesse, quero te dar prioridade antes de abrir pra mais gente.\n\nPosso te contar do que se trata?",
+   "created": "2026-08-14T16:10:04.268578Z",
+   "updated": "2026-08-17T15:30:57.811353Z"
+  },
+  {
+   "seq": "Negociação / SERVIÇOS AVULSOS AVULSOS 5852",
+   "stage": "Negociação",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 3,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Leads Avulsos - 3 negociacao - cadencia",
+   "text": "Oii [NOME], sabia que várias clientes que fizeram só 1 sessão aqui na Drenesse estão voltando pra fechar o pacote completo? ✨\n\nFiquei pensando em você — separamos a mesma condição pra quem ainda não fechou: 3 sessões do Método Drenesse por R$77,90 cada.😍 \n\nEssa é a última vez que consigo garantir esse valor pra você.👀",
+   "created": "2026-08-14T16:10:04.257327Z",
+   "updated": "2026-08-17T15:30:57.800227Z"
+  },
+  {
+   "seq": "Negociação / Social Selling 7853",
+   "stage": "Negociação",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 7,
+   "rd": 5,
+   "it": 2,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "UTILIDADE NEGOCIAÇÃO 1",
+   "text": "Olá, [Nome]. Consta em nosso sistema que você realizou uma avaliação com a nossa equipe de especialistas na Drenesse.\n\nEntramos em contato para atualizar o status do seu caso. Você deseja dar continuidade ao seu protocolo de atendimento?",
+   "created": "2026-08-20T15:49:51.16995Z",
+   "updated": "2026-08-20T15:49:51.16995Z"
+  },
+  {
+   "seq": "Negociação / Social Selling 7853",
+   "stage": "Negociação",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 7,
+   "rd": 4,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Negociação cadência 2",
+   "text": "Oi, [NOME]! 😊\nMuitos clientes acabam adiando de se cuidar por conta da rotina, insegurança ou até dúvidas… mas quando iniciam conosco, ficam felizes por terem dado esse passo!\n\nMe conta uma coisa:\nO que está te impedindo de começar seu tratamento hoje?",
+   "created": "2026-08-20T15:49:51.157796Z",
+   "updated": "2026-08-20T15:49:51.157796Z"
+  },
+  {
+   "seq": "Negociação / Social Selling 7853",
+   "stage": "Negociação",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 7,
+   "rd": 2,
+   "it": 1,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "07/08 CADENCIA NEGOCIAÇÃO 3",
+   "text": "Oi, [NOME] 🥰 Só pra eu entender: o que falta hoje pra você dar o próximo passo com a gente?",
+   "created": "2026-08-20T15:49:51.147236Z",
+   "updated": "2026-08-20T15:49:51.147236Z"
+  },
+  {
+   "seq": "Pre agendados / SERVIÇOS AVULSOS 5852",
+   "stage": "Pré AV",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 1,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Leads avulsos - pre agendamento - cadencia",
+   "text": "Oii [NOME] ❤️ Sua sessão na Drenesse está chegando!\n\nPra aproveitar ao máximo: beba bastante água hoje e amanhã, evite refeições muito pesadas antes do horário e chegue com uns 10 minutinhos de antecedência 😊\n\nQualquer dúvida antes do seu dia, é só chamar!",
+   "created": "2026-08-14T14:37:06.013319Z",
+   "updated": "2026-08-19T14:00:22.383666Z"
+  },
+  {
+   "seq": "Pre agendados / SERVIÇOS AVULSOS 5852",
+   "stage": "Pré AV",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 2,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "IMAGE",
+   "tname": "Cadencia pre agendamento- Stimullus Sculp",
+   "text": "VOCÊ SABIA [NOME]? 💡\nA academia do futuro está na Drenesse: Stimullus Sculp, tecnologia que promove 4x MAIOR definição muscular sem esforço!\n\nNosso aparelho estimula suas fibras musculares como se fosse centenas de contrações💪\n\nNa sua visita a unidade, a Sênior vai falar mais ❤️",
+   "created": "2026-08-19T14:00:22.352454Z",
+   "updated": "2026-08-19T14:00:22.352454Z"
+  },
+  {
+   "seq": "Pre agendados / SERVIÇOS AVULSOS 7853",
+   "stage": "Pré AV",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 4,
+   "rd": 2,
+   "it": 0,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "Leads avulsos - pre agendamento - cadencia",
+   "text": "Oii [NOME] ❤️ Sua sessão na Drenesse está chegando!\n\nPra aproveitar ao máximo: beba bastante água hoje e amanhã, evite refeições muito pesadas antes do horário e chegue com uns 10 minutinhos de antecedência 😊\n\nQualquer dúvida antes do seu dia, é só chamar!",
+   "created": "2026-08-14T14:34:31.213974Z",
+   "updated": "2026-08-19T13:58:59.759897Z"
+  },
+  {
+   "seq": "Pre agendados / SERVIÇOS AVULSOS 7853",
+   "stage": "Pré AV",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 3,
+   "rd": 1,
+   "it": 1,
+   "cat": "MARKETING",
+   "media": "IMAGE",
+   "tname": "Cadencia Pre Agendamento - informação Stimullus",
+   "text": "VOCÊ SABIA [NOME]? 💡\nA academia do futuro está na Drenesse: Stimullus Sculp, tecnologia que promove 4x MAIOR definição muscular sem esforço!\n\nNosso aparelho estimula suas fibras musculares como se fosse centenas de contrações💪 \n\nNa sua visita a unidade, a Sênior vai falar mais ❤️",
+   "created": "2026-08-19T13:58:59.727885Z",
+   "updated": "2026-08-19T13:58:59.727885Z"
+  },
+  {
+   "seq": "Pré AV SDR 1727",
+   "stage": "Pré AV",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 1,
+   "off": [
+    2,
+    "HOURS"
+   ],
+   "ex": 63,
+   "rd": 49,
+   "it": 18,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência Pre AV 1",
+   "text": "Oiee [NOME], passando aqui para lembrar que sua sessão já está marcada e vamos amar te receber❤️\nSe tiver qualquer dúvida pode perguntar!",
+   "created": "2026-05-18T14:05:26.317191Z",
+   "updated": "2026-09-15T16:22:49.860285Z"
+  },
+  {
+   "seq": "Pré AV SDR 1727",
+   "stage": "Pré AV",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 2,
+   "off": [
+    22,
+    "HOURS"
+   ],
+   "ex": 48,
+   "rd": 38,
+   "it": 6,
+   "cat": "s/ cat.",
+   "media": "VIDEO",
+   "tname": "Cadencia pre avaliação video",
+   "text": "Heloo [NOME], tudo bem?🥰\n\nAisi te mandou um recado, estamos ansiosas pra te receber!",
+   "created": "2026-05-18T14:05:26.302915Z",
+   "updated": "2026-09-16T11:01:20.173102Z"
+  },
+  {
+   "seq": "Pré AV SDR 1727",
+   "stage": "Pré AV",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 3,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 55,
+   "rd": 38,
+   "it": 4,
+   "cat": "s/ cat.",
+   "media": "IMAGE",
+   "tname": "Cadência Pre AV 3",
+   "text": "Oii [NOME]! ♥️\nEssa cliente chegou aqui sem saber exatamente o que precisava…\nMas depois da avaliação conseguimos montar o protocolo ideal pra ela ✨\nOlha só o resultado dela, incrível né?",
+   "created": "2026-05-18T14:05:26.28838Z",
+   "updated": "2026-09-18T12:11:12.640934Z"
+  },
+  {
+   "seq": "Pré AV SDR 6554",
+   "stage": "Pré AV",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 1,
+   "off": [
+    2,
+    "HOURS"
+   ],
+   "ex": 10,
+   "rd": 10,
+   "it": 3,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência Pre AV 1",
+   "text": "Oiee [NOME], passando aqui para lembrar que sua sessão já está marcada e vamos amar te receber❤️\nSe tiver qualquer dúvida pode perguntar!",
+   "created": "2026-05-18T14:07:35.027273Z",
+   "updated": "2026-06-12T11:50:51.731368Z"
+  },
+  {
+   "seq": "Pré AV SDR 6554",
+   "stage": "Pré AV",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 2,
+   "off": [
+    22,
+    "HOURS"
+   ],
+   "ex": 10,
+   "rd": 10,
+   "it": 2,
+   "cat": "s/ cat.",
+   "media": "DOCUMENT",
+   "tname": "Cadencia Pre AV 2",
+   "text": "Oiee, [NOME]! Sua avaliação está chegando e preparei um *BRINDE ESPECIAL* pra você 🎁\n\nEstou te enviando o e-book *“Cuidados Essenciais”*, com dicas simples para te ajudar a criar hábitos mais saudáveis no dia a dia.\n\nEspero que goste ✨",
+   "created": "2026-05-18T14:07:35.010472Z",
+   "updated": "2026-06-12T11:50:51.720331Z"
+  },
+  {
+   "seq": "Pré AV SDR 6554",
+   "stage": "Pré AV",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 3,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 9,
+   "rd": 9,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "IMAGE",
+   "tname": "Cadência Pre AV 3",
+   "text": "Oii [NOME]! ♥️\nEssa cliente chegou aqui sem saber exatamente o que precisava…\nMas depois da avaliação conseguimos montar o protocolo ideal pra ela ✨\nOlha só o resultado dela, incrível né?",
+   "created": "2026-05-18T14:07:34.993941Z",
+   "updated": "2026-06-12T11:50:51.709814Z"
+  },
+  {
+   "seq": "Pré AV SDR 6554",
+   "stage": "Pré AV",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 4,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 8,
+   "rd": 8,
+   "it": 1,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência Pre AV 4",
+   "text": "Oiee [NOME]🥰, sua avaliação está chegando, estamos ansiosas para te receber!",
+   "created": "2026-05-18T14:07:34.976387Z",
+   "updated": "2026-06-12T11:50:51.698768Z"
+  },
+  {
+   "seq": "Pré AV SDR 7853",
+   "stage": "Pré AV",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    2,
+    "HOURS"
+   ],
+   "ex": 521,
+   "rd": 490,
+   "it": 173,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "UTILIDADE PRE AV 1",
+   "text": "Olá, [NOME]! Sua sessão está confirmada. Se precisar tirar alguma dúvida antes, estamos disponíveis por aqui.",
+   "created": "2026-05-18T14:09:19.734191Z",
+   "updated": "2026-09-15T16:10:22.819654Z"
+  },
+  {
+   "seq": "Pré AV SDR 7853",
+   "stage": "Pré AV",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 4,
+   "off": [
+    4,
+    "HOURS"
+   ],
+   "ex": 71,
+   "rd": 63,
+   "it": 15,
+   "cat": "MARKETING",
+   "media": "VIDEO",
+   "tname": "cadencia pre av video",
+   "text": "Heloo [NOME], tudo bem?🥰\n\nAisi te mandou um recado, estamos ansiosas pra te receber!",
+   "created": "2026-09-15T16:10:22.782434Z",
+   "updated": "2026-09-15T16:10:22.782434Z"
+  },
+  {
+   "seq": "Pré AV SDR 7853",
+   "stage": "Pré AV",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 5,
+   "off": [
+    22,
+    "HOURS"
+   ],
+   "ex": 67,
+   "rd": 59,
+   "it": 34,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "UTILIDADE PRE AV 2",
+   "text": "Oi, [NOME]. Tudo bem? Passando para lembrar que sua sessão está agendada.",
+   "created": "2026-09-15T16:10:22.772299Z",
+   "updated": "2026-09-15T16:10:22.772299Z"
+  },
+  {
+   "seq": "Pré AV SDR 7853",
+   "stage": "Pré AV",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 6,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 46,
+   "rd": 36,
+   "it": 17,
+   "cat": "MARKETING",
+   "media": "IMAGE",
+   "tname": "Cadencia Pre Agendamento - informação Stimullus",
+   "text": "VOCÊ SABIA [NOME]? 💡\nA academia do futuro está na Drenesse: Stimullus Sculp, tecnologia que promove 4x MAIOR definição muscular sem esforço!\n\nNosso aparelho estimula suas fibras musculares como se fosse centenas de contrações💪 \n\nNa sua visita a unidade, a Sênior vai falar mais ❤️",
+   "created": "2026-09-15T16:10:22.749762Z",
+   "updated": "2026-09-15T16:10:22.749762Z"
+  },
+  {
+   "seq": "Pré AV / Social Selling 7853",
+   "stage": "Pré AV",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    2,
+    "HOURS"
+   ],
+   "ex": 6,
+   "rd": 6,
+   "it": 2,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "UTILIDADE PRE AV 1",
+   "text": "Olá, [NOME]! Sua sessão está confirmada. Se precisar tirar alguma dúvida antes, estamos disponíveis por aqui.",
+   "created": "2026-08-20T15:44:35.741843Z",
+   "updated": "2026-08-20T15:44:35.741843Z"
+  },
+  {
+   "seq": "Pré AV / Social Selling 7853",
+   "stage": "Pré AV",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    22,
+    "HOURS"
+   ],
+   "ex": 6,
+   "rd": 6,
+   "it": 5,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "UTILIDADE PRE AV 2",
+   "text": "Oi, [NOME]. Tudo bem? Passando para lembrar que sua sessão está agendada.",
+   "created": "2026-08-20T15:44:35.731542Z",
+   "updated": "2026-08-20T15:44:35.731542Z"
+  },
+  {
+   "seq": "Pré AV / Social Selling 7853",
+   "stage": "Pré AV",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 5,
+   "rd": 5,
+   "it": 4,
+   "cat": "MARKETING",
+   "media": "IMAGE",
+   "tname": "Cadencia Pre Agendamento - informação Stimullus",
+   "text": "VOCÊ SABIA [NOME]? 💡\nA academia do futuro está na Drenesse: Stimullus Sculp, tecnologia que promove 4x MAIOR definição muscular sem esforço!\n\nNosso aparelho estimula suas fibras musculares como se fosse centenas de contrações💪 \n\nNa sua visita a unidade, a Sênior vai falar mais ❤️",
+   "created": "2026-08-20T15:44:35.71825Z",
+   "updated": "2026-08-20T15:44:35.71825Z"
+  },
+  {
+   "seq": "Sem resposta / REATIV 7853",
+   "stage": "Sem resposta",
+   "origem": "Reativação",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 2522,
+   "rd": 1656,
+   "it": 427,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "[Reativação] Sem resposta dia 2",
+   "text": "Olá, [Nome]! ❤️\n\nTemos um PRESENTE EXCLUSIVO para você!\n\nSentimos sua falta e, por isso, reservamos para algumas clientes selecionadas um Spa Face totalmente GRATUITO.\n\nSua vaga está disponível apenas HOJE e AMANHÃ, e as vagas são bem limitadas.\n\nVamos aproveitar esse presente e agendar seu horário?",
+   "created": "2026-05-28T15:57:35.640907Z",
+   "updated": "2026-08-17T15:46:15.011722Z"
+  },
+  {
+   "seq": "Sem resposta / REATIV 7853",
+   "stage": "Sem resposta",
+   "origem": "Reativação",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 2165,
+   "rd": 1318,
+   "it": 437,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "[Reativação] Sem resposta dia 3",
+   "text": "Oii [Nome]!\n\nEstamos sentindo sua falta!😞 \n\nAcabei de liberar os ÚLTIMOS horários disponíveis do Spa Face GRATUITO para você HOJE ou AMANHÃ. Qual horário você prefere?",
+   "created": "2026-05-28T15:57:35.580709Z",
+   "updated": "2026-08-17T15:46:14.996044Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 1727",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 115,
+   "rd": 48,
+   "it": 11,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência SDR 1 ATUALIZADO 1727, 6554",
+   "text": "Oiii [NOME], o que te incomoda hoje? *Gordura localizada, Inchaço Corporal, flacidez?*",
+   "created": "2026-05-15T12:04:23.398968Z",
+   "updated": "2026-08-17T15:46:29.067804Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 1727",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 2,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 50,
+   "rd": 21,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "07/08 CADENCIA SEM RESPOSTA 02",
+   "text": "Oii [NOME], fiquei pensando aqui... o que fez você procurar a Drenesse? 😊 Me conta rapidinho que eu te ajudo a entender o melhor caminho pra você.\n\n*Emagrecimento, contorno corporal ou autocuidado?*",
+   "created": "2026-05-15T12:04:23.382066Z",
+   "updated": "2026-08-28T17:59:58.802609Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 1727",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 3,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 84,
+   "rd": 32,
+   "it": 8,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência 3 SDR Atualizado",
+   "text": "Oi, [NOME]! Tudo bem?\n\nSeparei uma *sessão experimental*  para você, válido somente por *dois dias*!\n\nQuer saber mais? 🥰",
+   "created": "2026-05-15T12:04:23.361489Z",
+   "updated": "2026-08-17T15:46:29.042676Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 1727",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 4,
+   "off": [
+    6,
+    "DAYS"
+   ],
+   "ex": 84,
+   "rd": 32,
+   "it": 10,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadencia SDR 4 ATUALIZADO",
+   "text": "Oii, [NOME]! ❤️\n\nMe tira uma dúvida sincera...\n\nSe cuidar ainda é uma prioridade para você ou foi só a correria do dia a dia que acabou te impedindo de me responder? 👀",
+   "created": "2026-05-15T12:04:23.347057Z",
+   "updated": "2026-08-17T15:46:29.029764Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 1727",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "1727",
+   "pos": 5,
+   "off": [
+    6,
+    "DAYS"
+   ],
+   "ex": 72,
+   "rd": 21,
+   "it": 2,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "07/08 cadencia sem resposta 03",
+   "text": "Oii [NOME], separamos algumas pessoas da nossa lista para um *Spa Face gratuito* essa semana 🥰 Você é uma delas! São poucas vagas e eu não queria que você perdesse.\nConsegue hoje ou amanhã?",
+   "created": "2026-05-15T12:04:23.312902Z",
+   "updated": "2026-08-17T15:46:29.016458Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 6554",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 25,
+   "rd": 25,
+   "it": 3,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência SDR 1 ATUALIZADO 1727, 6554",
+   "text": "Oiii [NOME], o que te incomoda hoje? *Gordura localizada, Inchaço Corporal, flacidez?*",
+   "created": "2026-05-15T11:06:44.753811Z",
+   "updated": "2026-06-03T13:49:42.111576Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 6554",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 2,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 24,
+   "rd": 24,
+   "it": 2,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência 2 SDR ATUALIZADO",
+   "text": "Oii *[NOME]*, vi que você não conseguiu me responder e gostaria de te conhecer melhor!!\n\nConsegue me responder rapidinho, o que mais te incomoda no seu corpo hoje?🥰",
+   "created": "2026-05-15T11:06:44.744276Z",
+   "updated": "2026-06-03T13:49:42.102005Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 6554",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 3,
+   "off": [
+    1,
+    "DAYS"
+   ],
+   "ex": 24,
+   "rd": 24,
+   "it": 2,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadência 3 SDR Atualizado",
+   "text": "Oi, [NOME]! Tudo bem?\n\nSeparei uma *sessão experimental*  para você, válido somente por *dois dias*!\n\nQuer saber mais? 🥰",
+   "created": "2026-05-15T11:06:44.734963Z",
+   "updated": "2026-06-03T13:49:42.092087Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 6554",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 4,
+   "off": [
+    2,
+    "DAYS"
+   ],
+   "ex": 23,
+   "rd": 23,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadencia SDR 4 ATUALIZADO",
+   "text": "Oii, [NOME]! ❤️\n\nMe tira uma dúvida sincera...\n\nSe cuidar ainda é uma prioridade para você ou foi só a correria do dia a dia que acabou te impedindo de me responder? 👀",
+   "created": "2026-05-15T11:06:44.725875Z",
+   "updated": "2026-06-03T13:49:42.081322Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 6554",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "6554",
+   "pos": 5,
+   "off": [
+    2,
+    "DAYS"
+   ],
+   "ex": 21,
+   "rd": 21,
+   "it": 1,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Cadencia SDR 5 ATUALIZADO TESTE",
+   "text": "Oiee [NOME], encontrei um pacote e lembrei de você!!\n\n*DRENAGEM+LIMPEZA DE PELE POR 198,60😱*\n\nVamos se cuidar?",
+   "created": "2026-05-15T11:06:44.716087Z",
+   "updated": "2026-06-03T13:49:42.070941Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 7853",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 6756,
+   "rd": 5646,
+   "it": 889,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Cadencia SDR 1 ATUALIZADO 7853",
+   "text": "Oii [NOME], o que te incomoda hoje?👇",
+   "created": "2026-05-15T12:08:49.017408Z",
+   "updated": "2026-08-25T16:12:45.632463Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 7853",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 6230,
+   "rd": 4943,
+   "it": 510,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "07/08 CADENCIA SEM RESPOSTA 2",
+   "text": "Oii [NOME], fiquei pensando aqui... o que fez você procurar a Drenesse? 😊 Me conta rapidinho que eu te ajudo a entender o melhor caminho pra você.",
+   "created": "2026-05-15T12:08:49.002511Z",
+   "updated": "2026-08-25T16:12:45.62167Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 7853",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 5254,
+   "rd": 4015,
+   "it": 359,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Cadencia sem resposta 25/08",
+   "text": "Heloo [NOME]! Você sabia que drenagem linfática + Stimullus Sculp formam um combo poderoso? \nEnquanto a drenagem reduz o inchaço, o Stimullus trabalha firmeza e contorno, é a academia do futuro!!\nQuer entender como funciona na prática?🥰",
+   "created": "2026-05-15T12:08:48.987431Z",
+   "updated": "2026-08-25T16:12:45.610561Z"
+  },
+  {
+   "seq": "Sem resposta | SDR 7853",
+   "stage": "Sem resposta",
+   "origem": "SDR",
+   "num": "7853",
+   "pos": 4,
+   "off": [
+    6,
+    "DAYS"
+   ],
+   "ex": 5037,
+   "rd": 3209,
+   "it": 377,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "SEM RESPOSTA CADENCIA 25/08",
+   "text": "Olá, [NOME]. Seu atendimento na Drenesse segue em aberto e ainda não teve retorno. Para atualizarmos seu status, me confirme se deseja continuar com a avaliação.",
+   "created": "2026-05-15T12:08:48.972526Z",
+   "updated": "2026-08-25T16:12:45.593282Z"
+  },
+  {
+   "seq": "Sem resposta / SERVIÇOS AVULSOS 5852",
+   "stage": "Sem resposta",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "IMAGE",
+   "tname": "Leads Avulsos - 1 sem resposta - cadencia",
+   "text": "Oii [NOME] ❤️\n\nJá que você demonstrou interesse na Drenesse, separei uma condição especial pra você começar hoje mesmo:\n\n✨ Limpeza de Pele + Drenagem + Dermo Scan de brinde por apenas R$169,90!\n\nComo prefere garantir a sua? PIX ou Cartão??",
+   "created": "2026-08-14T15:25:11.245948Z",
+   "updated": "2026-08-27T13:00:51.581714Z"
+  },
+  {
+   "seq": "Sem resposta / SERVIÇOS AVULSOS 5852",
+   "stage": "Sem resposta",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 2,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Leads Avulsos - 2 sem resposta - cadencia",
+   "text": "Oii [NOME], fiquei pensando aqui... o que fez você procurar a Drenesse? 😊 \n\nMe conta rapidinho que eu te ajudo a entender o melhor caminho pra você.",
+   "created": "2026-08-14T15:25:11.230664Z",
+   "updated": "2026-08-31T13:00:52.053304Z"
+  },
+  {
+   "seq": "Sem resposta / SERVIÇOS AVULSOS 5852",
+   "stage": "Sem resposta",
+   "origem": "Serviços Avulsos",
+   "num": "5852",
+   "pos": 3,
+   "off": [
+    6,
+    "DAYS"
+   ],
+   "ex": 0,
+   "rd": 0,
+   "it": 0,
+   "cat": "s/ cat.",
+   "media": "texto",
+   "tname": "Leads Avulsos - 3 sem resposta - cadencia",
+   "text": "Oiee [NOME] 🥰\n\nVocê sabia que o Método Drenesse pode eliminar até 3kg de retenção líquida em uma única sessão? 💧\n\nSe ficou curioso, é só me chamar que te explico como funciona!",
+   "created": "2026-08-14T15:25:11.207329Z",
+   "updated": "2026-09-07T13:00:52.62082Z"
+  },
+  {
+   "seq": "Sem resposta / SERVIÇOS AVULSOS 7853",
+   "stage": "Sem resposta",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 1,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "IMAGE",
+   "tname": "Leads Avulsos - 1 sem resposta - cadencia",
+   "text": "Oi [NOME] ❤️\n\nJá que você demonstrou interesse na Drenesse, separei uma condição especial pra você começar hoje mesmo:\n\n✨ Limpeza de Pele + Drenagem + Dermo Scan de brinde por apenas R$169,90!\n\nComo prefere garantir a sua?",
+   "created": "2026-08-14T15:22:45.419994Z",
+   "updated": "2026-08-25T12:58:11.486144Z"
+  },
+  {
+   "seq": "Sem resposta / SERVIÇOS AVULSOS 7853",
+   "stage": "Sem resposta",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 1,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Leads Avulsos - 2 sem resposta - cadencia",
+   "text": "Oii [NOME], fiquei pensando aqui... o que fez você procurar a Drenesse? 😊 \n\nMe conta rapidinho que eu te ajudo a entender o melhor caminho pra você.",
+   "created": "2026-08-14T15:22:45.405806Z",
+   "updated": "2026-08-25T12:58:11.470817Z"
+  },
+  {
+   "seq": "Sem resposta / SERVIÇOS AVULSOS 7853",
+   "stage": "Sem resposta",
+   "origem": "Serviços Avulsos",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    6,
+    "DAYS"
+   ],
+   "ex": 1,
+   "rd": 0,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Leads Avulsos - 3 sem resposta - cadencia",
+   "text": "Oiee [NOME] 🥰\n\nVocê sabia que o Método Drenesse pode eliminar até 3kg de retenção líquida em uma única sessão? 💧\n\nSe ficou curioso, é só me chamar que te explico como funciona!",
+   "created": "2026-08-14T15:22:45.390828Z",
+   "updated": "2026-08-25T12:58:11.449544Z"
+  },
+  {
+   "seq": "Sem resposta / Social Selling 7853",
+   "stage": "Sem resposta",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 1,
+   "off": [
+    null,
+    null
+   ],
+   "ex": 10,
+   "rd": 8,
+   "it": 1,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "Cadencia SDR 1 ATUALIZADO 7853",
+   "text": "Oii [NOME], o que te incomoda hoje?👇",
+   "created": "2026-08-20T15:41:00.200804Z",
+   "updated": "2026-08-20T15:41:00.200804Z"
+  },
+  {
+   "seq": "Sem resposta / Social Selling 7853",
+   "stage": "Sem resposta",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 2,
+   "off": [
+    4,
+    "DAYS"
+   ],
+   "ex": 9,
+   "rd": 7,
+   "it": 1,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "07/08 CADENCIA SEM RESPOSTA 2",
+   "text": "Oii [NOME], fiquei pensando aqui... o que fez você procurar a Drenesse? 😊 Me conta rapidinho que eu te ajudo a entender o melhor caminho pra você.",
+   "created": "2026-08-20T15:41:00.189651Z",
+   "updated": "2026-08-20T15:41:00.189651Z"
+  },
+  {
+   "seq": "Sem resposta / Social Selling 7853",
+   "stage": "Sem resposta",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 3,
+   "off": [
+    5,
+    "DAYS"
+   ],
+   "ex": 4,
+   "rd": 4,
+   "it": 0,
+   "cat": "MARKETING",
+   "media": "texto",
+   "tname": "07/08 CADENCIA SEM RESPOSTA 3",
+   "text": "Oii [NOME], separamos algumas pessoas da nossa lista para um *Spa Face* gratuito essa semana 🥰 Você é uma delas! São poucas vagas e eu não queria que você perdesse.",
+   "created": "2026-08-20T15:41:00.178941Z",
+   "updated": "2026-08-20T15:41:00.178941Z"
+  },
+  {
+   "seq": "Sem resposta / Social Selling 7853",
+   "stage": "Sem resposta",
+   "origem": "Social Selling",
+   "num": "7853",
+   "pos": 4,
+   "off": [
+    6,
+    "DAYS"
+   ],
+   "ex": 1,
+   "rd": 1,
+   "it": 0,
+   "cat": "UTILITY",
+   "media": "texto",
+   "tname": "UTILIDADE TESTE 13",
+   "text": "Olá, [NOME], Tudo bem? Identificamos que seu atendimento ainda não foi concluído. Para continuarmos, me informe se você deseja seguir com a avaliação ou se ficou alguma dúvida pendente.",
+   "created": "2026-08-20T15:41:00.164332Z",
+   "updated": "2026-08-20T15:41:00.164332Z"
+  }
+ ]
+}
