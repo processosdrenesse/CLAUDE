@@ -36,4 +36,5 @@ export const configStatus = () => ({
   LEVER_API_URL: (process.env.LEVER_API_URL ?? "").trim() ? "definida" : "padrão",
   DASHBOARD_PASSWORD: !!process.env.DASHBOARD_PASSWORD,
   ambiente: process.env.VERCEL ? "vercel" : "local",
+  versao: (process.env.VERCEL_GIT_COMMIT_SHA ?? "").slice(0, 7) || undefined,
 });

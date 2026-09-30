@@ -71,6 +71,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <p className="text-center text-[11px] leading-snug text-mute">
             {last ? <>Última atualização: {fmtStamp(last)}<br /></> : null}Fonte: Belle API + Lever API — Drenesse
           </p>
+          <p className="text-center text-[10px] text-mute/70" title={`Build ${__BUILD__.date}`}>Versão {__BUILD__.sha} • {new Date(__BUILD__.date).toLocaleDateString("pt-BR")}</p>
         </div>
       </aside>
       <main className="mx-auto max-w-[1400px] space-y-6 px-4 py-6 sm:px-8 sm:py-8">{children}</main>
