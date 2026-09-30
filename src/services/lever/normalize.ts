@@ -36,9 +36,14 @@ export function normalizePanel(area: AreaKey, d: Raw): Painel {
   return { id: d.id, area, titulo: d.title, etapas, etiquetas: Object.fromEntries((d.tags as Raw[]).map((t) => [t.id, String(t.name)])) };
 }
 
-const cf = (fields: Raw, prefix: string): unknown => {
-  const k = Object.keys(fields).find((x) => x.startsWith(prefix));
-  return k ? fields[k] : undefined;
+/** Campos personalizados têm sufixo numérico por painel (ex.: unidade-63) e o nome varia
+ *  ("data-de-avalia-o" no Social Selling, "data-avalia-o" no SDR). Procura por prefixos. */
+const cf = (fields: Raw, ...prefixes: string[]): unknown => {
+  for (const prefix of prefixes) {
+    const k = Object.keys(fields).find((x) => x.startsWith(prefix));
+    if (k) return fields[k];
+  }
+  return undefined;
 };
 const asText = (v: unknown) => (Array.isArray(v) ? v.join(", ") : String(v ?? "")).trim();
 
@@ -54,7 +59,7 @@ export function normalizeCard(c: Raw, painel: Painel, agentes: Map<string, strin
     valor: Number(c.monetaryAmount ?? 0),
     responsavel: respCampo || agentes.get(c.responsibleUserId) || "Sem responsável",
     unidade: normalizeUnit(cf(f, "unidade")),
-    dataAvaliacao: looseToIso(cf(f, "data-de-avalia")),
+    dataAvaliacao: looseToIso(cf(f, "data-de-avalia", "data-avalia")),
     interesse: asText(cf(f, "interesse")), potencial: asText(cf(f, "potencial-de-venda")),
     mesFechamento: titleCase(asText(cf(f, "m-s-de-fechamento"))),
     contatoIds: c.contactIds ?? [],

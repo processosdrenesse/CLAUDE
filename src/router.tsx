@@ -1,8 +1,8 @@
-import { createRootRoute, createRoute, createRouter, Outlet, useParams } from "@tanstack/react-router";
+import { createRootRoute, createRoute, createRouter, Outlet, redirect, useParams } from "@tanstack/react-router";
 import { Shell } from "@/components/layout/Shell";
 import { AREA_KEYS, type AreaKey } from "@/config/areas";
 import Agendamentos from "@/pages/Agendamentos";
-import Executivo from "@/pages/Executivo";
+import ConciliacaoBelleLever from "@/pages/ConciliacaoBelleLever";
 import FaturamentoComercial from "@/pages/FaturamentoComercial";
 import Parcerias from "@/pages/Parcerias";
 import { FaturamentoLever, Funil, QualidadeCrm } from "@/pages/LeverPages";
@@ -20,8 +20,11 @@ const FatPage = () => { const a = areaOf(); return <FaturamentoLever key={a} are
 const QualPage = () => { const a = areaOf(); return <QualidadeCrm key={a} area={a} />; };
 
 const tree = root.addChildren([
-  route("/", Executivo), route("/agendamentos", Agendamentos), route("/faturamento-comercial", FaturamentoComercial),
+  createRoute({ getParentRoute: () => root, path: "/", beforeLoad: () => { throw redirect({ to: "/agendamentos" }); } }),
+  route("/agendamentos", Agendamentos), route("/faturamento-comercial", FaturamentoComercial),
   route("/funil/$area", FunilPage), route("/faturamento/$area", FatPage), route("/qualidade/$area", QualPage), route("/parcerias", Parcerias),
+  // Conciliação Belle × Lever: fora do menu (Faturamento Comercial agora é só Lever)
+  route("/conciliacao-belle-lever", ConciliacaoBelleLever),
 ]);
 export const router = createRouter({ routeTree: tree });
 declare module "@tanstack/react-router" { interface Register { router: typeof router } }

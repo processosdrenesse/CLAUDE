@@ -2,12 +2,12 @@ import { useMemo, useState } from "react";
 import { AlertTriangle, CheckCircle2, CircleX, Filter as FilterIcon, Handshake, Layers, ReceiptText, Target, TrendingUp, Users, UserX, Wallet, CalendarClock, Percent } from "lucide-react";
 import { PageHeader } from "@/components/layout/Shell";
 import { DateRangeField, FilterCard, MultiSelect } from "@/components/ui/filters";
-import { Card, ChartCard, KpiCard, Loading, Section, SourceError } from "@/components/ui/primitives";
+import { Card, ChartCard, KpiCard, Loading, Notice, Section, SourceError } from "@/components/ui/primitives";
 import { BarsH, BarsV, C, Donut, Lines, SERIES } from "@/components/ui/charts";
 import { DataTable, type Col } from "@/components/ui/DataTable";
 import { useArea } from "@/hooks/queries";
 import { AREAS, type AreaKey } from "@/config/areas";
-import { emptyLeadFilters, evolucaoMensal, filtrarLeads, kpisFunil, opcoesLead, porEtapa, porResponsavel, porUnidadeLeads, qualidade, situacaoDe, somaValor, vendasLever, type LeadFilters } from "@/domain/funil";
+import { emptyLeadFilters, evolucaoMensal, filtrarLeads, kpisFunil, opcoesLead, porEtapa, porResponsavel, porUnidadeLeads, qualidade, semDataAvaliacao, somaValor, taxaConversao, vendasLever, type LeadFilters } from "@/domain/funil";
 import { fmtBrl, fmtInt, fmtPct } from "@/lib/format";
 import { isoToBr, ymLabel } from "@/lib/dates";
 import type { Lead } from "@/services/lever/types";
@@ -30,8 +30,8 @@ function Barra({ h, modo }: { h: ReturnType<typeof useLeadArea>; modo: Modo }) {
   return (
     <FilterCard onClear={h.clear}>
       <DateRangeField label="Data de Criação" value={f.criacao} onChange={(v) => set("criacao", v)} />
-      <DateRangeField label="Data de Avaliação" value={f.avaliacao} onChange={(v) => set("avaliacao", v)} />
-      {modo === "faturamento" && <DateRangeField label="Data de Fechamento" value={f.fechamento} onChange={(v) => set("fechamento", v)} hint="Última movimentação do card em fase de venda" />}
+      <DateRangeField label="Data de Avaliação" value={f.avaliacao} onChange={(v) => set("avaliacao", v)} hint="Campo manual “Data Avaliação” do Lever" />
+      {modo !== "funil" && <DateRangeField label="Data de Fechamento" value={f.fechamento} onChange={(v) => set("fechamento", v)} hint="Última movimentação do card em fase de venda (o Lever não expõe a data real de fechamento)" />}
       <MultiSelect label="Responsável" options={opcoesLead(leads, (l) => l.responsavel)} value={f.responsavel} onChange={(v) => set("responsavel", v)} />
       <MultiSelect label="Fase" options={etapas} value={f.etapa} onChange={(v) => set("etapa", v)} />
       <MultiSelect label="Situação" options={["Ativo", "Convertido", "Perdido", "Duplicado"]} value={f.situacao} onChange={(v) => set("situacao", v)} />
@@ -39,6 +39,12 @@ function Barra({ h, modo }: { h: ReturnType<typeof useLeadArea>; modo: Modo }) {
       <MultiSelect label="Mês de Fechamento" options={opcoesLead(leads, (l) => l.mesFechamento || "Não informado")} value={f.mesFechamento} onChange={(v) => set("mesFechamento", v)} />
     </FilterCard>
   );
+}
+
+/** Deixa explícito quantos leads ficam fora por não terem Data de Avaliação. */
+function AvisoSemAvaliacao({ h }: { h: ReturnType<typeof useLeadArea> }) {
+  const n = semDataAvaliacao(h.leads, h.f);
+  return n > 0 ? <Notice tone="info">{fmtInt(n)} lead(s) sem “Data de Avaliação” preenchida no Lever não entram neste filtro.</Notice> : null;
 }
 
 const sub = (area: AreaKey, txt: string) => `${txt} — funil "${AREAS[area].panelTitle}" do Lever.`;
@@ -65,6 +71,7 @@ export function Funil({ area }: { area: AreaKey }) {
     <>
       <PageHeader title={`Funil (${AREAS[area].label})`} subtitle={sub(area, "Leads, fases e conversão registrados no CRM")} />
       <Barra h={h} modo="funil" />
+      <AvisoSemAvaliacao h={h} />
       {h.q.isLoading && <Loading label="Buscando cards no Lever (todas as páginas)..." />}
       {h.q.error && <SourceError error={h.q.error} onRetry={() => h.q.refetch()} />}
       {h.q.data && (
@@ -105,6 +112,7 @@ export function FaturamentoLever({ area }: { area: AreaKey }) {
   const h = useLeadArea(area);
   const vendas = useMemo(() => vendasLever(h.filtrados), [h.filtrados]);
   const total = somaValor(vendas), n = vendas.length;
+  const tc = useMemo(() => taxaConversao(h.leads, h.f), [h.leads, h.f]);
   const resp = useMemo(() => porResponsavel(vendas).map((r) => ({ nome: r.nome, valor: r.valor, vendas: r.leads })).sort((a, b) => b.valor - a.valor), [vendas]);
   const unid = useMemo(() => porUnidadeLeads(vendas).map((r) => ({ nome: r.nome, valor: r.valor, vendas: r.leads })), [vendas]);
   const evo = useMemo(() => evolucaoMensal(vendas).filter((m) => m.convertidos > 0).map((m) => ({ mes: m.mes, valor: m.valor, vendas: m.convertidos })), [vendas]);
@@ -119,6 +127,7 @@ export function FaturamentoLever({ area }: { area: AreaKey }) {
     <>
       <PageHeader title={`Faturamento (${AREAS[area].label})`} subtitle={sub(area, "Vendas convertidas registradas no CRM (fases “Convertidos”)")} />
       <Barra h={h} modo="faturamento" />
+      <AvisoSemAvaliacao h={h} />
       {h.q.isLoading && <Loading label="Buscando cards no Lever (todas as páginas)..." />}
       {h.q.error && <SourceError error={h.q.error} onRetry={() => h.q.refetch()} />}
       {h.q.data && (
@@ -127,7 +136,9 @@ export function FaturamentoLever({ area }: { area: AreaKey }) {
             <KpiCard title="Faturamento total" value={fmtBrl(total)} icon={<Wallet />} tone="coral" />
             <KpiCard title="Quantidade de vendas" value={fmtInt(n)} icon={<ReceiptText />} tone="ok" />
             <KpiCard title="Ticket médio" value={fmtBrl(n ? total / n : 0)} icon={<TrendingUp />} tone="rasp" />
-            <KpiCard title="Convertidos" value={fmtInt(kpisFunil(h.filtrados).convertidos)} sub={`Conversão ${fmtPct(kpisFunil(h.filtrados).conversao)}`} icon={<Target />} tone="warn" />
+            <KpiCard title="Taxa de conversão" value={fmtPct(tc.taxa, 1)} icon={<Target />} tone="warn"
+              tip="Convertidos ÷ leads válidos (sem duplicados) nos mesmos filtros, exceto Data de Fechamento e Situação"
+              sub={<>Convertidos: <b>{fmtInt(tc.convertidos)}</b><br />Base considerada: <b>{fmtInt(tc.base)}</b></>} />
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <ChartCard title="Faturamento por Responsável" subtitle="Vendas convertidas"><BarsV data={resp.slice(0, 10)} x="nome" y="valor" name="Faturamento" fmt={fmtBrl} color={C.rasp} /></ChartCard>
@@ -163,6 +174,7 @@ export function QualidadeCrm({ area }: { area: AreaKey }) {
     <>
       <PageHeader title={`Qualidade do CRM (${AREAS[area].label})`} subtitle={sub(area, "Preenchimento dos campos obrigatórios dos leads")} />
       <Barra h={h} modo="qualidade" />
+      <AvisoSemAvaliacao h={h} />
       {h.q.isLoading && <Loading label="Buscando cards no Lever (todas as páginas)..." />}
       {h.q.error && <SourceError error={h.q.error} onRetry={() => h.q.refetch()} />}
       {h.q.data && (

@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
-import { Handshake, Target, Users, Wallet } from "lucide-react";
+import { CalendarClock, Handshake, Target, UserX, Users, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/layout/Shell";
 import { DateRangeField, FilterCard, MultiSelect } from "@/components/ui/filters";
 import { Card, ChartCard, KpiCard, Loading, Section, SourceError } from "@/components/ui/primitives";
 import { BarsV, Donut } from "@/components/ui/charts";
 import { DataTable } from "@/components/ui/DataTable";
 import { useArea } from "@/hooks/queries";
-import { emptyLeadFilters, filtrarLeads, leadsValidos, opcoesLead, somaValor } from "@/domain/funil";
+import { emptyLeadFilters, filtrarLeads, kpisFunil, leadsValidos, opcoesLead, somaValor } from "@/domain/funil";
 import { AREA_PARCERIAS } from "@/config/areas";
 import { fmtBrl, fmtInt, fmtPct, ratio } from "@/lib/format";
 
@@ -36,6 +36,8 @@ export default function Parcerias() {
     return ordem.filter((e) => m.has(e)).map((nome) => ({ nome, leads: m.get(nome)! }));
   }, [leads, q.data]);
   const conv = leads.filter((l) => l.convertido);
+  const k = useMemo(() => kpisFunil(leads), [leads]);
+  const pctLeads = (n: number) => `${fmtPct(ratio(n, leads.length), 1)} dos leads`;
 
   return (
     <>
@@ -52,11 +54,14 @@ export default function Parcerias() {
       {q.error && <SourceError error={q.error} onRetry={() => q.refetch()} />}
       {q.data && (
         <>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 xl:grid-cols-7">
             <KpiCard title="Leads" value={fmtInt(leads.length)} sub={f.etiqueta.length ? `${f.etiqueta.length} etiqueta(s)` : "Todos os cards etiquetados"} icon={<Users />} tone="coral" />
             <KpiCard title="Convertidos" value={fmtInt(conv.length)} sub={`Conversão ${fmtPct(ratio(conv.length, leads.length))}`} icon={<Target />} tone="ok" />
             <KpiCard title="Faturamento" value={fmtBrl(somaValor(conv))} icon={<Wallet />} tone="rasp" />
             <KpiCard title="Etiquetas" value={fmtInt(porEtiqueta.length)} icon={<Handshake />} tone="plain" />
+            <KpiCard title="Agendamento" value={fmtInt(k.agendados)} sub={pctLeads(k.agendados)} icon={<CalendarClock />} tone="rasp" tip="Cards na fase de agendamento (Pré-AV)" />
+            <KpiCard title="Falhou AV" value={fmtInt(k.faltaram)} sub={pctLeads(k.faltaram)} icon={<UserX />} tone="warn" tip="Cards na fase “Falhou AV”" />
+            <KpiCard title="Negociação" value={fmtInt(k.negociacao)} sub={pctLeads(k.negociacao)} icon={<Handshake />} tone="plain" tip="Cards na fase “Negociação”" />
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <ChartCard title="Leads por Etapa" subtitle="Ordem do funil SDRs"><BarsV data={porEtapa} x="nome" y="leads" name="Leads" height={320} /></ChartCard>

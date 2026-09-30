@@ -76,3 +76,52 @@ test("conciliação: ambíguo vai para revisão; telefone tem prioridade sobre n
   const r2 = conciliar([lado("1", "Maria A", { phone: "(84) 99999-1111" })], [lado("L1", "Outra Pessoa", { phone: "84999991111" })], new Set(["L1"]));
   assert.equal(r2[0].status, "Conciliado"); assert.equal(r2[0].criterio, "Telefone");
 });
+
+// ---------- Lever: datas, filtros combinados e taxa de conversão ----------
+import { normalizeCard, normalizePanel } from "../../services/lever/normalize.ts";
+import { emptyLeadFilters, filtrarLeads, taxaConversao, semDataAvaliacao } from "../../domain/funil.ts";
+import type { Lead } from "../../services/lever/types.ts";
+
+const painel = normalizePanel("sdr", {
+  id: "p", title: "SDRs", tags: [],
+  steps: [
+    { id: "s1", title: "Contato", position: 1, isFinal: false }, { id: "s2", title: "Convertidos", position: 2, isFinal: true },
+    { id: "s3", title: "Duplicados para excluir", position: 3, isFinal: false },
+  ],
+});
+const card = (o: Record<string, unknown>) => normalizeCard({ id: "x", key: "K", title: "T", createdAt: "2026-09-01T12:00:00Z", updatedAt: "2026-09-20T12:00:00Z", stepId: "s1", tagIds: [], contactIds: [], customFields: {}, ...o }, painel, new Map());
+
+test("Data de Avaliação: nome do campo varia por painel (SDR = data-avalia-o)", () => {
+  assert.equal(card({ customFields: { "data-avalia-o": ["2026/08/22"] } }).dataAvaliacao, "2026-08-22");
+  assert.equal(card({ customFields: { "data-de-avalia-o-94": ["2026/09/22"] } }).dataAvaliacao, "2026-09-22");
+  assert.equal(card({ customFields: {} }).dataAvaliacao, "");
+});
+
+test("Data de Avaliação não usa criação/fechamento e exclui quem não tem", () => {
+  const ls: Lead[] = [
+    card({ id: "a", customFields: { "data-avalia-o": ["2026/09/10"] }, createdAt: "2026-01-05T12:00:00Z" }),  // criado fora, avaliado dentro
+    card({ id: "b", customFields: { "data-avalia-o": ["2026/07/10"] }, createdAt: "2026-09-05T12:00:00Z" }),  // criado dentro, avaliado fora
+    card({ id: "c", customFields: {}, createdAt: "2026-09-05T12:00:00Z" }),                                  // sem avaliação
+  ];
+  const f = { ...emptyLeadFilters(), avaliacao: { from: "2026-09-01", to: "2026-09-30" } };
+  assert.deepEqual(filtrarLeads(ls, f).map((l) => l.id), ["a"]);
+  assert.equal(semDataAvaliacao(ls, f), 1);
+});
+
+test("filtros combinados: avaliação + responsável + unidade + fechamento", () => {
+  const mk = (id: string, resp: string, un: string, step: string, upd: string) =>
+    card({ id, stepId: step, updatedAt: upd, customFields: { "data-avalia-o": ["2026/09/10"], "unidade": un, "respons-vel-pela-ven": resp } });
+  const ls = [mk("1", "Ana", "Lagoa Nova", "s2", "2026-09-20T12:00:00Z"), mk("2", "Ana", "Zona Norte", "s2", "2026-09-20T12:00:00Z"),
+    mk("3", "Bia", "Lagoa Nova", "s2", "2026-09-20T12:00:00Z"), mk("4", "Ana", "Lagoa Nova", "s2", "2026-08-01T12:00:00Z")];
+  const f = { ...emptyLeadFilters(), avaliacao: { from: "2026-09-01", to: "2026-09-30" }, responsavel: ["Ana"], unidade: ["Lagoa Nova"], fechamento: { from: "2026-09-15", to: "2026-09-30" } };
+  assert.deepEqual(filtrarLeads(ls, f).map((l) => l.id), ["1"]);
+});
+
+test("taxa de conversão: quantidade, base (sem duplicados) e independência do fechamento", () => {
+  const ls = [card({ id: "1", stepId: "s2" }), card({ id: "2", stepId: "s1" }), card({ id: "3", stepId: "s1" }), card({ id: "4", stepId: "s3" }),
+    card({ id: "5", stepId: "s2", updatedAt: "2026-08-01T12:00:00Z" })];
+  const t = taxaConversao(ls, emptyLeadFilters());
+  assert.deepEqual([t.convertidos, t.base, Math.round(t.taxa)], [2, 4, 50]);
+  const t2 = taxaConversao(ls, { ...emptyLeadFilters(), fechamento: { from: "2026-09-01", to: "2026-09-30" } });
+  assert.deepEqual([t2.convertidos, t2.base], [1, 4]);  // base não encolhe com a data de fechamento
+});

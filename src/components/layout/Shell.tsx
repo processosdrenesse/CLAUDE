@@ -1,13 +1,13 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
-import { Calendar, DollarSign, Filter, Handshake, LayoutDashboard, Menu, RefreshCw, ShieldCheck, X } from "lucide-react";
+import { Calendar, DollarSign, Filter, Handshake, Menu, RefreshCw, ShieldCheck, X } from "lucide-react";
 import { NAV, type NavIcon } from "@/config/nav";
 import { cn } from "@/lib/cn";
 import { refreshAll } from "@/hooks/queries";
 
 const ICONS: Record<NavIcon, ReactNode> = {
-  layout: <LayoutDashboard />, calendar: <Calendar />, dollar: <DollarSign />, filter: <Filter />, shield: <ShieldCheck />, handshake: <Handshake />,
+  calendar: <Calendar />, dollar: <DollarSign />, filter: <Filter />, shield: <ShieldCheck />, handshake: <Handshake />,
 };
 
 export function Logo() {
@@ -52,7 +52,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <div key={g.title}>
               <div className="mb-1.5 px-3 text-[10px] font-semibold tracking-widest text-mute">{g.title}</div>
               {g.items.map((it) => {
-                const active = it.to === "/" ? path === "/" : path === it.to;
+                const active = path === it.to;
                 return (
                   <Link key={it.to} to={it.to} className={cn("flex items-center gap-3 rounded-xl px-3 py-2 text-[13.5px] font-medium [&_svg]:size-4", active ? "bg-coral text-white" : "text-ink hover:bg-coral-soft")}>
                     {ICONS[it.icon]}<span>{it.label}</span>

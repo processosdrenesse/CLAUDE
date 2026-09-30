@@ -40,8 +40,8 @@ src/services (normalização) → src/domain (regras/indicadores) → src/pages 
 
 ## Limitações conhecidas
 
-1. **Data de Inclusão** não existe na API do Belle (só está no relatório do BI). O filtro está desabilitado até o Belle expor o campo (`Agendamento.dataInclusao`).
-2. **Data de fechamento no Lever** = última movimentação do card (`updatedAt`); a API não expõe a data em que entrou na fase de venda.
+1. **Data de Inclusão** não existe na API do Belle (só está no relatório do BI). Investigado: nenhum endpoint documentado de agendamento traz o campo; `cliente/{id}/auditar` é log por cliente (1 chamada por cliente, limite de 40/min) e falhou no teste; `atendimentos_detalhado` retorna sem permissão. Nenhuma data substituta é usada: o filtro fica desabilitado até o Belle expor o campo (`Agendamento.dataInclusao`).
+2. **Data de Fechamento no Lever** = última movimentação do card (`updatedAt`). Investigado: o histórico do card (`track-log`) e a auditoria (`core/v1/audit`) retornam 404/403 com a chave de integração, e não há campo de data de fechamento no card (só o mês, em "Mês de Fechamento"). O filtro está rotulado explicitamente na tela.
 3. Parcerias = cards do funil SDRs, recortados pelo filtro de Etiquetas (as 24 etiquetas do painel, como no Lever).
 4. Equipe oficial de agendamento em `src/config/areas.ts` (`EQUIPE_OFICIAL`).
 
@@ -52,3 +52,14 @@ src/services (normalização) → src/domain (regras/indicadores) → src/pages 
 3. Deploy. Ao abrir, o navegador pede usuário (qualquer) e a senha.
 
 Atenção: em serverless o cache é por instância; a 1ª carga de cada página pode levar dezenas de segundos e há limite de tempo por função conforme o plano da Vercel.
+
+## Datas do Lever (nunca se substituem)
+
+| Filtro | Campo | Observação |
+|---|---|---|
+| Data de Criação | `createdAt` do card | |
+| Data de Avaliação | campo manual do card (`data-avalia-o` no SDR, `data-de-avalia-o-*` nos demais) | leads sem o campo ficam fora do filtro e a tela avisa quantos |
+| Data de Fechamento | `updatedAt` do card em fase de venda | rotulada como "última movimentação" |
+
+**Faturamento Comercial** usa somente o Lever. A conciliação Belle × Lever continua disponível (fora do menu) em `/conciliacao-belle-lever`.
+**Taxa de conversão** = convertidos ÷ leads válidos (sem duplicados) nos mesmos filtros, exceto Data de Fechamento e Situação; a tela mostra a quantidade e a base.

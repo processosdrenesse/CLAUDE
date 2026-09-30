@@ -103,3 +103,21 @@ export function qualidade(ls: Lead[]) {
 }
 
 export const opcoesLead = (ls: Lead[], pick: (l: Lead) => string) => [...new Set(ls.map(pick).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+/**
+ * Taxa de conversão com as quantidades usadas no cálculo.
+ * Convertidos = leads em fases de venda dentro de TODOS os filtros.
+ * Base = leads válidos (sem duplicados) dentro dos mesmos filtros, exceto Data de Fechamento e Situação
+ * (senão a base encolheria junto com o numerador e a taxa viraria 100%).
+ */
+export function taxaConversao(ls: Lead[], f: LeadFilters) {
+  const convertidos = leadsValidos(filtrarLeads(ls, f)).filter((l) => l.convertido).length;
+  const base = leadsValidos(filtrarLeads(ls, { ...f, fechamento: {}, situacao: [] })).length;
+  return { convertidos, base, taxa: ratio(convertidos, base) };
+}
+
+/** Leads que seriam elegíveis, mas não têm Data de Avaliação (ficam fora quando o filtro está ativo). */
+export function semDataAvaliacao(ls: Lead[], f: LeadFilters) {
+  if (!f.avaliacao.from && !f.avaliacao.to) return 0;
+  return leadsValidos(filtrarLeads(ls, { ...f, avaliacao: {} })).filter((l) => !l.dataAvaliacao).length;
+}

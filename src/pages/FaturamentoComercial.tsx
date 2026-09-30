@@ -1,186 +1,101 @@
 import { useMemo, useState } from "react";
-import { GitCompareArrows, Landmark, Link2, Percent, Scale, ShoppingBag, Wallet } from "lucide-react";
+import { Layers, Percent, ReceiptText, Target, TrendingUp, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/layout/Shell";
-import { DateRangeField, Field, FilterCard, MultiSelect } from "@/components/ui/filters";
+import { DateRangeField, FilterCard, MultiSelect } from "@/components/ui/filters";
 import { Card, ChartCard, KpiCard, Loading, Notice, Section, SourceError } from "@/components/ui/primitives";
-import { BarsGrouped, BarsH, C, Donut, Lines } from "@/components/ui/charts";
+import { BarsH, BarsV, C, Donut, Lines } from "@/components/ui/charts";
 import { DataTable, type Col } from "@/components/ui/DataTable";
-import { useAgendamentos, useAllAreas, useClientesDetalhe, useContatos, useVendasPlanos } from "@/hooks/queries";
-import { conciliar, DEFAULT_MATCH, resumoConciliacao, type LinhaConc, type StatusConc, type VendaLado } from "@/domain/conciliacao";
-import { filtrarVendas, vincularAtendimentos } from "@/domain/vendas";
-import { somaValor, vendasLever } from "@/domain/funil";
+import { useAllAreas } from "@/hooks/queries";
+import { emptyLeadFilters, evolucaoMensal, filtrarLeads, opcoesLead, porResponsavel, porUnidadeLeads, semDataAvaliacao, somaValor, taxaConversao, vendasLever, type LeadFilters } from "@/domain/funil";
 import { AREAS, AREA_KEYS } from "@/config/areas";
-import { firstOfMonth, inRange, isoToBr, lastOfMonth, toIso, ymLabel, ymOf, type DateRange } from "@/lib/dates";
-import { fmtBrl, fmtInt, fmtPct, ratio } from "@/lib/format";
-import { cn } from "@/lib/cn";
-import { UNITS } from "@/lib/units";
+import { fmtBrl, fmtInt, fmtPct } from "@/lib/format";
+import { isoToBr, ymLabel } from "@/lib/dates";
+import type { Lead } from "@/services/lever/types";
 
-const STATUS: StatusConc[] = ["Conciliado", "Somente Belle", "Somente Lever", "Divergência de valor", "Divergência de data", "Divergência de unidade", "Correspondência para revisão"];
-const BADGE: Record<StatusConc, string> = {
-  "Conciliado": "bg-ok/10 text-ok", "Somente Belle": "bg-rasp-soft text-rasp", "Somente Lever": "bg-coral-soft text-coral-dark",
-  "Divergência de valor": "bg-warn/10 text-warn", "Divergência de data": "bg-warn/10 text-warn", "Divergência de unidade": "bg-warn/10 text-warn", "Correspondência para revisão": "bg-zinc-100 text-mute",
-};
-const shift = (iso: string, days: number) => { const d = new Date(iso + "T12:00:00"); d.setDate(d.getDate() + days); return toIso(d); };
-const defaults = () => ({ periodo: { from: firstOfMonth(), to: lastOfMonth() } as Partial<DateRange>, unidade: [] as string[], responsavel: [] as string[], origem: [] as string[], conc: [] as string[] });
-
+/** Faturamento Comercial — 100% Lever (cards em fases de venda de todos os funis). */
 export default function FaturamentoComercial() {
-  const [f, setF] = useState(defaults);
-  const set = <K extends keyof ReturnType<typeof defaults>>(k: K, v: ReturnType<typeof defaults>[K]) => setF((p) => ({ ...p, [k]: v }));
-  const from = f.periodo.from || firstOfMonth(), to = f.periodo.to || lastOfMonth();
-
-  const vq = useVendasPlanos(from, to);
-  const aq = useAgendamentos(from, to);
   const lv = useAllAreas();
+  const [f, setF] = useState<LeadFilters>(emptyLeadFilters);
+  const [origem, setOrigem] = useState<string[]>([]);
+  const set = <K extends keyof LeadFilters>(k: K, v: LeadFilters[K]) => setF((p) => ({ ...p, [k]: v }));
 
-  const linhas0 = useMemo(() => {
-    if (!vq.data) return null;
-    // vendas de R$ 0,00 (cortesias/vouchers) não são faturamento e ficam fora da conciliação
-    const belleVendas = filtrarVendas(vq.data.items, { periodo: { from, to }, unidade: [] }).filter((v) => v.valor > 0);
-    const belle: VendaLado[] = belleVendas.map((v) => ({ id: v.id, cliente: v.cliente, unidade: v.unidade, data: v.data, valor: v.valor, extra: { clienteId: String(v.clienteId), vendedor: v.vendedor, plano: v.plano } }));
-    const conv = vendasLever(lv.leads);
-    const lever: VendaLado[] = conv
-      .filter((l) => inRange(l.atualizadoEm, { from: shift(from, -DEFAULT_MATCH.janelaDias), to: shift(to, DEFAULT_MATCH.janelaDias) }))
-      .map((l) => ({ id: l.id, cliente: l.titulo, unidade: l.unidade, data: l.atualizadoEm, valor: l.valor, extra: { responsavel: l.responsavel, origem: AREAS[l.area].label, contato: l.contatoIds[0] ?? "" } }));
-    const noPeriodo = new Set(lever.filter((l) => inRange(l.data, { from, to })).map((l) => l.id));
-    return { belle, lever, noPeriodo };
-  }, [vq.data, lv.leads, from, to]);
+  // Origem / Funil restringe o universo; os demais filtros usam a mesma camada de dados
+  const universo = useMemo(() => (origem.length ? lv.leads.filter((l) => origem.includes(AREAS[l.area].label)) : lv.leads), [lv.leads, origem]);
+  const filtrados = useMemo(() => filtrarLeads(universo, f), [universo, f]);
+  const vendas = useMemo(() => vendasLever(filtrados), [filtrados]);
+  const total = somaValor(vendas), n = vendas.length;
+  const tc = useMemo(() => taxaConversao(universo, f), [universo, f]);
+  const semAv = useMemo(() => semDataAvaliacao(universo, f), [universo, f]);
 
-  // 1ª passada (nome + unidade/data); pendências ganham dados de contato (CPF/telefone/e-mail) na 2ª
-  const passe1 = useMemo(() => (linhas0 ? conciliar(linhas0.belle, linhas0.lever, linhas0.noPeriodo) : []), [linhas0]);
-  const pendBelle = useMemo(() => passe1.filter((l) => l.status === "Somente Belle" && l.belle).slice(0, 60).map((l) => Number(l.belle!.extra?.clienteId)).filter(Boolean), [passe1]);
-  const pendLever = useMemo(() => passe1.filter((l) => l.status === "Somente Lever" && l.lever).slice(0, 60).map((l) => l.lever!.extra?.contato ?? "").filter(Boolean), [passe1]);
-  const bd = useClientesDetalhe(pendBelle);
-  const lc = useContatos(pendLever);
+  const porOrigem = useMemo(() => AREA_KEYS.map((k) => {
+    const l = vendas.filter((v) => v.area === k);
+    return { area: k, nome: AREAS[k].label, valor: somaValor(l), vendas: l.length };
+  }), [vendas]);
+  const resp = useMemo(() => porResponsavel(vendas).map((r) => ({ nome: r.nome, valor: r.valor, vendas: r.leads })).sort((a, b) => b.valor - a.valor), [vendas]);
+  const unid = useMemo(() => porUnidadeLeads(vendas).map((r) => ({ nome: r.nome, valor: r.valor, vendas: r.leads })), [vendas]);
+  const evo = useMemo(() => evolucaoMensal(vendas).filter((m) => m.convertidos > 0).map((m) => ({ mes: m.mes, valor: m.valor })), [vendas]);
+  const fases = useMemo(() => opcoesLead(lv.leads, (l) => l.etapa), [lv.leads]);
 
-  const linhasAll = useMemo(() => {
-    if (!linhas0) return [];
-    if (!bd.data && !lc.data) return passe1;
-    const bm = new Map((bd.data ?? []).map((c) => [String(c.codCliente), c]));
-    const lm = new Map((lc.data ?? []).map((c) => [c.id, c]));
-    const belle = linhas0.belle.map((b) => { const c = bm.get(b.extra?.clienteId ?? ""); return c ? { ...b, doc: c.cpf, phone: c.celular, email: c.email } : b; });
-    const lever = linhas0.lever.map((l) => { const c = lm.get(l.extra?.contato ?? ""); return c ? { ...l, phone: c.phone, email: c.email } : l; });
-    return conciliar(belle, lever, linhas0.noPeriodo);
-  }, [linhas0, passe1, bd.data, lc.data]);
-
-  // ---- filtros aplicados sobre as linhas: uma única camada para KPIs, gráficos e tabelas ----
-  const linhas = useMemo(() => linhasAll.filter((l) => {
-    const un = l.belle?.unidade ?? l.lever?.unidade;
-    return (f.unidade.length === 0 || (un && f.unidade.includes(un))) &&
-      (f.responsavel.length === 0 || (l.lever && f.responsavel.includes(l.lever.extra?.responsavel ?? ""))) &&
-      (f.origem.length === 0 || (l.lever && f.origem.includes(l.lever.extra?.origem ?? ""))) &&
-      (f.conc.length === 0 || f.conc.includes(l.status));
-  }), [linhasAll, f]);
-
-  const comAtendimento = useMemo(() => {
-    if (!vq.data || !aq.data) return null;
-    const vs = filtrarVendas(vq.data.items, { periodo: { from, to }, unidade: [] });
-    return new Set(vincularAtendimentos(vs, aq.data.items).filter((x) => x.comAtendimento).map((x) => x.venda.id));
-  }, [vq.data, aq.data, from, to]);
-
-  const belleRows = linhas.filter((l) => l.belle), leverRows = linhas.filter((l) => l.lever);
-  const fatBelle = belleRows.reduce((s, l) => s + l.belle!.valor, 0);
-  const fatLever = leverRows.reduce((s, l) => s + l.lever!.valor, 0);
-  const dif = fatBelle - fatLever;
-  const res = resumoConciliacao(linhas);
-  const vinc = belleRows.filter((l) => comAtendimento?.has(l.belle!.id)).length;
-
-  const porUnidade = UNITS.map((u) => {
-    const l = linhas.filter((x) => (x.belle?.unidade ?? x.lever?.unidade) === u);
-    const b = l.reduce((s, x) => s + (x.belle?.valor ?? 0), 0), v = l.reduce((s, x) => s + (x.lever?.valor ?? 0), 0);
-    return { unidade: u as string, belle: b, lever: v, diferenca: b - v, vendasBelle: l.filter((x) => x.belle).length, vendasLever: l.filter((x) => x.lever).length };
-  });
-  const porMes = useMemo(() => {
-    const m = new Map<string, { belle: number; lever: number }>();
-    for (const l of linhas) {
-      if (l.belle) { const r = m.get(ymOf(l.belle.data)) ?? m.set(ymOf(l.belle.data), { belle: 0, lever: 0 }).get(ymOf(l.belle.data))!; r.belle += l.belle.valor; }
-      if (l.lever) { const r = m.get(ymOf(l.lever.data)) ?? m.set(ymOf(l.lever.data), { belle: 0, lever: 0 }).get(ymOf(l.lever.data))!; r.lever += l.lever.valor; }
-    }
-    return [...m].sort(([a], [b]) => a.localeCompare(b)).map(([mes, r]) => ({ mes, ...r }));
-  }, [linhas]);
-  const porResp = useMemo(() => {
-    const m = new Map<string, { vendas: number; valor: number }>();
-    for (const l of leverRows) { const k = l.lever!.extra?.responsavel ?? "—"; const r = m.get(k) ?? m.set(k, { vendas: 0, valor: 0 }).get(k)!; r.vendas++; r.valor += l.lever!.valor; }
-    return [...m].map(([nome, r]) => ({ nome, ...r })).sort((a, b) => b.valor - a.valor);
-  }, [leverRows]);
-  const porOrigem = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const l of leverRows) m.set(l.lever!.extra?.origem ?? "—", (m.get(l.lever!.extra?.origem ?? "—") ?? 0) + l.lever!.valor);
-    return [...m].map(([name, value]) => ({ name, value }));
-  }, [leverRows]);
-  const porStatus = STATUS.map((s) => ({ name: s, value: linhas.filter((l) => l.status === s).length })).filter((x) => x.value);
-
-  const cols: Col<LinhaConc>[] = [
-    { key: "c", header: "Cliente", value: (r) => r.belle?.cliente ?? r.lever?.cliente ?? "" },
-    { key: "u", header: "Unidade", value: (r) => r.belle?.unidade ?? r.lever?.unidade ?? "—", render: (r) => <>{r.belle?.unidade ?? r.lever?.unidade ?? "—"}{r.belle && r.lever && r.belle.unidade !== r.lever.unidade && <span className="ml-1 text-[11px] text-warn">(Lever: {r.lever.unidade ?? "—"})</span>}</> },
-    { key: "d", header: "Data", value: (r) => r.belle?.data ?? r.lever?.data ?? "", render: (r) => <>{isoToBr(r.belle?.data ?? r.lever?.data ?? "")}{r.belle && r.lever && r.belle.data !== r.lever.data && <span className="ml-1 text-[11px] text-mute">(Lever: {isoToBr(r.lever.data)})</span>}</> },
-    { key: "vb", header: "Valor Belle", value: (r) => r.belle?.valor ?? 0, align: "right", render: (r) => (r.belle ? fmtBrl(r.belle.valor) : "—") },
-    { key: "vl", header: "Valor Lever", value: (r) => r.lever?.valor ?? 0, align: "right", render: (r) => (r.lever ? fmtBrl(r.lever.valor) : "—") },
-    { key: "r", header: "Responsável (Lever)", value: (r) => r.lever?.extra?.responsavel ?? "—" },
-    { key: "o", header: "Origem", value: (r) => r.lever?.extra?.origem ?? "—" },
-    { key: "a", header: "Atendimento", value: (r) => (r.belle ? (comAtendimento?.has(r.belle.id) ? "Sim" : "Não") : "—") },
-    { key: "k", header: "Critério", value: (r) => r.criterio },
-    { key: "s", header: "Status da conciliação", value: (r) => r.status, render: (r) => <span className={cn("whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium", BADGE[r.status])} title={r.candidatos ? `Candidatos: ${r.candidatos.map((c) => `${c.cliente} (${c.unidade ?? "?"}, ${isoToBr(c.data)}, ${fmtBrl(c.valor)})`).join(" | ")}` : undefined}>{r.status}</span> },
-  ];
-  const cUn: Col<(typeof porUnidade)[number]>[] = [
-    { key: "u", header: "Unidade", value: (r) => r.unidade },
-    { key: "vb", header: "Vendas Belle", value: (r) => r.vendasBelle, align: "right" }, { key: "vl", header: "Vendas Lever", value: (r) => r.vendasLever, align: "right" },
-    { key: "b", header: "Faturamento Belle", value: (r) => r.belle, align: "right", render: (r) => fmtBrl(r.belle) },
-    { key: "l", header: "Faturamento Lever", value: (r) => r.lever, align: "right", render: (r) => fmtBrl(r.lever) },
-    { key: "d", header: "Diferença", value: (r) => r.diferenca, align: "right", render: (r) => <span className={cn(r.diferenca !== 0 && "font-semibold text-warn")}>{fmtBrl(r.diferenca)}</span> },
+  const cols: Col<Lead>[] = [
+    { key: "t", header: "Cliente", value: (l) => l.titulo }, { key: "r", header: "Responsável", value: (l) => l.responsavel },
+    { key: "o", header: "Origem", value: (l) => AREAS[l.area].label }, { key: "u", header: "Unidade", value: (l) => l.unidade ?? "—" },
+    { key: "e", header: "Fase", value: (l) => l.etapa },
+    { key: "c", header: "Criação", value: (l) => l.criadoEm, render: (l) => isoToBr(l.criadoEm) },
+    { key: "a", header: "Avaliação", value: (l) => l.dataAvaliacao, render: (l) => isoToBr(l.dataAvaliacao) },
+    { key: "f", header: "Fechamento*", value: (l) => l.atualizadoEm, render: (l) => isoToBr(l.atualizadoEm) },
+    { key: "m", header: "Mês fech.", value: (l) => l.mesFechamento }, { key: "v", header: "Valor", value: (l) => l.valor, align: "right", render: (l) => fmtBrl(l.valor) },
   ];
 
-  const loading = vq.isLoading || lv.isLoading;
-  const err = vq.error ?? lv.error;
-  const opt = (arr: (string | undefined)[]) => [...new Set(arr.filter(Boolean) as string[])].sort((a, b) => a.localeCompare(b, "pt-BR"));
   return (
     <>
-      <PageHeader title="Faturamento Comercial" subtitle="Faturamento operacional do Belle (vendas de planos) cruzado com os registros comerciais do Lever — conciliação venda a venda." />
-      <FilterCard onClear={() => setF(defaults())}>
-        <DateRangeField label="Período (Data da venda)" value={f.periodo} onChange={(v) => set("periodo", v)} />
-        <Field label="Mês">
-          <input type="month" className="h-10 w-full rounded-lg border border-line bg-white px-2.5 text-sm outline-none focus:border-coral"
-            value={f.periodo.from && f.periodo.to && f.periodo.from.slice(0, 7) === f.periodo.to.slice(0, 7) ? f.periodo.from.slice(0, 7) : ""}
-            onChange={(e) => { if (!e.target.value) return; const [y, m] = e.target.value.split("-").map(Number); set("periodo", { from: toIso(new Date(y, m - 1, 1)), to: toIso(new Date(y, m, 0)) }); }} />
-        </Field>
-        <MultiSelect label="Unidade" options={[...UNITS]} value={f.unidade} onChange={(v) => set("unidade", v)} />
-        <MultiSelect label="Responsável (Lever)" options={opt(linhasAll.map((l) => l.lever?.extra?.responsavel))} value={f.responsavel} onChange={(v) => set("responsavel", v)} />
-        <MultiSelect label="Origem da venda" options={AREA_KEYS.map((k) => AREAS[k].label)} value={f.origem} onChange={(v) => set("origem", v)} />
-        <MultiSelect label="Status da conciliação" options={STATUS} value={f.conc} onChange={(v) => set("conc", v)} />
+      <PageHeader title="Faturamento Comercial" subtitle="Acompanhe o faturamento e o desempenho dos funis de Reativação, SDR, Social Selling e Vendas — dados 100% do Lever (fases “Convertidos”)." />
+      <FilterCard onClear={() => { setF(emptyLeadFilters()); setOrigem([]); }}>
+        <DateRangeField label="Data de Criação" value={f.criacao} onChange={(v) => set("criacao", v)} hint="Data de criação do card no Lever" />
+        <DateRangeField label="Data de Avaliação" value={f.avaliacao} onChange={(v) => set("avaliacao", v)} hint="Campo manual “Data Avaliação” do Lever" />
+        <DateRangeField label="Data de Fechamento" value={f.fechamento} onChange={(v) => set("fechamento", v)} hint="Última movimentação do card em fase de venda (o Lever não expõe a data real de fechamento)" />
+        <MultiSelect label="Origem / Funil" options={AREA_KEYS.map((k) => AREAS[k].label)} value={origem} onChange={setOrigem} />
+        <MultiSelect label="Responsável" options={opcoesLead(lv.leads, (l) => l.responsavel)} value={f.responsavel} onChange={(v) => set("responsavel", v)} />
+        <MultiSelect label="Fase" options={fases} value={f.etapa} onChange={(v) => set("etapa", v)} />
+        <MultiSelect label="Situação" options={["Ativo", "Convertido", "Perdido", "Duplicado"]} value={f.situacao} onChange={(v) => set("situacao", v)} />
+        <MultiSelect label="Unidade" options={[...opcoesLead(lv.leads, (l) => l.unidade ?? ""), "Sem unidade"]} value={f.unidade} onChange={(v) => set("unidade", v)} />
+        <MultiSelect label="Mês de Fechamento" options={opcoesLead(lv.leads, (l) => l.mesFechamento || "Não informado")} value={f.mesFechamento} onChange={(v) => set("mesFechamento", v)} />
       </FilterCard>
 
-      {loading && <Loading label="Cruzando vendas do Belle com o Lever..." />}
-      {err && <SourceError error={err} onRetry={() => { vq.refetch(); lv.refetch(); }} />}
-      {aq.error && <SourceError error={aq.error} onRetry={() => aq.refetch()} />}
-
-      {!loading && !err && linhas0 && (
+      {lv.isLoading && <Loading label="Buscando cards no Lever (todos os funis)..." />}
+      {lv.error && <SourceError error={lv.error} onRetry={lv.refetch} />}
+      {!lv.isLoading && !lv.error && (
         <>
-          <Notice tone="info">Belle = vendas de planos aprovadas com valor maior que zero (data da venda). Lever = cards em fases “Convertidos”, valor do card e data da última movimentação. Vendas do Lever até {DEFAULT_MATCH.janelaDias} dias fora do período entram apenas se casarem com uma venda do Belle. {(bd.isFetching || lc.isFetching) && "Refinando correspondências por CPF/telefone/e-mail…"}</Notice>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <KpiCard title="Faturamento Belle" value={fmtBrl(fatBelle)} sub={`${fmtInt(belleRows.length)} vendas de planos`} icon={<Landmark />} tone="coral" />
-            <KpiCard title="Faturamento Lever" value={fmtBrl(fatLever)} sub={`${fmtInt(leverRows.length)} vendas registradas`} icon={<Wallet />} tone="rasp" />
-            <KpiCard title="Diferença" value={fmtBrl(dif)} sub={`${fmtPct(ratio(Math.abs(dif), fatBelle))} do Belle`} icon={<Scale />} tone={dif === 0 ? "ok" : "warn"} tip="Faturamento Belle − Faturamento Lever" />
-            <KpiCard title="Vendas conciliadas" value={fmtPct(res.pctConciliado, 0)} sub={`${fmtInt(res.conciliadas)} de ${fmtInt(belleRows.length)} do Belle`} icon={<Percent />} tone="ok" />
-            <KpiCard title="Nas duas fontes" value={fmtInt(res.identificadasNasDuas)} icon={<GitCompareArrows />} tone="ok" />
-            <KpiCard title="Somente Belle" value={fmtInt(res.somenteBelle)} sub="Vendeu, mas não está no Lever" icon={<ShoppingBag />} tone="bad" />
-            <KpiCard title="Somente Lever" value={fmtInt(res.somenteLever)} sub="No CRM, sem venda no Belle" icon={<ShoppingBag />} tone="warn" />
-            <KpiCard title="Vendas com atendimento" value={comAtendimento ? fmtInt(vinc) : "…"} sub="Cliente atendido na unidade no período" icon={<Link2 />} tone="plain" tip="Cruzamento Belle: venda de plano × atendimento (status Atendido) do mesmo cliente e unidade" />
-          </div>
-
-          <div className="grid gap-4 lg:grid-cols-2">
-            <ChartCard title="Belle × Lever por Unidade"><BarsGrouped data={porUnidade} x="unidade" fmt={fmtBrl} series={[{ key: "belle", name: "Belle", color: C.coral }, { key: "lever", name: "Lever", color: C.rasp }]} /></ChartCard>
-            <ChartCard title="Status da Conciliação"><Donut data={porStatus} colorOf={(n) => ({ "Conciliado": C.ok, "Somente Belle": C.rasp, "Somente Lever": C.coral })[n] ?? C.warn} /></ChartCard>
-            <ChartCard title="Evolução do Faturamento por Mês" className="lg:col-span-2">
-              <Lines data={porMes} x="mes" xFmt={ymLabel} fmt={fmtBrl} series={[{ key: "belle", name: "Belle", color: C.coral }, { key: "lever", name: "Lever", color: C.rasp }]} />
-            </ChartCard>
-            <ChartCard title="Faturamento Lever por Responsável"><BarsH data={porResp.slice(0, 10)} y="nome" x="valor" name="Faturamento" fmt={fmtBrl} /></ChartCard>
-            <ChartCard title="Faturamento Lever por Origem"><Donut data={porOrigem} fmt={fmtBrl} /></ChartCard>
-          </div>
-
-          <Section title="Belle × Lever por unidade" hint="Faturamento total → por unidade → diferença">
-            <Card><DataTable rows={porUnidade} cols={cUn} rowKey={(r) => r.unidade} searchable={false} exportName="belle-x-lever-por-unidade" /></Card>
+          {semAv > 0 && <Notice tone="info">{fmtInt(semAv)} lead(s) sem “Data de Avaliação” preenchida no Lever não entram neste filtro.</Notice>}
+          <Section title="Faturamento">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
+              <KpiCard title="Faturamento total geral" value={fmtBrl(total)} sub={`${fmtInt(n)} vendas`} icon={<Wallet />} tone="coral" className="xl:col-span-2" />
+              {porOrigem.map((o, i) => (
+                <KpiCard key={o.area} title={`Faturamento ${o.nome}`} value={fmtBrl(o.valor)} sub={`${fmtInt(o.vendas)} vendas • ${fmtPct(total ? (o.valor / total) * 100 : 0, 1)} do total`} icon={<Layers />} tone={(["rasp", "ok", "warn", "plain"] as const)[i]} />
+              ))}
+            </div>
           </Section>
-          <Section title="Conciliação de vendas" hint="Correspondência: ID → CPF → telefone → e-mail → nome + unidade → nome + proximidade de data. Casos ambíguos ficam para revisão.">
-            <Card><DataTable rows={linhas} cols={cols} rowKey={(r) => r.chave} exportName="conciliacao-belle-lever" pageSize={15} /></Card>
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <KpiCard title="Quantidade de vendas" value={fmtInt(n)} icon={<ReceiptText />} tone="ok" />
+            <KpiCard title="Ticket médio" value={fmtBrl(n ? total / n : 0)} icon={<TrendingUp />} tone="rasp" />
+            <KpiCard title="Taxa de conversão" value={fmtPct(tc.taxa, 1)} icon={<Percent />} tone="warn"
+              tip="Convertidos ÷ leads válidos (sem duplicados) nos mesmos filtros, exceto Data de Fechamento e Situação"
+              sub={<>Convertidos: <b>{fmtInt(tc.convertidos)}</b><br />Base considerada: <b>{fmtInt(tc.base)}</b></>} />
+            <KpiCard title="Responsáveis com venda" value={fmtInt(resp.length)} icon={<Target />} tone="plain" />
+          </div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <ChartCard title="Distribuição do faturamento por origem" subtitle="Reativação × SDR × Social Selling × Vendas"><Donut data={porOrigem.filter((o) => o.valor > 0).map((o) => ({ name: o.nome, value: o.valor }))} fmt={fmtBrl} /></ChartCard>
+            <ChartCard title="Evolução do faturamento por mês" subtitle="Mês da última movimentação do card"><Lines data={evo} x="mes" xFmt={ymLabel} fmt={fmtBrl} series={[{ key: "valor", name: "Faturamento", color: C.rasp }]} /></ChartCard>
+            <ChartCard title="Faturamento por Responsável"><BarsH data={resp.slice(0, 10)} y="nome" x="valor" name="Faturamento" fmt={fmtBrl} /></ChartCard>
+            <ChartCard title="Faturamento por Unidade"><BarsV data={unid} x="nome" y="valor" name="Faturamento" fmt={fmtBrl} /></ChartCard>
+          </div>
+          <Section title="Ranking por responsável">
+            <Card><DataTable rows={resp} rowKey={(r) => r.nome} exportName="faturamento-comercial-ranking" cols={[
+              { key: "n", header: "Responsável", value: (r) => r.nome }, { key: "v", header: "Vendas", value: (r) => r.vendas, align: "right" },
+              { key: "f", header: "Faturamento", value: (r) => r.valor, align: "right", render: (r) => fmtBrl(r.valor) },
+              { key: "t", header: "Ticket médio", value: (r) => (r.vendas ? r.valor / r.vendas : 0), align: "right", render: (r) => fmtBrl(r.vendas ? r.valor / r.vendas : 0) }]} /></Card>
+          </Section>
+          <Section title="Vendas" hint="*Fechamento = última movimentação do card (o Lever não expõe a data real de entrada em “Convertidos”).">
+            <Card><DataTable rows={vendas} cols={cols} rowKey={(l) => l.id} exportName="faturamento-comercial" pageSize={15} /></Card>
           </Section>
         </>
       )}

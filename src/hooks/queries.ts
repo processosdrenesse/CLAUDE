@@ -31,7 +31,7 @@ export const useArea = (area: AreaKey) =>
 export const useContatos = (ids: string[]) =>
   useQuery({ queryKey: ["lever", "contatos", ids], queryFn: () => fetchContatos(ids), enabled: ids.length > 0, staleTime: 12 * 3_600_000 });
 
-/** Todas as áreas do Lever (Faturamento Comercial, Executivo, Parcerias). */
+/** Todas as áreas do Lever (Faturamento Comercial e Parcerias). */
 export function useAllAreas() {
   const results = useQueries({ queries: AREA_KEYS.map((a) => ({ queryKey: ["lever", "area", a], queryFn: () => fetchArea(a), staleTime: STALE })) });
   const leads = useMemo<Lead[]>(() => results.flatMap((r) => r.data?.leads ?? []), [results.map((r) => r.dataUpdatedAt).join()]);
