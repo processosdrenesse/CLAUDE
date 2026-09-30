@@ -2,7 +2,7 @@ import express from "express";
 import compression from "compression";
 import fs from "node:fs";
 import path from "node:path";
-import { env } from "./env.ts";
+import { configStatus } from "./env.ts";
 import { clearCache, cacheEpoch } from "./cache.ts";
 import { UpstreamError } from "./http.ts";
 import { parseBr } from "./dates.ts";
@@ -43,6 +43,8 @@ const range = (req: express.Request) => {
 const force = (req: express.Request) => req.query.refresh === "1";
 
 app.get("/api/health", (_q, r) => r.json({ ok: true }));
+// Abra /api/config para ver se o servidor enxerga as variáveis (mostra só sim/não, nunca os valores).
+app.get("/api/config", (_q, r) => r.json(configStatus()));
 app.post("/api/refresh", (_q, r) => { clearCache(); r.json({ ok: true, epoch: cacheEpoch() }); });
 
 app.get("/api/belle/units", wrap("belle", (q) => belle.units(force(q))));
