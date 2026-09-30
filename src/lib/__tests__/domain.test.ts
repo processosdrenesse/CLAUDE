@@ -67,7 +67,7 @@ test("Data de Inclusão e Data de Cadastro filtram de forma independente (dados 
 
 // ---------- Lever: datas, filtros combinados e taxa de conversão ----------
 import { normalizeCard, normalizePanel } from "../../services/lever/normalize.ts";
-import { emptyLeadFilters, filtrarLeads, taxaConversao, semDataAvaliacao } from "../../domain/funil.ts";
+import { emptyLeadFilters, filtrarLeads, taxaConversao, semDataAvaliacao, porResponsavel, somaValor, vendasLever } from "../../domain/funil.ts";
 import type { Lead } from "../../services/lever/types.ts";
 
 const painel = normalizePanel("sdr", {
@@ -105,11 +105,59 @@ test("filtros combinados: avaliação + responsável + unidade + fechamento", ()
   assert.deepEqual(filtrarLeads(ls, f).map((l) => l.id), ["1"]);
 });
 
-test("taxa de conversão: quantidade, base (sem duplicados) e independência do fechamento", () => {
-  const ls = [card({ id: "1", stepId: "s2" }), card({ id: "2", stepId: "s1" }), card({ id: "3", stepId: "s1" }), card({ id: "4", stepId: "s3" }),
-    card({ id: "5", stepId: "s2", updatedAt: "2026-08-01T12:00:00Z" })];
+test("taxa de conversão = convertidos ÷ compareceram (NÃO ÷ total de leads)", () => {
+  // painel de teste: s1 Contato (não compareceu), s2 Convertidos, s4 Negociação (compareceu)
+  const p2 = normalizePanel("sdr", { id: "p", title: "SDRs", tags: [], steps: [
+    { id: "s1", title: "Contato", position: 1 }, { id: "s2", title: "Convertidos", position: 2, isFinal: true },
+    { id: "s3", title: "Duplicados para excluir", position: 3 }, { id: "s4", title: "Negociação", position: 4 }] });
+  const c = (id: string, stepId: string, upd = "2026-09-20T12:00:00Z") => normalizeCard({ id, key: id, title: id, createdAt: "2026-09-01T12:00:00Z", updatedAt: upd, stepId, tagIds: [], contactIds: [], customFields: {} }, p2, new Map());
+  // 100 leads: 60 compareceram (15 convertidos + 45 em negociação), 40 sem comparecer
+  const ls = [...Array.from({ length: 15 }, (_, i) => c("cv" + i, "s2")), ...Array.from({ length: 45 }, (_, i) => c("ng" + i, "s4")), ...Array.from({ length: 40 }, (_, i) => c("ct" + i, "s1"))];
   const t = taxaConversao(ls, emptyLeadFilters());
-  assert.deepEqual([t.convertidos, t.base, Math.round(t.taxa)], [2, 4, 50]);
-  const t2 = taxaConversao(ls, { ...emptyLeadFilters(), fechamento: { from: "2026-09-01", to: "2026-09-30" } });
-  assert.deepEqual([t2.convertidos, t2.base], [1, 4]);  // base não encolhe com a data de fechamento
+  assert.deepEqual([t.convertidos, t.compareceram, t.taxa], [15, 60, 25]);  // 25%, e não 15%
+  // duplicados não contam; data de fechamento não encolhe o denominador
+  const t2 = taxaConversao([...ls, c("dp", "s3")], { ...emptyLeadFilters(), fechamento: { from: "2026-09-01", to: "2026-09-30" } });
+  assert.deepEqual([t2.convertidos, t2.compareceram], [15, 60]);
+});
+
+test("Reativação: compareceram = Reativados (com/sem venda); taxa não vira 100%", () => {
+  const pr = normalizePanel("reativacao", { id: "r", title: "INATIVOS", tags: [], steps: [
+    { id: "a", title: "Sem Resposta", position: 1 }, { id: "b", title: "Reativados sem venda", position: 2, isFinal: true }, { id: "c", title: "Reativados com venda", position: 3, isFinal: true }] });
+  const k = (id: string, st: string) => normalizeCard({ id, key: id, title: id, createdAt: "2026-09-01T12:00:00Z", updatedAt: "2026-09-02T12:00:00Z", stepId: st, tagIds: [], contactIds: [], customFields: {} }, pr, new Map());
+  const ls = [k("1", "a"), k("2", "b"), k("3", "b"), k("4", "b"), k("5", "c")];
+  const t = taxaConversao(ls, emptyLeadFilters());
+  assert.deepEqual([t.convertidos, t.compareceram, t.taxa], [1, 4, 25]);
+});
+
+import { canonicalResponsavel } from "../../config/responsaveis.ts";
+import { qualidade } from "../../domain/funil.ts";
+
+test("responsáveis: Julliane/Juliane e Bruna/Bruna Letícia consolidados antes da agregação", () => {
+  for (const n of ["JULLIANE", "Juliane", "julliane ", "Julliane"]) assert.equal(canonicalResponsavel(n), "Julliane");
+  for (const n of ["BRUNA", "Bruna Letícia", "bruna leticia", "Bruna Leticia"]) assert.equal(canonicalResponsavel(n), "Bruna");
+  assert.equal(canonicalResponsavel("Marina"), "Marina");
+  const mk = (id: string, resp: string, valor: number) => card({ id, stepId: "s2", monetaryAmount: valor, customFields: { "respons-vel-pela-ven": resp } });
+  const ls = [mk("1", "Julliane", 20000), mk("2", "Juliane", 15000), mk("3", "Bruna", 10000), mk("4", "Bruna Letícia", 8000)];
+  const g = porResponsavel(ls);
+  assert.deepEqual(g.map((x) => [x.nome, x.valor, x.convertidos]).sort(), [["Bruna", 18000, 2], ["Julliane", 35000, 2]]);
+});
+
+test("Qualidade da Reativação não considera Potencial de Venda nem Interesse", () => {
+  const ls = [card({ id: "1", stepId: "s1" })];
+  const rot = (a?: "reativacao") => qualidade(ls, a).campos.map((c) => c.rotulo);
+  assert.ok(rot().includes("Potencial de Venda") && rot().includes("Interesse"));
+  assert.ok(!rot("reativacao").includes("Potencial de Venda") && !rot("reativacao").includes("Interesse"));
+});
+
+test("vendas por origem: SDR + Reativação = SDR + Reativação, sem duplicar Social Selling", () => {
+  const painelR = normalizePanel("reativacao", { id: "r", title: "INATIVOS", tags: [], steps: [{ id: "c", title: "Reativados com venda", position: 1, isFinal: true }] });
+  const painelS = normalizePanel("social", { id: "s", title: "Social Selling", tags: [], steps: [{ id: "c", title: "Convertidos", position: 1, isFinal: true }] });
+  const mk = (id: string, pn: typeof painel, valor: number) => normalizeCard({ id, key: id, title: id, createdAt: "2026-09-01T12:00:00Z", updatedAt: "2026-09-02T12:00:00Z", stepId: "c", monetaryAmount: valor, tagIds: [], contactIds: [], customFields: {} }, pn, new Map());
+  const sdrP = normalizePanel("sdr", { id: "d", title: "SDRs", tags: [], steps: [{ id: "c", title: "Convertidos", position: 1, isFinal: true }] });
+  const vendas = [...Array.from({ length: 20 }, (_, i) => mk("d" + i, sdrP, 1000)), ...Array.from({ length: 10 }, (_, i) => mk("r" + i, painelR, 500)), ...Array.from({ length: 5 }, (_, i) => mk("s" + i, painelS, 200))];
+  const por = (a: string) => vendasLever(vendas).filter((v) => v.area === a);
+  assert.deepEqual([por("sdr").length, por("reativacao").length, por("social").length], [20, 10, 5]);
+  assert.equal(por("sdr").length + por("reativacao").length, 30);
+  assert.equal(somaValor(por("sdr")) + somaValor(por("reativacao")), 25000);
+  assert.equal(somaValor(vendas), 26000);
 });

@@ -24,3 +24,8 @@ export const EQUIPE_OFICIAL = [
   "Maria Leanne Lopes Alves",
   "Thayane Luiza de Freitas Fernandes",
 ];
+
+/** Campos que NÃO entram na análise de Qualidade do CRM de cada área. */
+export const QUALIDADE_SEM_CAMPOS: Partial<Record<AreaKey, string[]>> = {
+  reativacao: ["potencial", "interesse"],
+};

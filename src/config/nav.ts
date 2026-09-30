@@ -4,11 +4,14 @@ export type NavIcon = "calendar" | "dollar" | "filter" | "shield" | "handshake";
 export interface NavItem { to: string; label: string; icon: NavIcon; source: "Belle" | "Lever" | "Belle + Lever" }
 export interface NavGroup { title: string; items: NavItem[] }
 
+/** Áreas com página de Faturamento (Vendas — Serviços Avulsos não tem). */
+export const AREAS_COM_FATURAMENTO: AreaKey[] = ["reativacao", "sdr", "social"];
+
 const area = (k: AreaKey): NavGroup => ({
   title: AREAS[k].menu,
   items: [
     { to: `/funil/${k}`, label: "Funil", icon: "filter", source: "Lever" },
-    { to: `/faturamento/${k}`, label: "Faturamento", icon: "dollar", source: "Lever" },
+    ...(AREAS_COM_FATURAMENTO.includes(k) ? [{ to: `/faturamento/${k}`, label: "Faturamento", icon: "dollar" as const, source: "Lever" as const }] : []),
     { to: `/qualidade/${k}`, label: "Qualidade do CRM", icon: "shield", source: "Lever" },
   ],
 });

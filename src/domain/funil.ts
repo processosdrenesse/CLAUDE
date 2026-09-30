@@ -1,6 +1,7 @@
 import { inRange, ymOf, type DateRange } from "@/lib/dates";
 import { ratio } from "@/lib/format";
 import { UNITS } from "@/lib/units";
+import { QUALIDADE_SEM_CAMPOS, type AreaKey } from "@/config/areas";
 import type { Lead, Painel } from "@/services/lever/types";
 
 export interface LeadFilters {
@@ -91,29 +92,30 @@ export const CAMPOS_QUALIDADE: { chave: string; rotulo: string; ok: (l: Lead) =>
   { chave: "fechamento", rotulo: "Mês de Fechamento", ok: (l) => !!l.mesFechamento, soConvertido: true },
   { chave: "valor", rotulo: "Valor da venda", ok: (l) => l.valor > 0, soConvertido: true },
 ];
-export function qualidade(ls: Lead[]) {
+export function qualidade(ls: Lead[], area?: AreaKey) {
   const v = leadsValidos(ls);
-  const campos = CAMPOS_QUALIDADE.map((c) => {
+  const usados = CAMPOS_QUALIDADE.filter((c) => !(area && QUALIDADE_SEM_CAMPOS[area]?.includes(c.chave)));
+  const campos = usados.map((c) => {
     const base = c.soConvertido ? v.filter((l) => l.convertido) : v;
     const ok = base.filter(c.ok).length;
     return { ...c, total: base.length, preenchidos: ok, pct: base.length ? ratio(ok, base.length) : 100 };
   });
-  const faltantes = v.map((l) => ({ lead: l, faltam: CAMPOS_QUALIDADE.filter((c) => (!c.soConvertido || l.convertido) && !c.ok(l)).map((c) => c.rotulo) })).filter((x) => x.faltam.length);
+  const faltantes = v.map((l) => ({ lead: l, faltam: usados.filter((c) => (!c.soConvertido || l.convertido) && !c.ok(l)).map((c) => c.rotulo) })).filter((x) => x.faltam.length);
   return { campos, faltantes };
 }
 
 export const opcoesLead = (ls: Lead[], pick: (l: Lead) => string) => [...new Set(ls.map(pick).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
 
 /**
- * Taxa de conversão com as quantidades usadas no cálculo.
- * Convertidos = leads em fases de venda dentro de TODOS os filtros.
- * Base = leads válidos (sem duplicados) dentro dos mesmos filtros, exceto Data de Fechamento e Situação
- * (senão a base encolheria junto com o numerador e a taxa viraria 100%).
+ * Taxa de conversão = convertidos ÷ leads que COMPARECERAM (não o total de leads), com as quantidades.
+ * Convertidos = leads em fases de venda dentro de TODOS os filtros. Compareceram = leads (sem duplicados)
+ * que passaram pela avaliação, nos mesmos filtros exceto Data de Fechamento e Situação (senão o
+ * denominador encolheria junto com o numerador).
  */
 export function taxaConversao(ls: Lead[], f: LeadFilters) {
   const convertidos = leadsValidos(filtrarLeads(ls, f)).filter((l) => l.convertido).length;
-  const base = leadsValidos(filtrarLeads(ls, { ...f, fechamento: {}, situacao: [] })).length;
-  return { convertidos, base, taxa: ratio(convertidos, base) };
+  const compareceram = leadsValidos(filtrarLeads(ls, { ...f, fechamento: {}, situacao: [] })).filter((l) => l.compareceu).length;
+  return { convertidos, compareceram, taxa: ratio(convertidos, compareceram) };
 }
 
 /** Leads que seriam elegíveis, mas não têm Data de Avaliação (ficam fora quando o filtro está ativo). */

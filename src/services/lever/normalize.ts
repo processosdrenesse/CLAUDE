@@ -2,6 +2,7 @@ import { looseToIso, tsToIso } from "@/lib/dates";
 import { normText, titleCase } from "@/lib/text";
 import { normalizeUnit } from "@/lib/units";
 import { AREAS, ETAPAS_VENDA, type AreaKey } from "@/config/areas";
+import { canonicalResponsavel } from "@/config/responsaveis";
 import type { Agente, Etapa, EtapaTipo, Lead, Painel } from "./types";
 
 type Raw = Record<string, any>;
@@ -25,12 +26,21 @@ export function classificarEtapa(titulo: string): EtapaTipo {
   return "novo";
 }
 
+/**
+ * "Compareceu" = a avaliação aconteceu: chegou à Negociação ou converteu. Na Reativação (sem fase de
+ * Negociação) comparecem os "Reativados" (com ou sem venda).
+ */
+export function compareceuNaEtapa(titulo: string): boolean {
+  const t = normText(titulo);
+  return t.includes("negociacao") || ETAPAS_VENDA.includes(t) || t.startsWith("reativados");
+}
+
 export function normalizePanel(area: AreaKey, d: Raw): Painel {
   const etapas: Etapa[] = (d.steps as Raw[])
     .filter((s) => !s.archived)
     .map((s) => ({
       id: s.id, titulo: String(s.title).trim(), posicao: s.position, final: !!s.isFinal,
-      tipo: classificarEtapa(s.title), venda: ETAPAS_VENDA.includes(normText(s.title)),
+      tipo: classificarEtapa(s.title), venda: ETAPAS_VENDA.includes(normText(s.title)), compareceu: compareceuNaEtapa(s.title),
     }))
     .sort((a, b) => a.posicao - b.posicao);
   return { id: d.id, area, titulo: d.title, etapas, etiquetas: Object.fromEntries((d.tags as Raw[]).map((t) => [t.id, String(t.name)])) };
@@ -55,9 +65,9 @@ export function normalizeCard(c: Raw, painel: Painel, agentes: Map<string, strin
     id: c.id, codigo: c.key, titulo: String(c.title ?? "").trim(), area: painel.area,
     criadoEm: tsToIso(c.createdAt), atualizadoEm: tsToIso(c.updatedAt),
     etapaId: c.stepId, etapa: etapa?.titulo ?? "Fase removida", etapaTipo: etapa?.tipo ?? "novo",
-    convertido: !!etapa?.venda,
+    convertido: !!etapa?.venda, compareceu: !!etapa?.compareceu,
     valor: Number(c.monetaryAmount ?? 0),
-    responsavel: respCampo || agentes.get(c.responsibleUserId) || "Sem responsável",
+    responsavel: canonicalResponsavel(respCampo || agentes.get(c.responsibleUserId) || "Sem responsável"),
     unidade: normalizeUnit(cf(f, "unidade")),
     dataAvaliacao: looseToIso(cf(f, "data-de-avalia", "data-avalia")),
     interesse: asText(cf(f, "interesse")), potencial: asText(cf(f, "potencial-de-venda")),

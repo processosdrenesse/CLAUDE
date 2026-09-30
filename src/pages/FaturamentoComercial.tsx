@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Layers, Percent, ReceiptText, Target, TrendingUp, Wallet } from "lucide-react";
+import { Layers, Percent, ReceiptText, Share2, Target, Users, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/layout/Shell";
 import { DateRangeField, FilterCard, MultiSelect } from "@/components/ui/filters";
 import { Card, ChartCard, KpiCard, Loading, Notice, Section, SourceError } from "@/components/ui/primitives";
@@ -7,12 +7,16 @@ import { BarsH, BarsV, C, Donut, Lines } from "@/components/ui/charts";
 import { DataTable, type Col } from "@/components/ui/DataTable";
 import { useAllAreas } from "@/hooks/queries";
 import { emptyLeadFilters, evolucaoMensal, filtrarLeads, opcoesLead, porResponsavel, porUnidadeLeads, semDataAvaliacao, somaValor, taxaConversao, vendasLever, type LeadFilters } from "@/domain/funil";
-import { AREAS, AREA_KEYS } from "@/config/areas";
+import { AREAS, type AreaKey } from "@/config/areas";
 import { fmtBrl, fmtInt, fmtPct } from "@/lib/format";
 import { isoToBr, ymLabel } from "@/lib/dates";
 import type { Lead } from "@/services/lever/types";
 
-/** Faturamento Comercial — 100% Lever (cards em fases de venda de todos os funis). */
+/** Origens desta aba (Vendas — Serviços Avulsos não entra). Cada venda pertence a UMA origem: sem duplicidade. */
+const ORIGENS: AreaKey[] = ["sdr", "reativacao", "social"];
+const COMERCIAL: AreaKey[] = ["sdr", "reativacao"]; // "Faturamento Comercial" = SDR + Reativação
+
+/** Faturamento Comercial — 100% Lever (cards em fases de venda dos funis SDR, Reativação e Social Selling). */
 export default function FaturamentoComercial() {
   const lv = useAllAreas();
   const [f, setF] = useState<LeadFilters>(emptyLeadFilters);
@@ -20,21 +24,28 @@ export default function FaturamentoComercial() {
   const set = <K extends keyof LeadFilters>(k: K, v: LeadFilters[K]) => setF((p) => ({ ...p, [k]: v }));
 
   // Origem / Funil restringe o universo; os demais filtros usam a mesma camada de dados
-  const universo = useMemo(() => (origem.length ? lv.leads.filter((l) => origem.includes(AREAS[l.area].label)) : lv.leads), [lv.leads, origem]);
+  const leadsOrigens = useMemo(() => lv.leads.filter((l) => ORIGENS.includes(l.area)), [lv.leads]);
+  const universo = useMemo(() => (origem.length ? leadsOrigens.filter((l) => origem.includes(AREAS[l.area].label)) : leadsOrigens), [leadsOrigens, origem]);
   const filtrados = useMemo(() => filtrarLeads(universo, f), [universo, f]);
   const vendas = useMemo(() => vendasLever(filtrados), [filtrados]);
   const total = somaValor(vendas), n = vendas.length;
   const tc = useMemo(() => taxaConversao(universo, f), [universo, f]);
   const semAv = useMemo(() => semDataAvaliacao(universo, f), [universo, f]);
 
-  const porOrigem = useMemo(() => AREA_KEYS.map((k) => {
+  // Todos os totais saem da MESMA lista filtrada de vendas (cada venda tem uma origem) — sem somar agregados
+  const porOrigem = useMemo(() => ORIGENS.map((k) => {
     const l = vendas.filter((v) => v.area === k);
     return { area: k, nome: AREAS[k].label, valor: somaValor(l), vendas: l.length };
   }), [vendas]);
+  const origem_ = (k: AreaKey) => porOrigem.find((o) => o.area === k)!;
+  const comercial = useMemo(() => {
+    const l = vendas.filter((v) => COMERCIAL.includes(v.area));
+    return { valor: somaValor(l), vendas: l.length };
+  }, [vendas]);
   const resp = useMemo(() => porResponsavel(vendas).map((r) => ({ nome: r.nome, valor: r.valor, vendas: r.leads })).sort((a, b) => b.valor - a.valor), [vendas]);
   const unid = useMemo(() => porUnidadeLeads(vendas).map((r) => ({ nome: r.nome, valor: r.valor, vendas: r.leads })), [vendas]);
   const evo = useMemo(() => evolucaoMensal(vendas).filter((m) => m.convertidos > 0).map((m) => ({ mes: m.mes, valor: m.valor })), [vendas]);
-  const fases = useMemo(() => opcoesLead(lv.leads, (l) => l.etapa), [lv.leads]);
+  const fases = useMemo(() => opcoesLead(leadsOrigens, (l) => l.etapa), [leadsOrigens]);
 
   const cols: Col<Lead>[] = [
     { key: "t", header: "Cliente", value: (l) => l.titulo }, { key: "r", header: "Responsável", value: (l) => l.responsavel },
@@ -48,17 +59,17 @@ export default function FaturamentoComercial() {
 
   return (
     <>
-      <PageHeader title="Faturamento Comercial" subtitle="Acompanhe o faturamento e o desempenho dos funis de Reativação, SDR, Social Selling e Vendas — dados 100% do Lever (fases “Convertidos”)." />
+      <PageHeader title="Faturamento Comercial" subtitle="Acompanhe o faturamento e o desempenho dos funis SDR, Reativação e Social Selling — dados 100% do Lever (fases de venda)." />
       <FilterCard onClear={() => { setF(emptyLeadFilters()); setOrigem([]); }}>
         <DateRangeField label="Data de Criação" value={f.criacao} onChange={(v) => set("criacao", v)} hint="Data de criação do card no Lever" />
         <DateRangeField label="Data de Avaliação" value={f.avaliacao} onChange={(v) => set("avaliacao", v)} hint="Campo manual “Data Avaliação” do Lever" />
         <DateRangeField label="Data de Fechamento" value={f.fechamento} onChange={(v) => set("fechamento", v)} hint="Última movimentação do card em fase de venda (o Lever não expõe a data real de fechamento)" />
-        <MultiSelect label="Origem / Funil" options={AREA_KEYS.map((k) => AREAS[k].label)} value={origem} onChange={setOrigem} />
-        <MultiSelect label="Responsável" options={opcoesLead(lv.leads, (l) => l.responsavel)} value={f.responsavel} onChange={(v) => set("responsavel", v)} />
+        <MultiSelect label="Origem / Funil" options={ORIGENS.map((k) => AREAS[k].label)} value={origem} onChange={setOrigem} />
+        <MultiSelect label="Responsável" options={opcoesLead(leadsOrigens, (l) => l.responsavel)} value={f.responsavel} onChange={(v) => set("responsavel", v)} />
         <MultiSelect label="Fase" options={fases} value={f.etapa} onChange={(v) => set("etapa", v)} />
         <MultiSelect label="Situação" options={["Ativo", "Convertido", "Perdido", "Duplicado"]} value={f.situacao} onChange={(v) => set("situacao", v)} />
-        <MultiSelect label="Unidade" options={[...opcoesLead(lv.leads, (l) => l.unidade ?? ""), "Sem unidade"]} value={f.unidade} onChange={(v) => set("unidade", v)} />
-        <MultiSelect label="Mês de Fechamento" options={opcoesLead(lv.leads, (l) => l.mesFechamento || "Não informado")} value={f.mesFechamento} onChange={(v) => set("mesFechamento", v)} />
+        <MultiSelect label="Unidade" options={[...opcoesLead(leadsOrigens, (l) => l.unidade ?? ""), "Sem unidade"]} value={f.unidade} onChange={(v) => set("unidade", v)} />
+        <MultiSelect label="Mês de Fechamento" options={opcoesLead(leadsOrigens, (l) => l.mesFechamento || "Não informado")} value={f.mesFechamento} onChange={(v) => set("mesFechamento", v)} />
       </FilterCard>
 
       {lv.isLoading && <Loading label="Buscando cards no Lever (todos os funis)..." />}
@@ -67,23 +78,31 @@ export default function FaturamentoComercial() {
         <>
           {semAv > 0 && <Notice tone="info">{fmtInt(semAv)} lead(s) sem “Data de Avaliação” preenchida no Lever não entram neste filtro.</Notice>}
           <Section title="Faturamento">
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
-              <KpiCard title="Faturamento total geral" value={fmtBrl(total)} sub={`${fmtInt(n)} vendas`} icon={<Wallet />} tone="coral" className="xl:col-span-2" />
-              {porOrigem.map((o, i) => (
-                <KpiCard key={o.area} title={`Faturamento ${o.nome}`} value={fmtBrl(o.valor)} sub={`${fmtInt(o.vendas)} vendas • ${fmtPct(total ? (o.valor / total) * 100 : 0, 1)} do total`} icon={<Layers />} tone={(["rasp", "ok", "warn", "plain"] as const)[i]} />
-              ))}
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+              <KpiCard title="Faturamento total geral" value={fmtBrl(total)} sub={`${fmtInt(n)} vendas`} icon={<Wallet />} tone="coral" tip="SDR + Reativação + Social Selling, considerando os filtros aplicados" />
+              <KpiCard title="Faturamento Comercial (SDR + Reativação)" value={fmtBrl(comercial.valor)} sub={`${fmtPct(total ? (comercial.valor / total) * 100 : 0, 1)} do total`} icon={<Layers />} tone="rasp" tip="Faturamento SDR + Faturamento Reativação, calculado sobre as mesmas vendas filtradas" />
+              <KpiCard title="Faturamento Social Selling" value={fmtBrl(origem_("social").valor)} sub={`${fmtPct(total ? (origem_("social").valor / total) * 100 : 0, 1)} do total`} icon={<Share2 />} tone="warn" />
+              <KpiCard title="Faturamento SDR" value={fmtBrl(origem_("sdr").valor)} sub={`${fmtPct(total ? (origem_("sdr").valor / total) * 100 : 0, 1)} do total`} icon={<Users />} tone="ok" />
+              <KpiCard title="Faturamento Reativação" value={fmtBrl(origem_("reativacao").valor)} sub={`${fmtPct(total ? (origem_("reativacao").valor / total) * 100 : 0, 1)} do total`} icon={<Users />} tone="rasp" />
+              <KpiCard title="Quantidade total de vendas" value={fmtInt(n)} sub={`Ticket médio ${fmtBrl(n ? total / n : 0)}`} icon={<ReceiptText />} tone="plain" />
             </div>
           </Section>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <KpiCard title="Quantidade de vendas" value={fmtInt(n)} icon={<ReceiptText />} tone="ok" />
-            <KpiCard title="Ticket médio" value={fmtBrl(n ? total / n : 0)} icon={<TrendingUp />} tone="rasp" />
+          <Section title="Quantidade de vendas">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              <KpiCard title="Vendas SDR + Reativação" value={fmtInt(comercial.vendas)} icon={<Layers />} tone="coral" />
+              <KpiCard title="Vendas SDR" value={fmtInt(origem_("sdr").vendas)} icon={<Users />} tone="ok" />
+              <KpiCard title="Vendas Reativação" value={fmtInt(origem_("reativacao").vendas)} icon={<Users />} tone="rasp" />
+              <KpiCard title="Vendas Social Selling" value={fmtInt(origem_("social").vendas)} icon={<Share2 />} tone="warn" />
+            </div>
+          </Section>
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
             <KpiCard title="Taxa de conversão" value={fmtPct(tc.taxa, 1)} icon={<Percent />} tone="warn"
-              tip="Convertidos ÷ leads válidos (sem duplicados) nos mesmos filtros, exceto Data de Fechamento e Situação"
-              sub={<>Convertidos: <b>{fmtInt(tc.convertidos)}</b><br />Base considerada: <b>{fmtInt(tc.base)}</b></>} />
+              tip="Leads convertidos ÷ leads que compareceram (avaliação realizada), nos mesmos filtros exceto Data de Fechamento e Situação. Não usa o total de leads."
+              sub={<>Leads convertidos: <b>{fmtInt(tc.convertidos)}</b><br />Leads que compareceram: <b>{fmtInt(tc.compareceram)}</b></>} />
             <KpiCard title="Responsáveis com venda" value={fmtInt(resp.length)} icon={<Target />} tone="plain" />
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
-            <ChartCard title="Distribuição do faturamento por origem" subtitle="Reativação × SDR × Social Selling × Vendas"><Donut data={porOrigem.filter((o) => o.valor > 0).map((o) => ({ name: o.nome, value: o.valor }))} fmt={fmtBrl} /></ChartCard>
+            <ChartCard title="Distribuição do faturamento por origem" subtitle="SDR × Reativação × Social Selling"><Donut data={porOrigem.filter((o) => o.valor > 0).map((o) => ({ name: o.nome, value: o.valor }))} fmt={fmtBrl} /></ChartCard>
             <ChartCard title="Evolução do faturamento por mês" subtitle="Mês da última movimentação do card"><Lines data={evo} x="mes" xFmt={ymLabel} fmt={fmtBrl} series={[{ key: "valor", name: "Faturamento", color: C.rasp }]} /></ChartCard>
             <ChartCard title="Faturamento por Responsável"><BarsH data={resp.slice(0, 10)} y="nome" x="valor" name="Faturamento" fmt={fmtBrl} /></ChartCard>
             <ChartCard title="Faturamento por Unidade"><BarsV data={unid} x="nome" y="valor" name="Faturamento" fmt={fmtBrl} /></ChartCard>

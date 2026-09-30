@@ -1,6 +1,7 @@
 import { createRootRoute, createRoute, createRouter, Outlet, redirect, useParams } from "@tanstack/react-router";
 import { Shell } from "@/components/layout/Shell";
 import { AREA_KEYS, type AreaKey } from "@/config/areas";
+import { AREAS_COM_FATURAMENTO } from "@/config/nav";
 import Agendamentos from "@/pages/Agendamentos";
 import FaturamentoComercial from "@/pages/FaturamentoComercial";
 import Parcerias from "@/pages/Parcerias";
@@ -21,7 +22,8 @@ const QualPage = () => { const a = areaOf(); return <QualidadeCrm key={a} area={
 const tree = root.addChildren([
   createRoute({ getParentRoute: () => root, path: "/", beforeLoad: () => { throw redirect({ to: "/agendamentos" }); } }),
   route("/agendamentos", Agendamentos), route("/faturamento-comercial", FaturamentoComercial),
-  route("/funil/$area", FunilPage), route("/faturamento/$area", FatPage), route("/qualidade/$area", QualPage), route("/parcerias", Parcerias),
+  route("/funil/$area", FunilPage), createRoute({ getParentRoute: () => root, path: "/faturamento/$area", component: FatPage,
+    beforeLoad: ({ params }) => { if (!AREAS_COM_FATURAMENTO.includes(params.area as AreaKey)) throw redirect({ to: "/faturamento-comercial" }); } }), route("/qualidade/$area", QualPage), route("/parcerias", Parcerias),
 ]);
 export const router = createRouter({ routeTree: tree });
 declare module "@tanstack/react-router" { interface Register { router: typeof router } }

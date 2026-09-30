@@ -137,8 +137,8 @@ export function FaturamentoLever({ area }: { area: AreaKey }) {
             <KpiCard title="Quantidade de vendas" value={fmtInt(n)} icon={<ReceiptText />} tone="ok" />
             <KpiCard title="Ticket médio" value={fmtBrl(n ? total / n : 0)} icon={<TrendingUp />} tone="rasp" />
             <KpiCard title="Taxa de conversão" value={fmtPct(tc.taxa, 1)} icon={<Target />} tone="warn"
-              tip="Convertidos ÷ leads válidos (sem duplicados) nos mesmos filtros, exceto Data de Fechamento e Situação"
-              sub={<>Convertidos: <b>{fmtInt(tc.convertidos)}</b><br />Base considerada: <b>{fmtInt(tc.base)}</b></>} />
+              tip="Leads convertidos ÷ leads que compareceram (avaliação realizada), nos mesmos filtros exceto Data de Fechamento e Situação. Não usa o total de leads."
+              sub={<>Leads convertidos: <b>{fmtInt(tc.convertidos)}</b><br />Leads que compareceram: <b>{fmtInt(tc.compareceram)}</b></>} />
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <ChartCard title="Faturamento por Responsável" subtitle="Vendas convertidas"><BarsV data={resp.slice(0, 10)} x="nome" y="valor" name="Faturamento" fmt={fmtBrl} color={C.rasp} /></ChartCard>
@@ -162,7 +162,7 @@ export function FaturamentoLever({ area }: { area: AreaKey }) {
 
 export function QualidadeCrm({ area }: { area: AreaKey }) {
   const h = useLeadArea(area);
-  const ql = useMemo(() => qualidade(h.filtrados), [h.filtrados]);
+  const ql = useMemo(() => qualidade(h.filtrados, area), [h.filtrados, area]);
   const cols: Col<(typeof ql.faltantes)[number]>[] = [
     { key: "c", header: "Código", value: (r) => r.lead.codigo }, { key: "cr", header: "Criação", value: (r) => r.lead.criadoEm, render: (r) => isoToBr(r.lead.criadoEm) },
     { key: "f", header: "Fase", value: (r) => r.lead.etapa }, { key: "t", header: "Título", value: (r) => r.lead.titulo },
