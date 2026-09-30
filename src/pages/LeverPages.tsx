@@ -52,6 +52,7 @@ const sub = (area: AreaKey, txt: string) => `${txt} — funil "${AREAS[area].pan
 export function Funil({ area }: { area: AreaKey }) {
   const h = useLeadArea(area);
   const k = useMemo(() => kpisFunil(h.filtrados), [h.filtrados]);
+  const tc = useMemo(() => taxaConversao(h.leads, h.f), [h.leads, h.f]);
   const etapas = useMemo(() => (h.q.data ? porEtapa(h.filtrados, h.q.data.painel).filter((e) => e.tipo !== "excluido") : []), [h.filtrados, h.q.data]);
   const resp = useMemo(() => porResponsavel(h.filtrados), [h.filtrados]);
   const unid = useMemo(() => porUnidadeLeads(h.filtrados), [h.filtrados]);
@@ -80,10 +81,11 @@ export function Funil({ area }: { area: AreaKey }) {
             <KpiCard title="Total de leads" value={fmtInt(k.total)} sub={k.duplicados ? `${fmtInt(k.duplicados)} duplicados fora da conta` : undefined} icon={<Users />} tone="coral" tip="Exclui cards em fases de duplicados" />
             <KpiCard title="Leads ativos" value={fmtInt(k.ativos)} icon={<FilterIcon />} tone="rasp" tip="Total − convertidos − perdidos" />
             <KpiCard title="Agendados" value={fmtInt(k.agendados)} icon={<CalendarClock />} tone="warn" tip="Cards em fases de agendamento (Pré-AV/Agendados)" />
-            <KpiCard title="Compareceram" value={fmtInt(k.compareceram)} icon={<CheckCircle2 />} tone="ok" tip="Cards em Negociação ou Convertidos (avaliação realizada)" />
+            <KpiCard title="Compareceram" value={fmtInt(k.compareceram)} icon={<CheckCircle2 />} tone="ok" tip="Leads que passaram pela avaliação: Negociação ou fases de venda (na Reativação, os “Reativados” com ou sem venda). Respeita os filtros." />
             <KpiCard title="Faltaram" value={fmtInt(k.faltaram)} icon={<UserX />} tone="bad" tip="Cards em fases “Falhou”" />
             <KpiCard title="Negociação" value={fmtInt(k.negociacao)} icon={<Handshake />} tone="plain" />
-            <KpiCard title="Convertidos" value={fmtInt(k.convertidos)} sub={`Conversão: ${fmtPct(k.conversao)}`} icon={<Target />} tone="ok" />
+            <KpiCard title="Convertidos" value={fmtInt(k.convertidos)} icon={<Target />} tone="ok" tip="Taxa de conversão = convertidos ÷ leads que compareceram, nos mesmos filtros (exceto Situação). Não usa o total de leads."
+              sub={<>Conversão: <b>{fmtPct(tc.taxa, 1)}</b> ({fmtInt(tc.convertidos)} de {fmtInt(tc.compareceram)} que compareceram)</>} />
             <KpiCard title="Perdidos" value={fmtInt(k.perdidos)} icon={<CircleX />} tone="bad" />
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
@@ -98,6 +100,7 @@ export function Funil({ area }: { area: AreaKey }) {
           <Section title="Conversão por responsável">
             <Card><DataTable rows={resp} rowKey={(r) => r.nome} exportName={`funil-${area}-responsaveis`} cols={[
               { key: "n", header: "Responsável", value: (r) => r.nome }, { key: "l", header: "Leads", value: (r) => r.leads, align: "right" },
+              { key: "cp", header: "Compareceram", value: (r) => r.compareceram, align: "right" },
               { key: "c", header: "Convertidos", value: (r) => r.convertidos, align: "right" }, { key: "p", header: "Conversão", value: (r) => r.conversao, align: "right", render: (r) => fmtPct(r.conversao) },
               { key: "v", header: "Faturamento", value: (r) => r.valor, align: "right", render: (r) => fmtBrl(r.valor) }]} /></Card>
           </Section>

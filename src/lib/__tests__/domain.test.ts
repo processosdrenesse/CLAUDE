@@ -67,7 +67,7 @@ test("Data de Inclusão e Data de Cadastro filtram de forma independente (dados 
 
 // ---------- Lever: datas, filtros combinados e taxa de conversão ----------
 import { normalizeCard, normalizePanel } from "../../services/lever/normalize.ts";
-import { emptyLeadFilters, filtrarLeads, taxaConversao, semDataAvaliacao, porResponsavel, somaValor, vendasLever } from "../../domain/funil.ts";
+import { emptyLeadFilters, filtrarLeads, taxaConversao, semDataAvaliacao, porResponsavel, somaValor, vendasLever, kpisFunil } from "../../domain/funil.ts";
 import type { Lead } from "../../services/lever/types.ts";
 
 const painel = normalizePanel("sdr", {
@@ -160,4 +160,21 @@ test("vendas por origem: SDR + Reativação = SDR + Reativação, sem duplicar S
   assert.equal(por("sdr").length + por("reativacao").length, 30);
   assert.equal(somaValor(por("sdr")) + somaValor(por("reativacao")), 25000);
   assert.equal(somaValor(vendas), 26000);
+});
+
+test("Funil respeita o filtro: compareceram e conversão saem do conjunto filtrado (25 ÷ 59, não 25 ÷ 95)", () => {
+  const p2 = normalizePanel("sdr", { id: "p", title: "SDRs", tags: [], steps: [
+    { id: "a", title: "Contato", position: 1 }, { id: "b", title: "Falhou AV", position: 2 }, { id: "c", title: "Negociação", position: 3 }, { id: "d", title: "Convertidos", position: 4, isFinal: true }] });
+  const c = (id: string, step: string, av: string) => normalizeCard({ id, key: id, title: id, createdAt: "2026-01-01T12:00:00Z", updatedAt: "2026-09-25T12:00:00Z", stepId: step, tagIds: [], contactIds: [], customFields: { "data-avalia-o": [av] } }, p2, new Map());
+  const dentro = "2026/09/23", fora = "2026/08/10";
+  const ls = [
+    ...Array.from({ length: 25 }, (_, i) => c("cv" + i, "d", dentro)), ...Array.from({ length: 34 }, (_, i) => c("ng" + i, "c", dentro)),
+    ...Array.from({ length: 22 }, (_, i) => c("fa" + i, "b", dentro)), ...Array.from({ length: 14 }, (_, i) => c("ct" + i, "a", dentro)),   // 95 leads na semana
+    ...Array.from({ length: 300 }, (_, i) => c("of" + i, i % 2 ? "d" : "c", fora)),                                                          // fora do período: não contam
+  ];
+  const f = { ...emptyLeadFilters(), avaliacao: { from: "2026-09-21", to: "2026-09-26" } };
+  const k = kpisFunil(filtrarLeads(ls, f));
+  assert.deepEqual([k.total, k.compareceram, k.convertidos, k.faltaram, k.negociacao], [95, 59, 25, 22, 34]);
+  const t = taxaConversao(ls, f);
+  assert.deepEqual([t.convertidos, t.compareceram, Math.round(t.taxa * 10) / 10], [25, 59, 42.4]);
 });

@@ -60,6 +60,6 @@ Atenção: em serverless o cache é por instância; a 1ª carga de cada página 
 | Data de Fechamento | `updatedAt` do card em fase de venda | rotulada como "última movimentação" |
 
 **Faturamento Comercial** usa somente o Lever (a conciliação Belle × Lever foi removida).
-**Taxa de conversão** = leads convertidos ÷ leads que **compareceram** (não o total de leads), nos mesmos filtros exceto Data de Fechamento e Situação; a tela mostra as duas quantidades. "Compareceu" = fase Negociação ou de venda (SDR e Social Selling) / "Reativados" com ou sem venda (Reativação, que não tem fase de Negociação). Duplicados não contam.
+**Taxa de conversão** (Funil, Faturamento, responsáveis e Parcerias) = leads convertidos ÷ leads que **compareceram** (não o total de leads), nos mesmos filtros exceto Data de Fechamento e Situação; a tela mostra as duas quantidades. "Compareceu" = fase Negociação ou de venda (SDR e Social Selling) / "Reativados" com ou sem venda (Reativação, que não tem fase de Negociação). Duplicados não contam.
 **Responsáveis** são consolidados na normalização dos cards (`src/config/responsaveis.ts`): Julliane/Juliane → Julliane; Bruna/Bruna Letícia → Bruna.
 **Faturamento Comercial** cobre SDR, Reativação e Social Selling (cada venda pertence a uma única origem); Vendas — Serviços Avulsos não tem página de Faturamento.

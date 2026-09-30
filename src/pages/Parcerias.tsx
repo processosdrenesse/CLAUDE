@@ -22,12 +22,13 @@ export default function Parcerias() {
   const leads = useMemo(() => leadsValidos(filtrarLeads(todos, f)).filter((l) => l.etiquetas.length > 0), [todos, f]);
 
   const porEtiqueta = useMemo(() => {
-    const m = new Map<string, { leads: number; conv: number; valor: number }>();
+    const m = new Map<string, { leads: number; comp: number; conv: number; valor: number }>();
     for (const l of leads) for (const e of l.etiquetas.filter((x) => f.etiqueta.length === 0 || f.etiqueta.includes(x))) {
-      const r = m.get(e) ?? m.set(e, { leads: 0, conv: 0, valor: 0 }).get(e)!;
-      r.leads++; if (l.convertido) { r.conv++; r.valor += l.valor; }
+      const r = m.get(e) ?? m.set(e, { leads: 0, comp: 0, conv: 0, valor: 0 }).get(e)!;
+      r.leads++; if (l.compareceu) r.comp++; if (l.convertido) { r.conv++; r.valor += l.valor; }
     }
-    return [...m].map(([etiqueta, r]) => ({ etiqueta, ...r, conversao: ratio(r.conv, r.leads) })).sort((a, b) => b.leads - a.leads);
+    // conversão = convertidos ÷ compareceram
+    return [...m].map(([etiqueta, r]) => ({ etiqueta, ...r, conversao: ratio(r.conv, r.comp) })).sort((a, b) => b.leads - a.leads);
   }, [leads, f.etiqueta]);
   const porEtapa = useMemo(() => {
     const ordem = q.data?.painel.etapas.map((e) => e.titulo) ?? [];
@@ -56,7 +57,7 @@ export default function Parcerias() {
         <>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 xl:grid-cols-7">
             <KpiCard title="Leads" value={fmtInt(leads.length)} sub={f.etiqueta.length ? `${f.etiqueta.length} etiqueta(s)` : "Todos os cards etiquetados"} icon={<Users />} tone="coral" />
-            <KpiCard title="Convertidos" value={fmtInt(conv.length)} sub={`Conversão ${fmtPct(ratio(conv.length, leads.length))}`} icon={<Target />} tone="ok" />
+            <KpiCard title="Convertidos" value={fmtInt(conv.length)} sub={`Conversão ${fmtPct(ratio(conv.length, k.compareceram), 1)} (${fmtInt(conv.length)} de ${fmtInt(k.compareceram)} que compareceram)`} icon={<Target />} tone="ok" />
             <KpiCard title="Faturamento" value={fmtBrl(somaValor(conv))} icon={<Wallet />} tone="rasp" />
             <KpiCard title="Etiquetas" value={fmtInt(porEtiqueta.length)} icon={<Handshake />} tone="plain" />
             <KpiCard title="Agendamento" value={fmtInt(k.agendados)} sub={pctLeads(k.agendados)} icon={<CalendarClock />} tone="rasp" tip="Cards na fase de agendamento (Pré-AV)" />
@@ -70,6 +71,7 @@ export default function Parcerias() {
           <Section title="Resultados por Etiqueta">
             <Card><DataTable rows={porEtiqueta} rowKey={(r) => r.etiqueta} exportName="parcerias-por-etiqueta" empty="Nenhum card para as etiquetas selecionadas." cols={[
               { key: "e", header: "Etiqueta", value: (r) => r.etiqueta }, { key: "l", header: "Leads", value: (r) => r.leads, align: "right" },
+              { key: "cp", header: "Compareceram", value: (r) => r.comp, align: "right" },
               { key: "c", header: "Convertidos", value: (r) => r.conv, align: "right" }, { key: "p", header: "Conversão", value: (r) => r.conversao, align: "right", render: (r) => fmtPct(r.conversao) },
               { key: "f", header: "Faturamento", value: (r) => r.valor, align: "right", render: (r) => fmtBrl(r.valor) }]} /></Card>
           </Section>

@@ -40,13 +40,14 @@ export function kpisFunil(ls: Lead[]) {
   const convertidos = v.filter((l) => l.convertido).length;
   const perdidos = n("perdido");
   const negociacao = n("negociacao"), faltaram = n("faltou"), agendados = n("agendado");
+  const compareceram = v.filter((l) => l.compareceu).length;
   return {
     total: v.length,
     ativos: v.length - convertidos - perdidos,
     agendados, faltaram, negociacao, convertidos, perdidos,
-    // Compareceram = chegaram à negociação ou converteram (avaliação realizada)
-    compareceram: negociacao + convertidos,
-    conversao: ratio(convertidos, v.length),
+    // Compareceram = avaliação realizada (Negociação/venda; "Reativados" na Reativação) — mesma regra da taxa de conversão
+    compareceram,
+    conversao: ratio(convertidos, compareceram),
     duplicados: ls.length - v.length,
   };
 }
@@ -58,17 +59,18 @@ export const porEtapa = (ls: Lead[], painel: Painel) =>
   });
 
 function contagem(ls: Lead[], chave: (l: Lead) => string) {
-  const m = new Map<string, { leads: number; convertidos: number; valor: number }>();
+  const m = new Map<string, { leads: number; compareceram: number; convertidos: number; valor: number }>();
   for (const l of ls) {
-    const k = chave(l), r = m.get(k) ?? m.set(k, { leads: 0, convertidos: 0, valor: 0 }).get(k)!;
-    r.leads++; if (l.convertido) { r.convertidos++; r.valor += l.valor; }
+    const k = chave(l), r = m.get(k) ?? m.set(k, { leads: 0, compareceram: 0, convertidos: 0, valor: 0 }).get(k)!;
+    r.leads++; if (l.compareceu) r.compareceram++; if (l.convertido) { r.convertidos++; r.valor += l.valor; }
   }
-  return [...m].map(([nome, r]) => ({ nome, ...r, conversao: ratio(r.convertidos, r.leads) })).sort((a, b) => b.leads - a.leads);
+  // conversão = convertidos ÷ compareceram (não o total de leads)
+  return [...m].map(([nome, r]) => ({ nome, ...r, conversao: ratio(r.convertidos, r.compareceram) })).sort((a, b) => b.leads - a.leads);
 }
 export const porResponsavel = (ls: Lead[]) => contagem(leadsValidos(ls), (l) => l.responsavel);
 export const porUnidadeLeads = (ls: Lead[]) => {
   const c = contagem(leadsValidos(ls), (l) => l.unidade ?? "Sem unidade");
-  return [...UNITS, "Sem unidade"].map((u) => c.find((x) => x.nome === u) ?? { nome: u, leads: 0, convertidos: 0, valor: 0, conversao: 0 }).filter((x) => x.leads > 0 || x.nome !== "Sem unidade");
+  return [...UNITS, "Sem unidade"].map((u) => c.find((x) => x.nome === u) ?? { nome: u, leads: 0, compareceram: 0, convertidos: 0, valor: 0, conversao: 0 }).filter((x) => x.leads > 0 || x.nome !== "Sem unidade");
 };
 
 export function evolucaoMensal(ls: Lead[]) {
