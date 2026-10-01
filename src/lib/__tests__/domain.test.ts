@@ -178,3 +178,18 @@ test("Funil respeita o filtro: compareceram e conversão saem do conjunto filtra
   const t = taxaConversao(ls, f);
   assert.deepEqual([t.convertidos, t.compareceram, Math.round(t.taxa * 10) / 10], [25, 59, 42.4]);
 });
+
+test("taxa com Data de Fechamento: numerador e denominador no MESMO período (não o funil inteiro)", () => {
+  const p2 = normalizePanel("social", { id: "p", title: "Social Selling", tags: [], steps: [
+    { id: "a", title: "Contato", position: 1 }, { id: "n", title: "Negociação", position: 2 }, { id: "c", title: "Convertidos", position: 3, isFinal: true }] });
+  const mk = (id: string, step: string, upd: string) => normalizeCard({ id, key: id, title: id, createdAt: "2026-01-01T12:00:00Z", updatedAt: upd, stepId: step, tagIds: [], contactIds: [], customFields: {} }, p2, new Map());
+  const dentro = "2026-09-23T15:00:00Z", fora = "2026-07-10T15:00:00Z";
+  const ls = [
+    ...Array.from({ length: 12 }, (_, i) => mk("cv" + i, "c", dentro)),   // 12 vendas movimentadas no período
+    ...Array.from({ length: 2 }, (_, i) => mk("ng" + i, "n", dentro)),    // 2 em negociação, movimentados no período
+    ...Array.from({ length: 168 }, (_, i) => mk("ox" + i, i % 2 ? "c" : "n", fora)),  // compareceram, mas fora do período
+    ...Array.from({ length: 50 }, (_, i) => mk("ct" + i, "a", dentro)),   // não compareceram
+  ];
+  const t = taxaConversao(ls, { ...emptyLeadFilters(), fechamento: { from: "2026-09-21", to: "2026-09-26" } });
+  assert.deepEqual([t.convertidos, t.compareceram, Math.round(t.taxa * 10) / 10], [12, 14, 85.7]);  // e não 12 ÷ 182
+});

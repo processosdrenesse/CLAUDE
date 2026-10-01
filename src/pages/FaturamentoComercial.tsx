@@ -97,7 +97,7 @@ export default function FaturamentoComercial() {
           </Section>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
             <KpiCard title="Taxa de conversão" value={fmtPct(tc.taxa, 1)} icon={<Percent />} tone="warn"
-              tip="Leads convertidos ÷ leads que compareceram (avaliação realizada), nos mesmos filtros exceto Data de Fechamento e Situação. Não usa o total de leads."
+              tip="Leads convertidos ÷ leads que compareceram (avaliação realizada), no mesmo período e filtros (exceto Situação). Com Data de Fechamento, os dois lados usam leads com última movimentação no período. Não usa o total de leads."
               sub={<>Leads convertidos: <b>{fmtInt(tc.convertidos)}</b><br />Leads que compareceram: <b>{fmtInt(tc.compareceram)}</b></>} />
             <KpiCard title="Responsáveis com venda" value={fmtInt(resp.length)} icon={<Target />} tone="plain" />
           </div>

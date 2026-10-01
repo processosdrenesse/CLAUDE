@@ -110,13 +110,18 @@ export const opcoesLead = (ls: Lead[], pick: (l: Lead) => string) => [...new Set
 
 /**
  * Taxa de conversão = convertidos ÷ leads que COMPARECERAM (não o total de leads), com as quantidades.
- * Convertidos = leads em fases de venda dentro de TODOS os filtros. Compareceram = leads (sem duplicados)
- * que passaram pela avaliação, nos mesmos filtros exceto Data de Fechamento e Situação (senão o
- * denominador encolheria junto com o numerador).
+ *
+ * Os dois lados respeitam o MESMO período, qualquer que seja o filtro de data usado:
+ *  - Data de Criação / Data de Avaliação: filtram os leads; compareceram = os que, dentro do filtro, passaram pela avaliação.
+ *  - Data de Fechamento (última movimentação do card): convertidos = vendas movimentadas no período;
+ *    compareceram = leads que compareceram (Negociação ou venda) com a última movimentação no mesmo período.
+ * A Situação não entra no denominador (senão filtrar "Convertido" faria a taxa virar 100%).
  */
 export function taxaConversao(ls: Lead[], f: LeadFilters) {
   const convertidos = leadsValidos(filtrarLeads(ls, f)).filter((l) => l.convertido).length;
-  const compareceram = leadsValidos(filtrarLeads(ls, { ...f, fechamento: {}, situacao: [] })).filter((l) => l.compareceu).length;
+  const periodoFechamento = !!(f.fechamento.from || f.fechamento.to);
+  const compareceram = leadsValidos(filtrarLeads(ls, { ...f, fechamento: {}, situacao: [] }))
+    .filter((l) => l.compareceu && (!periodoFechamento || inRange(l.atualizadoEm, f.fechamento))).length;
   return { convertidos, compareceram, taxa: ratio(convertidos, compareceram) };
 }
 

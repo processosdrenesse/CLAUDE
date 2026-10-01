@@ -140,7 +140,7 @@ export function FaturamentoLever({ area }: { area: AreaKey }) {
             <KpiCard title="Quantidade de vendas" value={fmtInt(n)} icon={<ReceiptText />} tone="ok" />
             <KpiCard title="Ticket médio" value={fmtBrl(n ? total / n : 0)} icon={<TrendingUp />} tone="rasp" />
             <KpiCard title="Taxa de conversão" value={fmtPct(tc.taxa, 1)} icon={<Target />} tone="warn"
-              tip="Leads convertidos ÷ leads que compareceram (avaliação realizada), nos mesmos filtros exceto Data de Fechamento e Situação. Não usa o total de leads."
+              tip="Leads convertidos ÷ leads que compareceram (avaliação realizada), no mesmo período e filtros (exceto Situação). Com Data de Fechamento, os dois lados usam leads com última movimentação no período. Não usa o total de leads."
               sub={<>Leads convertidos: <b>{fmtInt(tc.convertidos)}</b><br />Leads que compareceram: <b>{fmtInt(tc.compareceram)}</b></>} />
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
