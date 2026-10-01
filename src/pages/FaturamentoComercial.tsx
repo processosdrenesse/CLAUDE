@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
-import { Layers, Percent, ReceiptText, Share2, Target, Users, Wallet } from "lucide-react";
+import { Layers, ReceiptText, Share2, Target, Users, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/layout/Shell";
 import { DateRangeField, FilterCard, MultiSelect } from "@/components/ui/filters";
 import { Card, ChartCard, KpiCard, Loading, Notice, Section, SourceError } from "@/components/ui/primitives";
 import { BarsH, BarsV, C, Donut, Lines } from "@/components/ui/charts";
 import { DataTable, type Col } from "@/components/ui/DataTable";
 import { useAllAreas } from "@/hooks/queries";
-import { emptyLeadFilters, evolucaoMensal, filtrarLeads, opcoesLead, porResponsavel, porUnidadeLeads, semDataAvaliacao, somaValor, taxaConversao, vendasLever, type LeadFilters } from "@/domain/funil";
+import { emptyLeadFilters, evolucaoMensal, filtrarLeads, opcoesLead, porResponsavel, porUnidadeLeads, semDataAvaliacao, somaValor, vendasLever, type LeadFilters } from "@/domain/funil";
 import { AREAS, type AreaKey } from "@/config/areas";
 import { fmtBrl, fmtInt, fmtPct } from "@/lib/format";
 import { isoToBr, ymLabel } from "@/lib/dates";
@@ -29,7 +29,6 @@ export default function FaturamentoComercial() {
   const filtrados = useMemo(() => filtrarLeads(universo, f), [universo, f]);
   const vendas = useMemo(() => vendasLever(filtrados), [filtrados]);
   const total = somaValor(vendas), n = vendas.length;
-  const tc = useMemo(() => taxaConversao(universo, f), [universo, f]);
   const semAv = useMemo(() => semDataAvaliacao(universo, f), [universo, f]);
 
   // Todos os totais saem da MESMA lista filtrada de vendas (cada venda tem uma origem) — sem somar agregados
@@ -96,9 +95,6 @@ export default function FaturamentoComercial() {
             </div>
           </Section>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-            <KpiCard title="Taxa de conversão" value={fmtPct(tc.taxa, 1)} icon={<Percent />} tone="warn"
-              tip="Leads convertidos ÷ leads que compareceram (avaliação realizada), no mesmo período e filtros (exceto Situação). Com Data de Fechamento, os dois lados usam leads com última movimentação no período. Não usa o total de leads."
-              sub={<>Leads convertidos: <b>{fmtInt(tc.convertidos)}</b><br />Leads que compareceram: <b>{fmtInt(tc.compareceram)}</b></>} />
             <KpiCard title="Responsáveis com venda" value={fmtInt(resp.length)} icon={<Target />} tone="plain" />
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
