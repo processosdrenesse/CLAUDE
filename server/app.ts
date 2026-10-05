@@ -51,8 +51,17 @@ app.get("/api/config", (_q, r) => r.json(configStatus()));
 app.post("/api/refresh", (_q, r) => { clearCache(); r.json({ ok: true, epoch: cacheEpoch() }); });
 
 app.get("/api/belle/units", wrap("belle", (q) => belle.units(force(q))));
+/** Par opcional de datas dd/mm/aaaa (`<prefixo>From`/`<prefixo>To`); lança 400 se vier só uma ponta. */
+const optRange = (req: express.Request, from: string, to: string) => {
+  const f = String(req.query[from] ?? ""), t = String(req.query[to] ?? "");
+  if (!f && !t) return undefined;
+  if (!/^\d{2}\/\d{2}\/\d{4}$/.test(f) || !/^\d{2}\/\d{2}\/\d{4}$/.test(t)) throw new UpstreamError("belle", 400, `Informe ${from} e ${to} no formato dd/mm/aaaa`);
+  return { from: parseBr(f), to: parseBr(t) };
+};
 app.get("/api/belle/agendamentos", wrap("belle", async (q) => {
-  const { rows, warning } = await belle.agendamentos(...range(q), force(q));
+  const ag = optRange(q, "from", "to"), inc = optRange(q, "incFrom", "incTo");
+  if (!ag && !inc) throw new UpstreamError("belle", 400, "Informe from/to (agendamento) e/ou incFrom/incTo (inclusão)");
+  const { rows, warning } = await belle.agendamentos({ ag, inc }, force(q));
   return { __warn: true, data: rows, warning };
 }));
 

@@ -63,3 +63,11 @@ Atenção: em serverless o cache é por instância; a 1ª carga de cada página 
 **Taxa de conversão** (Funil, Faturamento, responsáveis e Parcerias) = leads convertidos ÷ leads que **compareceram** (não o total de leads), nos mesmos filtros exceto Data de Fechamento e Situação; a tela mostra as duas quantidades. "Compareceu" = fase Negociação ou de venda (SDR e Social Selling) / "Reativados" com ou sem venda (Reativação, que não tem fase de Negociação). Duplicados não contam.
 **Responsáveis** são consolidados na normalização dos cards (`src/config/responsaveis.ts`): Julliane/Juliane → Julliane; Bruna/Bruna Letícia → Bruna.
 **Faturamento Comercial** cobre SDR, Reativação e Social Selling (cada venda pertence a uma única origem); Vendas — Serviços Avulsos não tem página de Faturamento.
+
+## Período consultado em Agendamentos
+
+O período buscado no Belle é sempre informado na tela (nunca restringido em silêncio):
+- **Data de Agendamento** (de/até completos) → busca por ela;
+- **Data de Inclusão** (de/até completos) → busca por inclusão, em **qualquer data de agendamento, inclusive futuros** (o BI trata o filtro de agendamento vazio como "até hoje" e descartaria os agendamentos futuros, por isso o servidor envia uma janela ampla);
+- nenhuma data completa → mês atual, com aviso.
+Validado contra o sistema antigo (planilhas): inclusão 28/09–03/10 → 127 agendamentos, 64 atendidos.

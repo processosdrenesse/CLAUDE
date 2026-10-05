@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { removerDuplicidades, filtrarAgendamentos, emptyAgFilters, kpisAgendamentos } from "../../domain/agendamentos.ts";
+import { removerDuplicidades, filtrarAgendamentos, emptyAgFilters, kpisAgendamentos, janelaDeBusca } from "../../domain/agendamentos.ts";
 import { inRange } from "../dates.ts";
 import { normalizeUnit } from "../units.ts";
 import { classificarEtapa } from "../../services/lever/normalize.ts";
@@ -192,4 +192,15 @@ test("taxa com Data de Fechamento: numerador e denominador no MESMO período (n�
   ];
   const t = taxaConversao(ls, { ...emptyLeadFilters(), fechamento: { from: "2026-09-21", to: "2026-09-26" } });
   assert.deepEqual([t.convertidos, t.compareceram, Math.round(t.taxa * 10) / 10], [12, 14, 85.7]);  // e não 12 ÷ 182
+});
+
+test("janela de busca no Belle: usa a Data de Inclusão quando a de Agendamento está vazia (nada restringido em silêncio)", () => {
+  const mes = { from: "2026-10-01", to: "2026-10-31" };
+  const f = emptyAgFilters();                                    // agendamento vazio
+  const d = janelaDeBusca(f, mes);                               // sem datas: mês atual, avisado
+  assert.deepEqual([d.ag, d.inc, d.padrao, d.incompletos], [mes, undefined, true, []]);
+  const j = janelaDeBusca({ ...f, inclusao: { from: "2026-09-28", to: "2026-10-03" } }, mes);
+  assert.equal(j.padrao, false); assert.equal(j.ag, undefined); assert.deepEqual(j.inc, { from: "2026-09-28", to: "2026-10-03" });
+  const k = janelaDeBusca({ ...emptyAgFilters({ from: "2026-09-01", to: "2026-09-30" }), inclusao: { from: "2026-09-28" } }, mes);
+  assert.deepEqual(k.incompletos, ["Data de Inclusão"]); assert.deepEqual(k.ag, { from: "2026-09-01", to: "2026-09-30" });
 });

@@ -21,6 +21,26 @@ export const emptyAgFilters = (agendamento: Partial<DateRange> = {}): AgFilters 
 
 const has = (sel: string[], v: string) => sel.length === 0 || sel.includes(v);
 
+export interface JanelaBusca {
+  ag?: DateRange;                // Data de Agendamento (completa)
+  inc?: DateRange;               // Data de Inclusão (completa)
+  padrao: boolean;               // nenhuma data completa: busca o mês atual
+  incompletos: string[];         // filtros de data com só uma das pontas preenchida (ignorados na busca)
+}
+const completo = (r: Partial<DateRange>): r is DateRange => !!r.from && !!r.to && r.from <= r.to;
+
+/**
+ * Define QUAL período é consultado no Belle — nunca em silêncio:
+ *  - Data de Agendamento e/ou Data de Inclusão completas → consulta por elas (inclusão = qualquer data de agendamento);
+ *  - nenhuma completa → mês atual (padrao = true), e a tela avisa.
+ */
+export function janelaDeBusca(f: AgFilters, mesAtual: DateRange): JanelaBusca {
+  const incompletos = ([["Data de Agendamento", f.agendamento], ["Data de Inclusão", f.inclusao]] as const)
+    .filter(([, r]) => (r.from || r.to) && !completo(r)).map(([n]) => n);
+  const ag = completo(f.agendamento) ? f.agendamento : undefined, inc = completo(f.inclusao) ? f.inclusao : undefined;
+  return ag || inc ? { ag, inc, padrao: false, incompletos } : { ag: mesAtual, padrao: true, incompletos };
+}
+
 /**
  * Regra de negócio: a Data de Agendamento dentro do período torna o registro elegível.
  * Data de Inclusão e Data de Cadastro (do BI do Belle) filtram de forma independente;

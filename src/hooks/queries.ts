@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useQueries, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
-import { fetchAgendamentos } from "@/services/belle/api";
+import { fetchAgendamentos, type JanelaApi } from "@/services/belle/api";
 import { fetchArea } from "@/services/lever/api";
 import { AREA_KEYS, type AreaKey } from "@/config/areas";
 import type { Lead, Painel } from "@/services/lever/types";
@@ -9,8 +9,12 @@ const STALE = 5 * 60_000;
 const MAX_DIAS = 800;
 const ok = (from: string, to: string) => !!from && !!to && from <= to && (Date.parse(to) - Date.parse(from)) / 86_400_000 <= MAX_DIAS;
 
-export const useAgendamentos = (from: string, to: string) =>
-  useQuery({ queryKey: ["belle", "agendamentos", from, to], queryFn: () => fetchAgendamentos(from, to), enabled: ok(from, to), staleTime: STALE });
+export const useAgendamentos = (j: JanelaApi) =>
+  useQuery({
+    queryKey: ["belle", "agendamentos", j.ag?.from, j.ag?.to, j.inc?.from, j.inc?.to],
+    queryFn: () => fetchAgendamentos(j), staleTime: STALE,
+    enabled: (!j.ag || ok(j.ag.from, j.ag.to)) && (!j.inc || ok(j.inc.from, j.inc.to)),
+  });
 
 export const useArea = (area: AreaKey) =>
   useQuery({ queryKey: ["lever", "area", area], queryFn: () => fetchArea(area), staleTime: STALE });

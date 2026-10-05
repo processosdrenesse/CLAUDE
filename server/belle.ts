@@ -71,12 +71,17 @@ const biLimiter = new Limiter(400);
 const iso3 = (d: Date) => `${d.toISOString().slice(0, 10)}T03:00:00.000Z`;
 const isoToBr = (s: unknown) => (typeof s === "string" && /^\d{4}-\d{2}-\d{2}/.test(s) ? `${s.slice(8, 10)}/${s.slice(5, 7)}/${s.slice(0, 4)}` : "");
 
-async function biPage(estab: number, m: Month, offset: number, perPage: number) {
+interface Rng { from: Date; to: Date }
+interface BiSpec { ag?: Rng; inc?: Rng }
+
+const biRange = (id: string, r?: Rng) =>
+  r ? [{ id, value: iso3(r.from) }, { id, value2: iso3(r.to) }, { id, range: false }] : [{ id, value: "" }];
+
+async function biPage(estab: number, spec: BiSpec, offset: number, perPage: number) {
   const emptyFilters = ["338681863", "338681860", "338681859", "338681858", "338681857", "338681855", "338681853", "338681852"].map((id) => ({ id, value: "" }));
   const body = {
     reportId: BI_REPORT_ID, sortColumn: "0", sortOrder: 1, recordsPerPage: perPage, estab: String(estab), offsetRecords: offset, ignoreRecords: false,
-    filters: [...emptyFilters, { id: BI_FILTER.inclusao, value: "" },
-      { id: BI_FILTER.agendamento, value: iso3(m.start) }, { id: BI_FILTER.agendamento, value2: iso3(m.end) }, { id: BI_FILTER.agendamento, range: false }],
+    filters: [...emptyFilters, ...biRange(BI_FILTER.inclusao, spec.inc), ...biRange(BI_FILTER.agendamento, spec.ag)],
   };
   return requestJson<{ record_count: number; data: unknown[][] }>(`${env.BELLE_BI_URL}/report/build?estabGeral=1`, {
     source: "belle", limiter: biLimiter, method: "POST", body, headers: { Authorization: env.BELLE_BI_TOKEN, "Content-Type": "text/plain" },
@@ -84,10 +89,10 @@ async function biPage(estab: number, m: Month, offset: number, perPage: number) 
 }
 
 /** Colunas do relatório: ID, Cadastro, Inclusão, Usuário, Cliente("id-nome"), Data agend., Hora, Status, Profissional, Sala, Tipo, Serviço("cod-nome"). */
-async function biMonth(u: UnitRef, m: Month): Promise<Row[]> {
+async function biFetch(u: UnitRef, spec: BiSpec): Promise<Row[]> {
   const per = 4000, all: unknown[][] = [];
   for (let off = 0; ; off += per) {
-    const r = await biPage(u.cod, m, off, per);
+    const r = await biPage(u.cod, spec, off, per);
     if (!Array.isArray(r.data)) throw new UpstreamError("belle", 502, "Resposta inesperada do BI");
     all.push(...r.data);
     if (all.length >= r.record_count || r.data.length === 0) break;
@@ -109,20 +114,51 @@ async function biMonth(u: UnitRef, m: Month): Promise<Row[]> {
   return [...byId.values()];
 }
 
-const agendamentosBi = (from: Date, to: Date, force: boolean) => monthly("agbi", biMonth, "dataAgendamento", from, to, force);
+const biMonth = (u: UnitRef, m: Month) => biFetch(u, { ag: { from: m.start, to: m.end } });
+const agendamentosBiPorAgendamento = (from: Date, to: Date, force: boolean) => monthly("agbi", biMonth, "dataAgendamento", from, to, force);
 
 /**
- * Agendamentos: usa o BI (com Data de Inclusão/Cadastro) quando há token; se o token faltar ou for
- * recusado, cai para a API de integração (sem essas duas datas) e devolve um aviso.
+ * Janela "qualquer data de agendamento". O BI NÃO trata o filtro de agendamento vazio como "tudo": ele
+ * descarta os agendamentos futuros (só devolve até hoje). Por isso enviamos uma janela explícita e ampla.
  */
-export async function agendamentos(from: Date, to: Date, force = false): Promise<{ rows: Row[]; warning?: string }> {
-  if (!env.BELLE_BI_TOKEN) return { rows: await agendamentosApi(from, to, force), warning: "BELLE_BI_TOKEN não configurado: Data de Inclusão e Data de Cadastro indisponíveis." };
+function janelaQualquerAgendamento(): Rng {
+  const dia = 86_400_000;
+  return { from: new Date(Date.UTC(2020, 0, 1)), to: new Date(Date.now() + 1100 * dia) };
+}
+
+/** Busca pela Data de Inclusão (todas as datas de agendamento, inclusive futuras, ou restrita a `ag` se informada). */
+async function agendamentosBiPorInclusao(inc: Rng, ag: Rng | undefined, force: boolean): Promise<Row[]> {
+  const us = await units(force);
+  const key = (r?: Rng) => (r ? `${r.from.toISOString().slice(0, 10)}_${r.to.toISOString().slice(0, 10)}` : "*");
+  const janela = ag ?? janelaQualquerAgendamento();
+  const chunks = await pool(us, 1, (u) =>
+    memo(`belle:biinc:${u.cod}:${key(ag)}:${key(inc)}`, 10 * 60_000, async () =>
+      (await biFetch(u, { ag: janela, inc })).map((r): Row => ({ ...r, codEstab: u.cod, unidade: u.name })), force));
+  return chunks.flat();
+}
+
+/**
+ * Agendamentos. Janela de busca (nada é restringido em silêncio):
+ *  - com Data de Inclusão → consulta o BI por inclusão (todas as datas de agendamento, a menos que `ag` seja informada);
+ *  - só com Data de Agendamento → BI por mês de agendamento.
+ * Sem token do BI (ou se ele falhar) cai para a API de integração, que só filtra por agendamento, e avisa.
+ */
+export async function agendamentos(q: BiSpec, force = false): Promise<{ rows: Row[]; warning?: string }> {
+  const hoje = new Date(); const mes = { from: new Date(Date.UTC(hoje.getUTCFullYear(), hoje.getUTCMonth(), 1)), to: new Date(Date.UTC(hoje.getUTCFullYear(), hoje.getUTCMonth() + 1, 0)) };
+  const viaApi = async (warning: string) => {
+    const ag = q.ag ?? mes;
+    const extra = q.ag ? "" : " A busca usou o mês atual.";
+    return { rows: await agendamentosApi(ag.from, ag.to, force), warning: warning + extra };
+  };
+  if (!env.BELLE_BI_TOKEN) return viaApi("BELLE_BI_TOKEN não configurado: Data de Inclusão e Data de Cadastro indisponíveis.");
   try {
-    return { rows: await agendamentosBi(from, to, force) };
+    if (q.inc) return { rows: await agendamentosBiPorInclusao(q.inc, q.ag, force) };
+    const ag = q.ag ?? mes;
+    return { rows: await agendamentosBiPorAgendamento(ag.from, ag.to, force) };
   } catch (e) {
     const status = e instanceof UpstreamError ? e.status : 0;
     const why = status === 401 || status === 403 ? "token do BI inválido ou expirado" : "falha ao consultar o BI";
     console.error("[belle:bi]", why, (e as Error).message);
-    return { rows: await agendamentosApi(from, to, force), warning: `Data de Inclusão e Data de Cadastro indisponíveis: ${why}. Atualize BELLE_BI_TOKEN.` };
+    return viaApi(`Data de Inclusão e Data de Cadastro indisponíveis: ${why}. Atualize BELLE_BI_TOKEN.`);
   }
 }

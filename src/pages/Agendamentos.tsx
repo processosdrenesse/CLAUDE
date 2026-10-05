@@ -6,7 +6,7 @@ import { ChartCard, KpiCard, Loading, Notice, Section, SourceError, Toggle, Card
 import { BarsH, BarsV, C, Donut, Lines, STATUS_COLOR } from "@/components/ui/charts";
 import { DataTable, type Col } from "@/components/ui/DataTable";
 import { useAgendamentos } from "@/hooks/queries";
-import { agrupar, emptyAgFilters, ehEquipeOficial, evolucao, filtrarAgendamentos, kpisAgendamentos, opcoes, porStatus, porUnidade, type AgFilters, type Granularidade } from "@/domain/agendamentos";
+import { agrupar, emptyAgFilters, janelaDeBusca, ehEquipeOficial, evolucao, filtrarAgendamentos, kpisAgendamentos, opcoes, porStatus, porUnidade, type AgFilters, type Granularidade } from "@/domain/agendamentos";
 import { firstOfMonth, isoToBr, lastOfMonth, ymLabel } from "@/lib/dates";
 import { fmtInt, fmtPct } from "@/lib/format";
 import { EQUIPE_OFICIAL } from "@/config/areas";
@@ -23,13 +23,13 @@ export default function Agendamentos() {
   const [gran, setGran] = useState<Granularidade>("dia");
   const set = <K extends keyof AgFilters>(k: K, v: AgFilters[K]) => setF((p) => ({ ...p, [k]: v }));
 
-  // A janela de busca no Belle é a Data de Agendamento (ou o mês atual se vazia).
-  const from = f.agendamento.from || firstOfMonth(), to = f.agendamento.to || lastOfMonth();
-  const q = useAgendamentos(from, to);
+  // Período consultado no Belle: definido pelos filtros de data e SEMPRE informado na tela (nada restrito em silêncio).
+  const janela = useMemo(() => janelaDeBusca(f, { from: firstOfMonth(), to: lastOfMonth() }), [f]);
+  const q = useAgendamentos({ ag: janela.ag, inc: janela.inc });
 
   const todos = q.data?.items ?? [];
   const universo = useMemo(() => (soOficial ? todos.filter((a) => ehEquipeOficial(a.colaborador, EQUIPE_OFICIAL)) : todos), [todos, soOficial]);
-  const linhas = useMemo(() => filtrarAgendamentos(universo, { ...f, agendamento: { from, to } }), [universo, f, from, to]);
+  const linhas = useMemo(() => filtrarAgendamentos(universo, f), [universo, f]);
 
   const k = useMemo(() => kpisAgendamentos(linhas), [linhas]);
   const porColab = useMemo(() => agrupar(linhas, (a) => a.colaborador, "taxa"), [linhas]);
@@ -92,6 +92,13 @@ export default function Agendamentos() {
         </label>
       </FilterCard>
 
+      <Notice tone={janela.padrao || janela.incompletos.length ? "warn" : "info"}>
+        {janela.padrao
+          ? "Nenhuma data de busca informada: exibindo os agendamentos do mês atual. Informe a Data de Agendamento ou a Data de Inclusão para consultar outro período."
+          : <>Consultando o Belle: {janela.ag && <>agendamentos de <b>{isoToBr(janela.ag.from)}</b> a <b>{isoToBr(janela.ag.to)}</b></>}
+              {janela.ag && janela.inc && " "}{janela.inc && <>{janela.ag ? "incluídos de" : "agendamentos incluídos de"} <b>{isoToBr(janela.inc.from)}</b> a <b>{isoToBr(janela.inc.to)}</b>{!janela.ag && " (qualquer data de agendamento, inclusive futuros)"}</>}.</>}
+        {janela.incompletos.length > 0 && <> Informe as duas datas (de e até) de {janela.incompletos.join(" e ")}: enquanto isso, não entram na busca.</>}
+      </Notice>
       {q.isLoading && <Loading label="Buscando agendamentos no Belle (4 unidades)..." />}
       {q.error && <SourceError error={q.error} onRetry={() => q.refetch()} />}
       {q.data?.warning && <Notice>{q.data.warning}</Notice>}
