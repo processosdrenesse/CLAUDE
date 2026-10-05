@@ -18,8 +18,8 @@ from reportlab.platypus import (Flowable, KeepTogether, PageBreak, Paragraph,
                                 SimpleDocTemplate, Spacer, Table, TableStyle)
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-DADOS = sys.argv[1] if len(sys.argv) > 1 else os.path.join(AQUI, "dados_2026-09-30.json")
-SAIDA = sys.argv[2] if len(sys.argv) > 2 else os.path.join(AQUI, "Analise_Sequencias_Lever_2026-09-30.pdf")
+import glob
+DADOS = sys.argv[1] if len(sys.argv) > 1 else sorted(glob.glob(os.path.join(AQUI, "dados_*.json")))[-1]
 
 FD = "/usr/share/fonts/truetype/dejavu/"
 pdfmetrics.registerFont(TTFont("DV", FD + "DejaVuSans.ttf"))
@@ -40,6 +40,7 @@ BG_BEST, BG_WORST = colors.HexColor("#e1f1e6"), colors.HexColor("#fbe0dd")
 # ---------------------------------------------------------------- dados
 snap = json.load(open(DADOS, encoding="utf-8"))
 DATA_TXT = "/".join(reversed(snap["coletado_em"].split("-")))
+SAIDA = sys.argv[2] if len(sys.argv) > 2 else os.path.join(AQUI, f"Analise_Sequencias_Lever_{snap['coletado_em']}.pdf")
 SEQS = snap["sequencias"]
 PASSOS = snap["passos"]
 por_seq = defaultdict(list)
@@ -90,6 +91,16 @@ def T(seq, pos):
     """Taxa de resposta do passo `pos` da sequência (texto)."""
     p = next(p for p in por_seq[seq] if p["pos"] == pos)
     return pct(rate(p["it"], p["ex"]))
+
+
+def L(seq, pos):
+    p = next(p for p in por_seq[seq] if p["pos"] == pos)
+    return pct(rate(p["rd"], p["ex"]), 0)
+
+
+def faixa_leitura(*nomes):
+    v = [info[n]["stats"]["executionReadRate"] * 100 for n in nomes]
+    return f"{round(min(v))}–{round(max(v))}%"
 
 
 def N(seq, pos):
@@ -212,15 +223,17 @@ def leitura(nome):
         "Tom de utilidade (“antes de reorganizar nossa agenda”) + “hoje e amanhã”. Funciona. <b>Manter.</b>",
     PRE17:
         f"Lembrete simples vai bem ({T(PRE17, 1)}). A foto de resultado ({T(PRE17, 3)}) é o ponto fraco — trocar pelo lembrete “sua sessão está agendada” usado no 7853 ({T(PRE7, 5)}).",
+    "Sem resposta / Social Selling 7853":
+        f"Mesmos modelos do Sem resposta 7853, com amostra pequena ({s['executionCount']} envios): 10–11% nos 3 primeiros toques e 0% no 4º (utilidade de teste, 4 envios). Acompanhar antes de mexer.",
     "Pré AV SDR 6554":
         "Canal sem confirmação de leitura; amostra pequena (37 envios). A foto de resultado teve 0 respostas.",
     "Sem resposta / REATIV 7853":
         f"Motor de conversas do Lever: {fnum(s['executionInteractionCount'])} respostas. A 2ª mensagem responde MAIS que a 1ª ({T('Sem resposta / REATIV 7853', 2)} × {T('Sem resposta / REATIV 7853', 1)}) — "
         "escassez + escolha de horário. <b>Modelo a copiar para outras cadências.</b>",
     NEG17:
-        f"1ª mensagem boa ({T(NEG17, 1)}); cai forte nas seguintes e a leitura despenca (36% no 3º toque).",
+        f"1ª mensagem boa ({T(NEG17, 1)}); cai forte nas seguintes e a leitura despenca ({L(NEG17, 3)} no 3º toque).",
     FAL17:
-        f"Mensagem 1 ok ({T(FAL17, 1)}); 2 a 4 abaixo de 10% e leitura de só 32% no último toque.",
+        f"Mensagem 1 ok ({T(FAL17, 1)}); 2 a 4 abaixo de 10% e leitura de só {L(FAL17, 4)} no último toque.",
     FAL7:
         f"Utilidades 1 e 2 seguram {T(FAL7, 1)}/{T(FAL7, 2)}. O 3º toque (“empurrãozinho”) cai para {T(FAL7, 3)}; o Spa Face do 4º toque recupera ({T(FAL7, 4)}).",
     NEG7:
@@ -321,7 +334,7 @@ def montar():
         f"<b>O que menos engaja:</b> mensagens “educativas/curiosidade” (“Você sabia…”, “60% das pessoas…”, combo Stimullus), perguntas abertas de objeção no 2º/3º toque da Negociação e toda a sequência de "
         f"<b>Leads frios | SDR 7853 ({pct(taxa_seq(info[LF]))})</b>, que consome {fnum(info[LF]['stats']['executionCount'])} envios — {pct(leads_frios_pct, 0)} de todo o volume.",
         "<b>Padrão de queda:</b> em quase toda cadência a 1ª mensagem responde 2 a 3× mais que as seguintes. Os toques 2–4 precisam trocar de abordagem (oferta concreta + escolha simples), não repetir a pergunta.",
-        f"<b>Canal 1727 lê pouco:</b> {pct(info[SR17]['stats']['executionReadRate'], 0)} de leitura no Sem resposta e 47–52% em Negociação e Faltou AV, contra 67–75% no 7853 nas mesmas etapas. "
+        f"<b>Canal 1727 lê pouco:</b> {pct(info[SR17]['stats']['executionReadRate'], 0)} de leitura no Sem resposta e {faixa_leitura(NEG17, FAL17)} em Negociação e Faltou AV, contra {faixa_leitura(S7, NEG7, FAL7)} no 7853 nas mesmas etapas. "
         "A mesma mensagem performa pior nele — vale revisar a qualidade/saúde desse número.",
         "<b>Ação:</b> a lista final (página “Cadências que você deve mudar”) traz 9 cadências priorizadas, qual mensagem trocar e o texto sugerido para substituir.",
     ])
@@ -429,9 +442,9 @@ def montar():
           "Usar a sequência: “o que te incomoda hoje?” → sessão experimental 2 dias → utilidade “seu atendimento segue em aberto”."]),
         ("7", "Faltou AV | SDR 1727", faixa(taxa_seq(info[FAL17])), "toques 2–4 fracos · " + dados(FAL17),
          f"Substituir M2 a M4 (8–10%) pelas utilidades do 7853 ({T(FAL7, 1)} e {T(FAL7, 2)}).",
-         ["<b>M2 →</b> “UTILIDADE FALTOU AV 2”; <b>M3 →</b> Spa Face; <b>M4 →</b> excluir (32% de leitura)."]),
+         [f"<b>M2 →</b> “UTILIDADE FALTOU AV 2”; <b>M3 →</b> Spa Face; <b>M4 →</b> excluir ({L(FAL17, 4)} de leitura)."]),
         ("8", "Negociação | SDR 1727", faixa(taxa_seq(info[NEG17])), "toque 3 crítico · " + dados(NEG17),
-         f"Mesmo ajuste da Negociação 7853: M3 ({T(NEG17, 3)}, 36% de leitura) → oferta concreta.", []),
+         f"Mesmo ajuste da Negociação 7853: M3 ({T(NEG17, 3)}, {L(NEG17, 3)} de leitura) → oferta concreta.", []),
         ("9", "Pré AV SDR 1727", faixa(taxa_seq(info[PRE17])), "toque 3 fraco · " + dados(PRE17),
          f"Trocar só a M3, foto de resultado ({T(PRE17, 3)}).",
          [f"<b>M3 →</b> “Oi, [NOME]. Tudo bem? Passando para lembrar que sua sessão está agendada.” ({T(PRE7, 5)} no 7853)"]),
