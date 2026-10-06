@@ -71,3 +71,26 @@ O período buscado no Belle é sempre informado na tela (nunca restringido em si
 - **Data de Inclusão** (de/até completos) → busca por inclusão, em **qualquer data de agendamento, inclusive futuros** (o BI trata o filtro de agendamento vazio como "até hoje" e descartaria os agendamentos futuros, por isso o servidor envia uma janela ampla);
 - nenhuma data completa → mês atual, com aviso.
 Validado contra o sistema antigo (planilhas): inclusão 28/09–03/10 → 127 agendamentos, 64 atendidos.
+
+## Quadro Avaliação × Cabine SDR × Cabine (SDR — Novos → Faturamento)
+Quadro isolado e removível. Para remover: apague `server/avaliacaoCabine/`, `src/components/avaliacaoCabine/`,
+`src/domain/avaliacaoCabine.ts`, `src/lib/__tests__/avaliacaoCabine.test.ts`, as linhas marcadas em `server/app.ts`
+e `src/pages/LeverPages.tsx` e o item `crons` do `vercel.json`.
+
+- **Vendas**: cards do painel SDRs nas fases Convertidos/Convertidos avulsos, casados com os planos **aprovados** do Belle
+  (`venda_planos`) pelo telefone (8 últimos dígitos; depois e-mail e nome), ±90 dias, um card para um plano.
+  Faturamento e data = valor e data da venda no Belle. Fora do quadro: card sem telefone, sem plano aprovado, plano
+  suspenso, valor zero/teste, card duplicado, mais de um cliente possível. Outra unidade só é aceita com valor igual.
+- **Classificação** (documento do Belle, por cliente/dia): Avaliação = avaliação atendida no dia; Cabine SDR = avaliação
+  com falta/desmarcada + experimental atendida, ou só experimental e nunca teve plano aprovado antes; senão Cabine.
+  Experimental = serviços 22, 56210744, 56260425, 33353403, 56210746, 56210745 **sem** plano; avaliação = tipo
+  "Avaliação" ou serviço 52; Retorno/Consulta/sem serviço ficam fora.
+- **Agendamentos**: sessões (todas as situações) dos clientes do funil SDR (telefone de qualquer card do painel SDRs).
+- **Taxa de conversão**: atendidas com plano comprado ÷ atendidas (Avaliação e Cabine SDR: cliente/dia; Cabine: cliente/mês).
+- **Período**: Data de Fechamento (prioridade, = data da venda no Belle) ou Data de Avaliação do card; sem datas = 2026
+  até hoje. Unidade filtra pela unidade do Belle. Outros filtros preenchidos → quadro em branco (com aviso).
+- **Pré-cálculo**: `GET /api/avaliacao-cabine/cron` (header `Authorization: Bearer $CRON_SECRET`; a Vercel chama todo
+  dia às 06:00 de Brasília). Mês atual e anterior são refeitos todo dia; os demais meses de 2026 1× por semana (rodízio);
+  histórico de planos (2020–2025) uma única vez; contatos do Lever em varredura mensal + busca dos novos. Os pedaços
+  ficam no Vercel Blob privado (`BLOB_READ_WRITE_TOKEN`) ou em `.cache/avaliacao-cabine` no modo local.
+  A tela lê `GET /api/avaliacao-cabine`.

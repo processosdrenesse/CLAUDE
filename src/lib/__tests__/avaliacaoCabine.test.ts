@@ -1,0 +1,77 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { calcular, classeDoDia, tipoSessao, type CardSdr, type Plano, type Sessao } from "../../../server/avaliacaoCabine/regras.ts";
+import { montarQuadro, periodoDoQuadro, type ResultadoAC } from "../../domain/avaliacaoCabine.ts";
+import { emptyLeadFilters } from "../../domain/funil.ts";
+
+test("avaliação×cabine: tipo da sessão", () => {
+  assert.equal(tipoSessao("Avaliação", "999", 0), "AV");
+  assert.equal(tipoSessao("Serviço", "52", 0), "AV");
+  assert.equal(tipoSessao("Serviço", "22", 0), "EXP");
+  assert.equal(tipoSessao("Serviço", "22", 123), "CAB"); // experimental dentro de plano = cabine
+  assert.equal(tipoSessao("Serviço", "777", 0), "CAB");
+  assert.equal(tipoSessao("Retorno", "777", 0), null);
+  assert.equal(tipoSessao("Serviço", "", 0), null);
+});
+
+test("avaliação×cabine: classe do dia", () => {
+  assert.equal(classeDoDia([{ t: "AV", s: "Atendido" }], undefined, "2026-05-01"), "A");
+  assert.equal(classeDoDia([{ t: "AV", s: "Falhou" }, { t: "EXP", s: "Atendido" }], "2025-01-01", "2026-05-01"), "S");
+  assert.equal(classeDoDia([{ t: "EXP", s: "Atendido" }], undefined, "2026-05-01"), "S");
+  assert.equal(classeDoDia([{ t: "EXP", s: "Atendido" }], "2026-05-01", "2026-05-01"), "S"); // 1º plano é o do próprio dia
+  assert.equal(classeDoDia([{ t: "EXP", s: "Atendido" }], "2025-03-01", "2026-05-01"), "C"); // já tinha plano
+  assert.equal(classeDoDia([], undefined, "2026-05-01"), "C"); // compra sem sessão no dia
+});
+
+const sess = (o: Partial<Sessao>): Sessao => ({ d: "2026-05-04", u: "Lagoa Nova", c: 1, t: "AV", s: "Atendido", ...o });
+const plano = (o: Partial<Plano>): Plano => ({ d: "2026-05-04", u: "Lagoa Nova", c: 1, nome: "Maria Silva", st: "Aprovado", v: 1000, orc: 1, ...o });
+const card = (o: Partial<CardSdr>): CardSdr => ({ id: "c1", key: "SDRS-1", nome: "Maria Silva", fone: "99990001", email: "", unidade: "Lagoa Nova", fechamento: "2026-05-04", valor: 1000, ...o });
+
+test("avaliação×cabine: casamento, exclusões e conversão", () => {
+  const contatos = new Map([[1, { f: "99990001", e: "" }], [2, { f: "99990002", e: "" }], [3, { f: "99990003", e: "" }], [9, { f: "11112222", e: "" }]]);
+  const r = calcular({
+    sessoes: [
+      sess({}), // cliente 1: avaliação atendida + compra no dia → Avaliação
+      sess({ c: 2, t: "AV", s: "Falhou", d: "2026-05-05" }), sess({ c: 2, t: "EXP", d: "2026-05-05" }), // → Cabine SDR
+      sess({ c: 3, t: "CAB", d: "2026-05-10" }), // cabine, compra em outro dia do mês → Cabine
+      sess({ c: 9, t: "AV" }), // cliente fora do funil SDR: não conta nas sessões
+    ],
+    planos: [
+      plano({}), plano({ c: 2, d: "2026-05-05", v: 500, orc: 2, nome: "Ana" }), plano({ c: 3, d: "2026-05-20", v: 300, orc: 3, nome: "Bia" }),
+      plano({ c: 9, orc: 9, nome: "Fora" }),
+    ],
+    primeiroPlano: new Map([[1, "2026-05-04"], [2, "2026-05-05"], [3, "2026-05-20"], [9, "2026-05-04"]]),
+    contatos,
+    cards: [
+      card({}),
+      card({ id: "c2", key: "SDRS-2", nome: "Ana", fone: "99990002", valor: 450, fechamento: "2026-05-06" }), // valor diferente → usa o do Belle
+      card({ id: "c3", key: "SDRS-3", nome: "Bia", fone: "99990003", valor: 300, unidade: "Zona Norte" }), // outra unidade, valor igual → aceita
+      card({ id: "c4", key: "SDRS-4", fone: "" }), // sem telefone
+      card({ id: "c5", key: "SDRS-5", nome: "Maria Silva", fone: "99990001" }), // duplicado
+    ],
+    fonesSdr: new Set(["99990001", "99990002", "99990003"]),
+  });
+  assert.deepEqual(r.vendas.map((v) => [v.key, v.g, v.v]), [["SDRS-1", "A", 1000], ["SDRS-2", "S", 500], ["SDRS-3", "C", 300]]);
+  assert.deepEqual(r.excluidos.map((x) => [x.key, x.motivo]).sort(), [["SDRS-4", "Card sem telefone"], ["SDRS-5", "Card duplicado (plano já usado por outro card)"]]);
+  const soma = (g: string, i: 3 | 4) => r.conversao.filter((c) => c[2] === g).reduce((s, c) => s + c[i], 0);
+  assert.deepEqual([soma("A", 3), soma("A", 4), soma("S", 3), soma("S", 4), soma("C", 3), soma("C", 4)], [1, 1, 1, 1, 1, 1]);
+  const ag = (g: string) => r.agenda.filter((a) => a[2] === g).reduce((s, a) => s + a[3], 0);
+  assert.deepEqual([ag("A"), ag("S"), ag("C")], [2, 1, 1]); // a avaliação com falta vai para Avaliação; a experimental para Cabine SDR
+
+  // Quadro na tela: período, unidade e filtros que deixam o quadro em branco
+  const res = r as unknown as ResultadoAC;
+  const f = emptyLeadFilters();
+  const p = periodoDoQuadro(f, "2026-12-31");
+  assert.ok(p.ok && p.modo === "padrao");
+  const q = montarQuadro(res, p as Extract<typeof p, { ok: true }>, [], new Map());
+  assert.deepEqual(q.linhas.map((l) => [l.g, l.faturamento, l.quantidade]), [["A", 1000, 1], ["S", 500, 1], ["C", 300, 1], ["T", 1800, 1 + 1 + 1]]);
+  const qz = montarQuadro(res, p as Extract<typeof p, { ok: true }>, ["Zona Norte"], new Map());
+  assert.equal(qz.linhas.at(-1)!.faturamento, 0);
+  const pf = periodoDoQuadro({ ...f, fechamento: { from: "2026-05-05", to: "2026-05-31" }, avaliacao: { from: "2026-01-01", to: "2026-01-02" } }, "2026-12-31");
+  assert.ok(pf.ok && pf.modo === "fechamento");
+  assert.equal(montarQuadro(res, pf as Extract<typeof pf, { ok: true }>, [], new Map()).linhas.at(-1)!.faturamento, 800);
+  const pa = periodoDoQuadro({ ...f, avaliacao: { from: "2026-04-01", to: "2026-04-30" } }, "2026-12-31");
+  assert.equal(montarQuadro(res, pa as Extract<typeof pa, { ok: true }>, [], new Map([["c1", "2026-04-20"]])).linhas.at(-1)!.faturamento, 1000);
+  const pb = periodoDoQuadro({ ...f, responsavel: ["Bruna"] }, "2026-12-31");
+  assert.deepEqual(pb, { ok: false, filtros: ["Responsável"] });
+});

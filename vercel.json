@@ -7,5 +7,6 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ]
+  ],
+  "crons": [{ "path": "/api/avaliacao-cabine/cron", "schedule": "0 9 * * *" }]
 }

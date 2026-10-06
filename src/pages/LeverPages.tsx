@@ -11,6 +11,7 @@ import { emptyLeadFilters, evolucaoMensal, filtrarLeads, kpisFunil, opcoesLead, 
 import { fmtBrl, fmtInt, fmtPct } from "@/lib/format";
 import { isoToBr, ymLabel } from "@/lib/dates";
 import type { Lead } from "@/services/lever/types";
+import { QuadroAvaliacaoCabine } from "@/components/avaliacaoCabine/QuadroAvaliacaoCabine";
 
 type Modo = "funil" | "faturamento" | "qualidade";
 
@@ -143,6 +144,7 @@ export function FaturamentoLever({ area }: { area: AreaKey }) {
               tip="Leads convertidos ÷ leads que compareceram (avaliação realizada), no mesmo período e filtros (exceto Situação). Com Data de Fechamento, os dois lados usam leads com última movimentação no período. Não usa o total de leads."
               sub={<>Leads convertidos: <b>{fmtInt(tc.convertidos)}</b><br />Leads que compareceram: <b>{fmtInt(tc.compareceram)}</b></>} />
           </div>
+          {area === "sdr" && <QuadroAvaliacaoCabine f={h.f} leads={h.leads} />}
           <div className="grid gap-4 lg:grid-cols-2">
             <ChartCard title="Faturamento por Responsável" subtitle="Vendas convertidas"><BarsV data={resp.slice(0, 10)} x="nome" y="valor" name="Faturamento" fmt={fmtBrl} color={C.rasp} /></ChartCard>
             <ChartCard title="Faturamento por Unidade"><BarsV data={unid} x="nome" y="valor" name="Faturamento" fmt={fmtBrl} /></ChartCard>

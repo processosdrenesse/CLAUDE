@@ -8,8 +8,10 @@ import { UpstreamError } from "./http.ts";
 import { parseBr } from "./dates.ts";
 import * as belle from "./belle.ts";
 import * as lever from "./lever.ts";
+import { rotaCron as avaliacaoCabineCron, rotaDados as avaliacaoCabineDados } from "./avaliacaoCabine/rotas.ts";
 
 const app = express();
+app.use(avaliacaoCabineCron); // quadro Avaliação × Cabine: cron autenticado por CRON_SECRET
 
 // Proteção opcional: defina DASHBOARD_PASSWORD para exigir login (usuário: qualquer; senha: o valor).
 if (process.env.DASHBOARD_PASSWORD) {
@@ -68,6 +70,7 @@ app.get("/api/belle/agendamentos", wrap("belle", async (q) => {
 app.get("/api/lever/panels", wrap("lever", (q) => lever.panels(force(q))));
 app.get("/api/lever/panels/:id", wrap("lever", (q) => lever.panelDetail(String(q.params.id), force(q))));
 app.get("/api/lever/panels/:id/cards", wrap("lever", (q) => lever.cards(String(q.params.id), force(q))));
+app.use(avaliacaoCabineDados); // quadro Avaliação × Cabine (SDR → Faturamento)
 app.get("/api/lever/agents", wrap("lever", (q) => lever.agents(force(q))));
 
 // Serve o frontend compilado (npm run build) quando existir — funciona igual no Windows/Mac/Linux.
