@@ -108,7 +108,7 @@ const contatoTupla = (c: Contato): [string, string] => [fone8(c.phoneNumber ?? c
 // ---------- execução
 export interface Relatorio { feitos: string[]; pendentes: string[]; erros: string[]; calculado: boolean; contatos?: string; segundos: number }
 
-export async function executar(o: { limiteSegundos?: number; agora?: Date } = {}): Promise<Relatorio> {
+export async function executar(o: { limiteSegundos?: number; agora?: Date; recalcular?: boolean } = {}): Promise<Relatorio> {
   const t0 = Date.now(), limite = (o.limiteSegundos ?? 230) * 1000;
   const resta = () => limite - (Date.now() - t0);
   const hoje = hojeBr(o.agora), dow = new Date(`${hoje}T12:00:00Z`).getUTCDay();
@@ -166,7 +166,7 @@ export async function executar(o: { limiteSegundos?: number; agora?: Date } = {}
 
   const faltando = tarefas.filter((t) => !inv.has(t.p)).map((t) => t.p);
   const resultadoEm = inv.get("resultado.json");
-  const precisaCalcular = !faltando.length && !!contatos.concluidoEm && (feitos.length > 0 || mudouContatos || !resultadoEm || hojeBr(resultadoEm) < hoje);
+  const precisaCalcular = !faltando.length && !!contatos.concluidoEm && (o.recalcular || feitos.length > 0 || mudouContatos || !resultadoEm || hojeBr(resultadoEm) < hoje);
   let calculado = false;
   if (precisaCalcular && resta() > 60_000) {
     await calcularEGravar(tarefas.map((t) => t.p), contatos, o.agora);

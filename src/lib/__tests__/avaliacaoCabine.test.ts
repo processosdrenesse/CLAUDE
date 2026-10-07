@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { calcular, classeDoDia, tipoSessao, type CardSdr, type Plano, type Sessao } from "../../../server/avaliacaoCabine/regras.ts";
-import { montarQuadro, periodoDoQuadro, type ResultadoAC } from "../../domain/avaliacaoCabine.ts";
+import { conciliar, montarQuadro, periodoDoQuadro, type CardTopo, type ResultadoAC } from "../../domain/avaliacaoCabine.ts";
 import { emptyLeadFilters } from "../../domain/funil.ts";
 
 test("avaliação×cabine: tipo da sessão", () => {
@@ -52,7 +52,7 @@ test("avaliação×cabine: casamento, exclusões e conversão", () => {
     fonesSdr: new Set(["99990001", "99990002", "99990003"]),
   });
   assert.deepEqual(r.vendas.map((v) => [v.key, v.g, v.v]), [["SDRS-1", "A", 1000], ["SDRS-2", "S", 500], ["SDRS-3", "C", 300]]);
-  assert.deepEqual(r.excluidos.map((x) => [x.key, x.motivo]).sort(), [["SDRS-4", "Card sem telefone"], ["SDRS-5", "Card duplicado (plano já usado por outro card)"]]);
+  assert.deepEqual(r.excluidos.map((x) => [x.key, x.motivo]).sort(), [["SDRS-4", "Card sem telefone"], ["SDRS-5", "Mesmo plano casado com mais de um card (plano ficou com SDRS-1)"]]);
   const soma = (g: string, i: 3 | 4) => r.conversao.filter((c) => c[2] === g).reduce((s, c) => s + c[i], 0);
   assert.deepEqual([soma("A", 3), soma("A", 4), soma("S", 3), soma("S", 4), soma("C", 3), soma("C", 4)], [1, 1, 1, 1, 1, 1]);
   const ag = (g: string) => r.agenda.filter((a) => a[2] === g).reduce((s, a) => s + a[3], 0);
@@ -74,4 +74,40 @@ test("avaliação×cabine: casamento, exclusões e conversão", () => {
   assert.equal(montarQuadro(res, pa as Extract<typeof pa, { ok: true }>, [], new Map([["c1", "2026-04-20"]])).linhas.at(-1)!.faturamento, 1000);
   const pb = periodoDoQuadro({ ...f, responsavel: ["Bruna"] }, "2026-12-31");
   assert.deepEqual(pb, { ok: false, filtros: ["Responsável"] });
+});
+
+test("avaliação×cabine: planos do mesmo dia somados, comparecimento e conciliação com os cards do topo", () => {
+  const contatos = new Map([[1, { f: "99990001", e: "" }], [2, { f: "99990002", e: "" }], [3, { f: "99990003", e: "" }]]);
+  const r = calcular({
+    sessoes: [
+      sess({ c: 1, d: "2026-10-02" }), sess({ c: 1, d: "2026-10-01", s: "Falhou" }), sess({ c: 1, d: "2026-09-30", s: "Desmarcado" }),
+      sess({ c: 2, t: "EXP", d: "2026-10-01" }), sess({ c: 2, t: "EXP", d: "2026-09-29", s: "Falhou" }),
+    ],
+    planos: [
+      plano({ c: 1, d: "2026-10-02", v: 1900, orc: 1 }), plano({ c: 1, d: "2026-10-02", v: 890, orc: 2 }), // mesmo dia → 1 venda de 2.790
+      plano({ c: 3, d: "2026-09-25", v: 2000, orc: 3, nome: "Aline" }), // venda antes do período
+    ],
+    primeiroPlano: new Map([[1, "2026-10-02"], [3, "2026-09-25"]]),
+    contatos,
+    cards: [
+      card({ id: "c1", key: "SDRS-14220", valor: 2800, fechamento: "2026-10-02" }),
+      card({ id: "c2", key: "SDRS-14133", nome: "Sem Plano", fone: "99990002", valor: 0, fechamento: "2026-10-01" }),
+      card({ id: "c3", key: "SDRS-3349", nome: "Aline", fone: "99990003", valor: 2000, fechamento: "2026-10-01" }),
+    ],
+    fonesSdr: new Set(["99990001", "99990002", "99990003"]),
+  });
+  assert.deepEqual(r.vendas.map((v) => [v.key, v.v, v.planos]), [["SDRS-3349", 2000, 1], ["SDRS-14220", 2790, 2]]);
+  assert.equal(r.excluidos.find((x) => x.key === "SDRS-14133")?.motivo, "Cliente sem plano no Belle");
+  const res = r as unknown as ResultadoAC;
+  const p = { ok: true as const, modo: "fechamento" as const, r: { from: "2026-09-28", to: "2026-10-03" } };
+  const q = montarQuadro(res, p, [], new Map());
+  const [av, sdr] = q.linhas;
+  assert.deepEqual(av.comparecimento, { atendidos: 1, faltas: 1, taxa: 50 }); // desmarcado fica fora
+  assert.deepEqual(sdr.comparecimento, { atendidos: 1, faltas: 1, taxa: 50 });
+  const lead = (id: string, codigo: string, valor: number): CardTopo => ({ id, codigo, titulo: codigo, valor, unidade: "Lagoa Nova", atualizadoEm: "2026-10-01", dataAvaliacao: "", convertido: true, etapa: "Convertidos" });
+  const topo = [lead("c1", "SDRS-14220", 2800), lead("c2", "SDRS-14133", 0), lead("c3", "SDRS-3349", 2000)];
+  const c = conciliar(res, p, [], topo, topo, q.vendas);
+  assert.deepEqual([c.nTopo, c.totalTopo, c.nQuadro, c.totalQuadro, c.fecha], [3, 4800, 1, 2790, true]);
+  assert.deepEqual(c.itens.map((i) => [i.key, i.efeito]), [["SDRS-3349", -2000], ["SDRS-14220", -10], ["SDRS-14133", 0]]);
+  assert.match(c.itens[0].motivo, /fora do período \(25\/09\/2026\)/);
 });

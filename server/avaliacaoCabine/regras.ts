@@ -23,10 +23,11 @@ export interface Plano { d: string; u: string; c: number; nome: string; st: stri
 export interface ContatoBelle { f: string; e: string }
 export interface CardSdr { id: string; key: string; nome: string; fone: string; email: string; unidade: string | null; fechamento: string; valor: number }
 
-export interface Venda { d: string; u: string; g: Grupo; v: number; card: string; key: string; nome: string; vLever: number }
+/** Uma venda = um card casado com o(s) plano(s) aprovado(s) da cliente no mesmo dia (somados). */
+export interface Venda { d: string; u: string; g: Grupo; v: number; card: string; key: string; nome: string; vLever: number; c?: number; planos?: number }
 export interface Excluido { card: string; key: string; nome: string; fechamento: string; v: number; motivo: string }
 export interface Resultado {
-  versao: 1;
+  versao: 1 | 2;
   geradoEm: string;
   vendas: Venda[];
   /** [dia, unidade, grupo, agendamentos] — sessões dos clientes do funil SDR (todas as situações). */
@@ -34,9 +35,12 @@ export interface Resultado {
   /** [dia, unidade, grupo, atendidas, convertidas] — unidades de fechamento (cliente/dia; Cabine: cliente/mês). */
   conversao: [string, string, Grupo, number, number][];
   excluidos: Excluido[];
+  /** [dia, unidade, grupo, atendidos, faltas] — comparecimento (falta = "Falhou"; desmarcado/cancelado fora). */
+  comparecimento?: [string, string, Grupo, number, number][];
 }
 
 export const ATENDIDO = "Atendido";
+export const FALTA = "Falhou";
 export const fone8 = (s: unknown) => { const d = String(s ?? "").replace(/\D/g, ""); return d.length >= 8 ? d.slice(-8) : ""; };
 export const normTxt = (s: unknown) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 const diasEntre = (a: string, b: string) => Math.abs(Date.parse(a) - Date.parse(b)) / 86_400_000;
@@ -90,7 +94,12 @@ export function calcular(e: Entrada): Resultado {
   const emailDe = (c: number) => e.contatos.get(c)?.e ?? "";
 
   // ---- casamento card do Lever ↔ plano do Belle (telefone > e-mail > nome; um para um)
-  const usados = new Set<number>();
+  const usados = new Map<number, string>(); // codOrcamento → card que ficou com o plano
+  // planos aprovados da mesma cliente no mesmo dia contam como uma venda (valor somado)
+  const doDia = new Map<string, typeof aprovados>();
+  for (const p of aprovados) { const k = `${p.c}|${p.d}`; (doDia.get(k) ?? doDia.set(k, []).get(k)!).push(p); }
+  const livresDoDia = (p: { c: number; d: string }) => doDia.get(`${p.c}|${p.d}`)!.filter((x) => !usados.has(x.orc));
+  const totalDoDia = (p: { c: number; d: string }) => livresDoDia(p).reduce((s, x) => s + x.v, 0);
   const vendas: Venda[] = [];
   const excluidos: Excluido[] = [];
   const clientesCasados = new Set<number>();
@@ -98,7 +107,7 @@ export function calcular(e: Entrada): Resultado {
   for (const L of [...e.cards].sort((a, b) => a.fechamento.localeCompare(b.fechamento) || a.key.localeCompare(b.key))) {
     if (!L.fone) { exclui(L, "Card sem telefone"); continue; }
     const perto = (p: { d: string }) => diasEntre(p.d, L.fechamento) <= 90;
-    const valorIgual = (p: { v: number }) => Math.abs(p.v - L.valor) <= 1;
+    const valorIgual = (p: { c: number; d: string; v: number }) => Math.abs(p.v - L.valor) <= 1 || Math.abs(totalDoDia(p) - L.valor) <= 1;
     const criterios: ((p: (typeof aprovados)[number]) => boolean)[] = [
       (p) => foneDe(p.c) === L.fone && (!L.unidade || p.u === L.unidade || valorIgual(p)), // outra unidade só com valor igual
       (p) => !!L.email && emailDe(p.c) === L.email && (!L.unidade || p.u === L.unidade),
@@ -114,21 +123,26 @@ export function calcular(e: Entrada): Resultado {
       break;
     }
     if (escolhido) {
-      usados.add(escolhido.orc);
+      const dia = livresDoDia(escolhido);
+      for (const x of dia) usados.set(x.orc, L.key);
       clientesCasados.add(escolhido.c);
-      vendas.push({ d: escolhido.d, u: escolhido.u, g: escolhido.g, v: escolhido.v, card: L.id, key: L.key, nome: L.nome, vLever: L.valor });
+      vendas.push({
+        d: escolhido.d, u: escolhido.u, g: escolhido.g, v: Math.round(dia.reduce((s, x) => s + x.v, 0) * 100) / 100,
+        card: L.id, key: L.key, nome: L.nome, vLever: L.valor, c: escolhido.c, planos: dia.length,
+      });
       continue;
     }
+    const jaUsado = aprovados.find((p) => usados.has(p.orc) && perto(p) && foneDe(p.c) === L.fone);
     if (ambiguo) exclui(L, "Mais de um cliente possível no Belle");
-    else if (aprovados.some((p) => usados.has(p.orc) && perto(p) && foneDe(p.c) === L.fone)) exclui(L, "Card duplicado (plano já usado por outro card)");
-    else if (suspensos.some((p) => perto(p) && foneDe(p.c) === L.fone)) exclui(L, "Plano suspenso no Belle");
-    else if (!L.valor) exclui(L, "Valor zero / teste");
-    else exclui(L, "Sem plano aprovado no Belle");
+    else if (jaUsado) exclui(L, `Mesmo plano casado com mais de um card (plano ficou com ${usados.get(jaUsado.orc)})`);
+    else if (suspensos.some((p) => perto(p) && foneDe(p.c) === L.fone)) exclui(L, "Cliente sem plano aprovado no Belle (só plano suspenso)");
+    else exclui(L, "Cliente sem plano no Belle");
   }
 
   // ---- sessões e unidades de fechamento só dos clientes do funil SDR (pelo telefone)
   const doFunil = (c: number) => clientesCasados.has(c) || (!!foneDe(c) && e.fonesSdr.has(foneDe(c)));
   const agenda = new Map<string, number>();
+  const comp = new Map<string, [number, number]>();
   const conv = new Map<string, [number, number]>();
   const somaConv = (d: string, u: string, g: Grupo, ok: boolean) => {
     const k = `${d}|${u}|${g}`; const r = conv.get(k) ?? [0, 0]; r[0]++; if (ok) r[1]++; conv.set(k, r);
@@ -141,6 +155,11 @@ export function calcular(e: Entrada): Resultado {
     for (const s of ss) {
       const g: Grupo = s.t === "AV" ? "A" : s.t === "CAB" ? "C" : gDia;
       const ka = `${d}|${s.u}|${g}`; agenda.set(ka, (agenda.get(ka) ?? 0) + 1);
+      // comparecimento: Avaliação só sessões de avaliação; Cabine SDR as experimentais; Cabine as de cabine
+      // (e experimentais do dia classificado como Cabine)
+      if ((s.s === ATENDIDO || s.s === FALTA) && !(g === "A" && s.t !== "AV")) {
+        const r = comp.get(ka) ?? [0, 0]; r[s.s === ATENDIDO ? 0 : 1]++; comp.set(ka, r);
+      }
       if (g === "C" && s.s === ATENDIDO) {
         const km = `${c}|${d.slice(0, 7)}`; const prev = cabineMes.get(km);
         if (!prev || d < prev.d) cabineMes.set(km, { d, u: s.u });
@@ -155,11 +174,12 @@ export function calcular(e: Entrada): Resultado {
 
   const ord = <T extends unknown[]>(a: T, b: T) => String(a[0]).localeCompare(String(b[0]));
   return {
-    versao: 1,
+    versao: 2,
     geradoEm: (e.agora ?? new Date()).toISOString(),
     vendas: vendas.sort((a, b) => a.d.localeCompare(b.d)),
     agenda: [...agenda].map(([k, n]) => { const [d, u, g] = k.split("|"); return [d, u, g as Grupo, n] as [string, string, Grupo, number]; }).sort(ord),
     conversao: [...conv].map(([k, [n, ok]]) => { const [d, u, g] = k.split("|"); return [d, u, g as Grupo, n, ok] as [string, string, Grupo, number, number]; }).sort(ord),
     excluidos,
+    comparecimento: [...comp].map(([k, [a, f]]) => { const [d, u, g] = k.split("|"); return [d, u, g as Grupo, a, f] as [string, string, Grupo, number, number]; }).sort(ord),
   };
 }

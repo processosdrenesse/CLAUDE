@@ -86,6 +86,11 @@ e `src/pages/LeverPages.tsx` e o item `crons` do `vercel.json`.
   Experimental = serviços 22, 56210744, 56260425, 33353403, 56210746, 56210745 **sem** plano; avaliação = tipo
   "Avaliação" ou serviço 52; Retorno/Consulta/sem serviço ficam fora.
 - **Agendamentos**: sessões (todas as situações) dos clientes do funil SDR (telefone de qualquer card do painel SDRs).
+- **Vários planos no mesmo dia**: planos aprovados da mesma cliente no mesmo dia contam como uma venda (valores somados).
+- **Comparecimento**: atendidos ÷ (atendidos + faltas "Falhou"); desmarcados/cancelados fora. Avaliação: sessões de
+  avaliação; Cabine SDR: experimentais; Cabine: sessões de cabine.
+- **Conciliação**: abaixo do quadro, cards do topo (Lever, mesmos filtros) → vendas do quadro (Belle), card a card,
+  com o motivo de cada diferença (sem plano, venda fora do período, diferença de valor, plano em mais de um card…).
 - **Taxa de conversão**: atendidas com plano comprado ÷ atendidas (Avaliação e Cabine SDR: cliente/dia; Cabine: cliente/mês).
 - **Período**: Data de Fechamento (prioridade, = data da venda no Belle) ou Data de Avaliação do card; sem datas = 2026
   até hoje. Unidade filtra pela unidade do Belle. Outros filtros preenchidos → quadro em branco (com aviso).
@@ -93,4 +98,4 @@ e `src/pages/LeverPages.tsx` e o item `crons` do `vercel.json`.
   dia às 06:00 de Brasília). Mês atual e anterior são refeitos todo dia; os demais meses de 2026 1× por semana (rodízio);
   histórico de planos (2020–2025) uma única vez; contatos do Lever em varredura mensal + busca dos novos. Os pedaços
   ficam no Vercel Blob privado (`BLOB_READ_WRITE_TOKEN`) ou em `.cache/avaliacao-cabine` no modo local.
-  A tela lê `GET /api/avaliacao-cabine`.
+  A tela lê `GET /api/avaliacao-cabine`. `?recalcular=1` no cron refaz o cálculo sem recoletar.

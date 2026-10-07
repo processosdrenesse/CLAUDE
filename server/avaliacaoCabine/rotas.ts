@@ -13,7 +13,7 @@ export const rotaCron = Router().get("/api/avaliacao-cabine/cron", async (req, r
   if (req.headers.authorization !== `Bearer ${secret}`) return void res.status(401).json({ error: true, message: "Não autorizado" });
   try {
     const s = Math.min(Math.max(Number(req.query.segundos) || 230, 30), 270);
-    const r = await executar({ limiteSegundos: s });
+    const r = await executar({ limiteSegundos: s, recalcular: req.query.recalcular === "1" });
     console.log("[avaliacao-cabine]", JSON.stringify({ ...r, feitos: r.feitos.length, pendentes: r.pendentes.length }));
     res.json(r);
   } catch (e) {
