@@ -1,9 +1,18 @@
-# Acrescentar ao Caddyfile do VPS (ex.: /etc/caddy/Caddyfile) e rodar: systemctl reload caddy
-# O Caddy emite o HTTPS sozinho (portas 80 e 443 abertas; DNS já apontado para o VPS).
+# Neste VPS o Caddy roda no contêiner Docker "n8n-caddy" (o mesmo do n8n e dos outros sistemas).
+#   Caddyfile: /opt/n8n/Caddyfile (montado no contêiner como /etc/caddy/Caddyfile)
+#   O contêiner enxerga o VPS pelo gateway da rede n8n_default: 172.18.0.1 (127.0.0.1 seria o próprio contêiner).
+# Acrescentar SEMPRE com "tee -a" (o arquivo é montado direto; editores que recriam o arquivo não são vistos):
+#   sudo cp /opt/n8n/Caddyfile /opt/n8n/Caddyfile.bak-$(date +%Y%m%d%H%M)
+#   sudo tee -a /opt/n8n/Caddyfile < (os blocos abaixo)
+#   sudo docker exec n8n-caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+#   sudo docker exec n8n-caddy caddy reload   --config /etc/caddy/Caddyfile --adapter caddyfile
+# Pré-requisitos já feitos no VPS:
+#   /etc/systemd/system/drenesse-painel@.service.d/host.conf  →  [Service] Environment=HOST=0.0.0.0
+#   ufw allow from 172.18.0.0/16 to any port 8787:8788 proto tcp   (internet continua bloqueada nessas portas)
 painel.drenesse.com.br {
-	reverse_proxy 127.0.0.1:8787
+	reverse_proxy 172.18.0.1:8787
 }
 
 homolog.painel.drenesse.com.br {
-	reverse_proxy 127.0.0.1:8788
+	reverse_proxy 172.18.0.1:8788
 }

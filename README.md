@@ -72,6 +72,17 @@ src/services (normalização) → src/domain (regras/indicadores) → src/pages 
     `sudo systemctl start drenesse-quadro@producao`.
   - Logs: `journalctl -u drenesse-painel@producao -f`.
   - Publicar à mão, como root: `drenesse-publicar producao <commit>`. Mantém os segredos do `.env` atual.
+- **Caddy deste VPS (Docker):** o HTTPS é feito pelo contêiner `n8n-caddy`, o mesmo do n8n e dos outros
+  sistemas.
+  - O arquivo é `/opt/n8n/Caddyfile`. Os blocos do painel apontam para `172.18.0.1:8787/8788`, o gateway da
+    rede `n8n_default`, porque dentro do contêiner `127.0.0.1` é o próprio contêiner.
+  - Para isso o painel escuta em `0.0.0.0`, pelo drop-in
+    `/etc/systemd/system/drenesse-painel@.service.d/host.conf`.
+  - O ufw libera 8787/8788 **só** para `172.18.0.0/16`; para a internet essas portas continuam fechadas.
+  - Detalhes e comandos (acrescentar com `tee -a`, `caddy validate`/`reload` via `docker exec`) em
+    `deploy/Caddyfile.exemplo`.
+- **Saúde:** `GET /api/health` responde `{"ok":true}` sem senha e não mostra dados. É usada pela
+  publicação para confirmar que o painel subiu; todo o resto exige a senha.
 - **Local, sem VPS:** `npm run quadro:atualizar` atualiza os dados do quadro em `.cache/avaliacao-cabine`.
 
 ## Publicar na Vercel (antigo — substituído pelo VPS)
