@@ -53,7 +53,10 @@ export function periodoDoQuadro(f: LeadFilters, hoje: string): Periodo {
 
 export interface LinhaAC {
   g: Grupo | "T"; nome: string;
-  faturamento: number; pct: number; quantidade: number; agendamentos: number;
+  faturamento: number; pct: number; quantidade: number;
+  /** Cabine: agendamentos, comparecimento e taxa de conversão não são exibidos (null → "—").
+   *  No Total, agendamentos e comparecimento somam só Avaliação + Cabine SDR. */
+  agendamentos: number | null;
   atendidas: number; convertidas: number;
   /** null na linha Total: soma cliente/dia com cliente/mês e não tem significado */
   taxa: number | null;
@@ -81,6 +84,8 @@ export function montarQuadro(res: ResultadoAC, p: Extract<Periodo, { ok: true }>
   const total = vendas.reduce((s, v) => s + v.v, 0);
   const linha = (g: Grupo | "T", nome: string): LinhaAC => {
     const eh = (gx: Grupo) => g === "T" || gx === g;
+    const ehSessao = (gx: Grupo) => (g === "T" ? gx !== "C" : gx === g); // Total de sessões sem a Cabine
+    const semSessoes = g === "C";
     const vs = vendas.filter((v) => eh(v.g));
     const faturamento = vs.reduce((s, v) => s + v.v, 0);
     let atendidas = conv.filter((c) => eh(c[2]) && !(novaCabine && c[2] === "C")).reduce((s, c) => s + c[3], 0);
@@ -88,10 +93,10 @@ export function montarQuadro(res: ResultadoAC, p: Extract<Periodo, { ok: true }>
     if (novaCabine && eh("C")) { atendidas += cabUnid.size; convertidas += cabConv.size; }
     return {
       g, nome, faturamento, pct: total ? (faturamento / total) * 100 : 0, quantidade: vs.length,
-      agendamentos: agenda.filter((a) => eh(a[2])).reduce((s, a) => s + a[3], 0),
-      atendidas, convertidas, taxa: g === "T" ? null : atendidas ? (convertidas / atendidas) * 100 : 0,
-      comparecimento: comp ? (() => {
-        const at = comp.filter((c) => eh(c[2])).reduce((s, c) => s + c[3], 0), fa = comp.filter((c) => eh(c[2])).reduce((s, c) => s + c[4], 0);
+      agendamentos: semSessoes ? null : agenda.filter((a) => ehSessao(a[2])).reduce((s, a) => s + a[3], 0),
+      atendidas, convertidas, taxa: g === "T" || semSessoes ? null : atendidas ? (convertidas / atendidas) * 100 : 0,
+      comparecimento: comp && !semSessoes ? (() => {
+        const at = comp.filter((c) => ehSessao(c[2])).reduce((s, c) => s + c[3], 0), fa = comp.filter((c) => ehSessao(c[2])).reduce((s, c) => s + c[4], 0);
         return { atendidos: at, faltas: fa, taxa: at + fa ? (at / (at + fa)) * 100 : 0 };
       })() : null,
     };

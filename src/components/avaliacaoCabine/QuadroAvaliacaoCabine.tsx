@@ -37,9 +37,9 @@ export function QuadroAvaliacaoCabine({ f, leads }: { f: LeadFilters; leads: Lea
     { key: "f", header: "Faturamento", value: (r) => r.faturamento, align: "right", render: (r) => fmtBrl(r.faturamento) },
     { key: "p", header: "% do total", value: (r) => r.pct, align: "right", render: (r) => fmtPct(r.pct, 1) },
     { key: "q", header: "Quantidade", value: (r) => r.quantidade, align: "right", render: (r) => fmtInt(r.quantidade) },
-    { key: "a", header: "Agendamentos", value: (r) => r.agendamentos, align: "right", render: (r) => fmtInt(r.agendamentos) },
+    { key: "a", header: "Agendamentos", value: (r) => r.agendamentos ?? "", align: "right", render: (r) => (r.agendamentos === null ? "—" : fmtInt(r.agendamentos)) },
     {
-      key: "c", header: "Comparecimento", value: (r) => r.comparecimento?.taxa ?? -1, align: "right",
+      key: "c", header: "Comparecimento", value: (r) => r.comparecimento?.taxa ?? "", align: "right",
       render: (r) => (r.comparecimento
         ? <span title={`${r.comparecimento.atendidos} atendidos e ${r.comparecimento.faltas} faltas (status Falhou); desmarcados e cancelados ficam fora`}>{fmtPct(r.comparecimento.taxa, 1)} <span className="text-xs text-mute">({fmtInt(r.comparecimento.atendidos)} de {fmtInt(r.comparecimento.atendidos + r.comparecimento.faltas)})</span></span>
         : "—"),
@@ -88,8 +88,9 @@ export function QuadroAvaliacaoCabine({ f, leads }: { f: LeadFilters; leads: Lea
             </p>
             <p>
               Faturamento e quantidade: valor da venda no Belle. Agendamentos: sessões (avaliação, experimental e cabine, todas as situações) dos clientes do funil SDR, pela data da sessão.
-              Comparecimento: atendidos ÷ (atendidos + faltas), com atendidos/faltas ao lado (Avaliação: sessões de avaliação; Cabine SDR: experimentais; Cabine: sessões de cabine).
-              Taxa de conversão: atendidas com plano comprado (acima de R$ 0) ÷ atendidas — Avaliação e Cabine SDR por cliente/dia; Cabine por cliente/mês, só com sessões e compras dentro do período. No Total fica em branco (mistura cliente/dia com cliente/mês).
+              Comparecimento: atendidos ÷ (atendidos + faltas), com "atendidos de (atendidos + faltas)" ao lado (Avaliação: sessões de avaliação; Cabine SDR: experimentais).
+              Taxa de conversão: atendidas com plano comprado (acima de R$ 0) no mesmo dia ÷ atendidas, por cliente/dia.
+              Na Cabine, agendamentos, comparecimento e taxa de conversão não são exibidos; no Total, agendamentos e comparecimento somam Avaliação + Cabine SDR.
               Planos aprovados da mesma cliente no mesmo dia contam como uma venda, com os valores somados.
             </p>
           </div>

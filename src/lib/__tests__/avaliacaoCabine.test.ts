@@ -65,8 +65,8 @@ test("avaliação×cabine: casamento, exclusões e conversão", () => {
   assert.ok(p.ok && p.modo === "padrao");
   const q = montarQuadro(res, p as Extract<typeof p, { ok: true }>, [], new Map());
   assert.deepEqual(q.linhas.map((l) => [l.g, l.faturamento, l.quantidade]), [["A", 1000, 1], ["S", 500, 1], ["C", 300, 1], ["T", 1800, 1 + 1 + 1]]);
-  // Cabine por cliente/mês: atendida em 10/05 e compra em 20/05 → 1/1; Total sem taxa
-  assert.deepEqual(q.linhas.map((l) => [l.g, l.convertidas, l.atendidas, l.taxa]), [["A", 1, 1, 100], ["S", 1, 1, 100], ["C", 1, 1, 100], ["T", 3, 3, null]]);
+  // Cabine e Total sem taxa de conversão; Cabine sem agendamentos/comparecimento; Total de sessões = Avaliação + Cabine SDR
+  assert.deepEqual(q.linhas.map((l) => [l.g, l.taxa, l.agendamentos, l.comparecimento?.atendidos ?? null]), [["A", 100, 2, 1], ["S", 100, 1, 1], ["C", null, null, null], ["T", null, 3, 2]]);
   const qz = montarQuadro(res, p as Extract<typeof p, { ok: true }>, ["Zona Norte"], new Map());
   assert.equal(qz.linhas.at(-1)!.faturamento, 0);
   const pf = periodoDoQuadro({ ...f, fechamento: { from: "2026-05-05", to: "2026-05-31" }, avaliacao: { from: "2026-01-01", to: "2026-01-02" } }, "2026-12-31");
