@@ -54,7 +54,7 @@ test("avaliação×cabine: casamento, exclusões e conversão", () => {
   assert.deepEqual(r.vendas.map((v) => [v.key, v.g, v.v]), [["SDRS-1", "A", 1000], ["SDRS-2", "S", 500], ["SDRS-3", "C", 300]]);
   assert.deepEqual(r.excluidos.map((x) => [x.key, x.motivo]).sort(), [["SDRS-4", "Card sem telefone"], ["SDRS-5", "Mesmo plano casado com mais de um card (plano ficou com SDRS-1)"]]);
   const soma = (g: string, i: 3 | 4) => r.conversao.filter((c) => c[2] === g).reduce((s, c) => s + c[i], 0);
-  assert.deepEqual([soma("A", 3), soma("A", 4), soma("S", 3), soma("S", 4), soma("C", 3), soma("C", 4)], [1, 1, 1, 1, 1, 1]);
+  assert.deepEqual([soma("A", 3), soma("A", 4), soma("S", 3), soma("S", 4)], [1, 1, 1, 1]);
   const ag = (g: string) => r.agenda.filter((a) => a[2] === g).reduce((s, a) => s + a[3], 0);
   assert.deepEqual([ag("A"), ag("S"), ag("C")], [2, 1, 1]); // a avaliação com falta vai para Avaliação; a experimental para Cabine SDR
 
@@ -65,6 +65,8 @@ test("avaliação×cabine: casamento, exclusões e conversão", () => {
   assert.ok(p.ok && p.modo === "padrao");
   const q = montarQuadro(res, p as Extract<typeof p, { ok: true }>, [], new Map());
   assert.deepEqual(q.linhas.map((l) => [l.g, l.faturamento, l.quantidade]), [["A", 1000, 1], ["S", 500, 1], ["C", 300, 1], ["T", 1800, 1 + 1 + 1]]);
+  // Cabine por cliente/mês: atendida em 10/05 e compra em 20/05 → 1/1; Total sem taxa
+  assert.deepEqual(q.linhas.map((l) => [l.g, l.convertidas, l.atendidas, l.taxa]), [["A", 1, 1, 100], ["S", 1, 1, 100], ["C", 1, 1, 100], ["T", 3, 3, null]]);
   const qz = montarQuadro(res, p as Extract<typeof p, { ok: true }>, ["Zona Norte"], new Map());
   assert.equal(qz.linhas.at(-1)!.faturamento, 0);
   const pf = periodoDoQuadro({ ...f, fechamento: { from: "2026-05-05", to: "2026-05-31" }, avaliacao: { from: "2026-01-01", to: "2026-01-02" } }, "2026-12-31");
@@ -110,4 +112,40 @@ test("avaliação×cabine: planos do mesmo dia somados, comparecimento e concili
   assert.deepEqual([c.nTopo, c.totalTopo, c.nQuadro, c.totalQuadro, c.fecha], [3, 4800, 1, 2790, true]);
   assert.deepEqual(c.itens.map((i) => [i.key, i.efeito]), [["SDRS-3349", -2000], ["SDRS-14220", -10], ["SDRS-14133", 0]]);
   assert.match(c.itens[0].motivo, /fora do período \(25\/09\/2026\)/);
+});
+
+test("avaliação×cabine: conversão da Cabine só com compras no período, R$ 0 não converte e nota de compras fora do quadro", () => {
+  const contatos = new Map([[1, { f: "99990001", e: "" }], [2, { f: "99990002", e: "" }], [3, { f: "99990003", e: "" }], [4, { f: "99990004", e: "" }]]);
+  const r = calcular({
+    sessoes: [
+      sess({ c: 1, t: "CAB", d: "2026-09-29" }), // comprou em 14/09 (antes do período) → não converte
+      sess({ c: 2, t: "CAB", d: "2026-09-29" }), // renovação em 30/09 → converte, vai para a nota
+      sess({ c: 3, t: "CAB", d: "2026-09-29" }), // plano de R$ 0 → não converte
+      sess({ c: 4, t: "AV", d: "2026-09-29" }), // avaliação atendida + compra; card em Negociação → converte, vai para a nota
+    ],
+    planos: [
+      plano({ c: 1, d: "2026-09-14", v: 98.7, orc: 1, nome: "Janyele" }),
+      plano({ c: 2, d: "2026-03-10", v: 1000, orc: 2, nome: "Marysa" }), plano({ c: 2, d: "2026-09-30", v: 1691, orc: 3, nome: "Marysa" }),
+      plano({ c: 3, d: "2026-09-29", v: 0, orc: 4, nome: "Girlania" }),
+      plano({ c: 4, d: "2026-09-29", v: 1862.1, orc: 5, nome: "Beatrice" }),
+    ],
+    primeiroPlano: new Map([[1, "2026-09-14"], [2, "2026-03-10"], [3, "2026-01-30"], [4, "2026-09-29"]]),
+    contatos,
+    cards: [card({ id: "m", key: "SDRS-6106", nome: "Marysa", fone: "99990002", valor: 1000, fechamento: "2026-03-10" })],
+    fonesSdr: new Set(["99990001", "99990002", "99990003", "99990004"]),
+    cardsPorFone: new Map([
+      ["99990002", [{ id: "m", key: "SDRS-6106", fase: "Convertidos", convertido: true, fechamento: "2026-03-31" }]],
+      ["99990004", [{ id: "b", key: "SDRS-12293", fase: "Negociação", convertido: false, fechamento: "2026-10-05" }]],
+    ]),
+  });
+  const res = r as unknown as ResultadoAC;
+  const p = { ok: true as const, modo: "fechamento" as const, r: { from: "2026-09-28", to: "2026-10-03" } };
+  const q = montarQuadro(res, p, [], new Map());
+  const [av, , cab] = q.linhas;
+  assert.deepEqual([av.convertidas, av.atendidas], [1, 1]);
+  assert.deepEqual([cab.convertidas, cab.atendidas], [1, 3]); // só a renovação de 30/09
+  assert.deepEqual(q.comprasFora.map((x) => [x.nome, x.d, x.v, x.cards, x.motivo]), [
+    ["Beatrice", "2026-09-29", 1862.1, "SDRS-12293 (Negociação)", "card fora de Convertidos"],
+    ["Marysa", "2026-09-30", 1691, "SDRS-6106 (Convertidos)", "renovação – card convertido em mar/2026"],
+  ]);
 });

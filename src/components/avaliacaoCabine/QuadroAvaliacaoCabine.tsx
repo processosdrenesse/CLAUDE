@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/services/http";
 import { Card, Loading, Notice, Section, SourceError } from "@/components/ui/primitives";
 import { DataTable, type Col } from "@/components/ui/DataTable";
-import { conciliar, montarQuadro, periodoDoQuadro, type ItemConciliacao, type LinhaAC, type ResultadoAC } from "@/domain/avaliacaoCabine";
+import { conciliar, GRUPOS, montarQuadro, periodoDoQuadro, type CompraAC, type ItemConciliacao, type LinhaAC, type ResultadoAC } from "@/domain/avaliacaoCabine";
 import { filtrarLeads, vendasLever, type LeadFilters } from "@/domain/funil";
 import type { Lead } from "@/services/lever/types";
 import { fmtBrl, fmtInt, fmtPct } from "@/lib/format";
@@ -41,13 +41,22 @@ export function QuadroAvaliacaoCabine({ f, leads }: { f: LeadFilters; leads: Lea
     {
       key: "c", header: "Comparecimento", value: (r) => r.comparecimento?.taxa ?? -1, align: "right",
       render: (r) => (r.comparecimento
-        ? <span title={`${r.comparecimento.atendidos} atendidos e ${r.comparecimento.faltas} faltas (status Falhou); desmarcados e cancelados ficam fora`}>{fmtPct(r.comparecimento.taxa, 1)} <span className="text-xs text-mute">({fmtInt(r.comparecimento.atendidos)}/{fmtInt(r.comparecimento.faltas)})</span></span>
+        ? <span title={`${r.comparecimento.atendidos} atendidos e ${r.comparecimento.faltas} faltas (status Falhou); desmarcados e cancelados ficam fora`}>{fmtPct(r.comparecimento.taxa, 1)} <span className="text-xs text-mute">({fmtInt(r.comparecimento.atendidos)} de {fmtInt(r.comparecimento.atendidos + r.comparecimento.faltas)})</span></span>
         : "—"),
     },
     {
-      key: "t", header: "Taxa de conversão", value: (r) => r.taxa, align: "right",
-      render: (r) => <span title={`${r.convertidas} de ${r.atendidas} atendidas com plano comprado`}>{fmtPct(r.taxa, 1)} <span className="text-xs text-mute">({fmtInt(r.convertidas)}/{fmtInt(r.atendidas)})</span></span>,
+      key: "t", header: "Taxa de conversão", value: (r) => r.taxa ?? "", align: "right",
+      render: (r) => r.taxa === null ? "—" : <span title={`${r.convertidas} de ${r.atendidas} atendidas com plano comprado`}>{fmtPct(r.taxa, 1)} <span className="text-xs text-mute">({fmtInt(r.convertidas)}/{fmtInt(r.atendidas)})</span></span>,
     },
+  ];
+
+  const nomeGrupo = (g: string) => GRUPOS.find((x) => x.g === g)?.nome ?? g;
+  const colsFora: Col<CompraAC & { motivo: string }>[] = [
+    { key: "n", header: "Cliente", value: (r) => r.nome }, { key: "d", header: "Data", value: (r) => r.d, render: (r) => isoToBr(r.d) },
+    { key: "v", header: "Valor", value: (r) => r.v, align: "right", render: (r) => fmtBrl(r.v) },
+    { key: "g", header: "Tipo", value: (r) => nomeGrupo(r.g) }, { key: "u", header: "Unidade", value: (r) => r.u },
+    { key: "c", header: "Card(s) e fase", value: (r) => r.cards || "nenhum card com o telefone da cliente" },
+    { key: "m", header: "Motivo", value: (r) => r.motivo },
   ];
 
   const colsConc: Col<ItemConciliacao>[] = [
@@ -80,7 +89,7 @@ export function QuadroAvaliacaoCabine({ f, leads }: { f: LeadFilters; leads: Lea
             <p>
               Faturamento e quantidade: valor da venda no Belle. Agendamentos: sessões (avaliação, experimental e cabine, todas as situações) dos clientes do funil SDR, pela data da sessão.
               Comparecimento: atendidos ÷ (atendidos + faltas), com atendidos/faltas ao lado (Avaliação: sessões de avaliação; Cabine SDR: experimentais; Cabine: sessões de cabine).
-              Taxa de conversão: atendidas com plano comprado ÷ atendidas (Avaliação e Cabine SDR por cliente/dia; Cabine por cliente/mês).
+              Taxa de conversão: atendidas com plano comprado (acima de R$ 0) ÷ atendidas — Avaliação e Cabine SDR por cliente/dia; Cabine por cliente/mês, só com sessões e compras dentro do período. No Total fica em branco (mistura cliente/dia com cliente/mês).
               Planos aprovados da mesma cliente no mesmo dia contam como uma venda, com os valores somados.
             </p>
           </div>
@@ -88,12 +97,24 @@ export function QuadroAvaliacaoCabine({ f, leads }: { f: LeadFilters; leads: Lea
             <div className="mt-4 space-y-2">
               <p className="text-sm">
                 <b>Conciliação com os cards do topo</b> — Cards no período: <b>{fmtInt(conc.nTopo)}</b> ({fmtBrl(conc.totalTopo)} no Lever) → no quadro: <b>{fmtInt(conc.nQuadro)}</b> ({fmtBrl(conc.totalQuadro)} no Belle)
-                {conc.itens.length > 0 && <> • diferença de {fmtBrl(conc.totalQuadro - conc.totalTopo)} explicada abaixo</>}
+                {conc.itens.length > 0 && (() => {
+                  const dif = Math.round((conc.totalQuadro - conc.totalTopo) * 100) / 100;
+                  return <> • {dif < 0 ? `${fmtBrl(-dif)} a menos no quadro` : dif > 0 ? `${fmtBrl(dif)} a mais no quadro` : "mesmo valor"}, explicado abaixo</>;
+                })()}
               </p>
               {!conc.fecha && <Notice>A conciliação não fechou; avise o responsável pelo painel.</Notice>}
               {conc.itens.length > 0 && (
                 <DataTable rows={conc.itens} cols={colsConc} rowKey={(r, i) => `${r.key}-${i}`} exportName="avaliacao-cabine-conciliacao" pageSize={10} />
               )}
+            </div>
+          )}
+          {q2.comprasFora.length > 0 && (
+            <div className="mt-4 space-y-2">
+              <p className="text-sm">
+                <b>Compras na taxa de conversão que não estão no quadro</b> — {fmtInt(q2.comprasFora.length)} ({fmtBrl(q2.comprasFora.reduce((s, x) => s + x.v, 0))} no Belle).
+                <span className="text-xs text-mute"> Compras reais no Belle de clientes do funil SDR que entram na taxa de conversão, mas não nas vendas do quadro (card fora de Convertidos ou renovação de cliente que já tinha convertido); servem para corrigir os cards no Lever.</span>
+              </p>
+              <DataTable rows={q2.comprasFora} cols={colsFora} rowKey={(r) => `${r.c}-${r.d}-${r.g}`} exportName="avaliacao-cabine-compras-fora" pageSize={10} />
             </div>
           )}
         </Card>

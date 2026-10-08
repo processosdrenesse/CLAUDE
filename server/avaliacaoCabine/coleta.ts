@@ -8,7 +8,7 @@ import { env } from "../env.ts";
 import { Limiter, pool, requestJson } from "../http.ts";
 import { units, type UnitRef } from "../belle.ts";
 import * as lever from "../lever.ts";
-import { calcular, fone8, normTxt, tipoSessao, type CardSdr, type Plano, type Resultado, type Sessao } from "./regras.ts";
+import { calcular, fone8, normTxt, tipoSessao, type CardInfo, type CardSdr, type Plano, type Resultado, type Sessao } from "./regras.ts";
 import { gravar, inventario, ler } from "./store.ts";
 
 const ANO_INICIAL = 2026;
@@ -221,7 +221,16 @@ async function calcularEGravar(caminhos: string[], contatos: Contatos, agora?: D
     }))
     .filter((c) => c.fechamento >= desde);
 
-  const r: Resultado = calcular({ sessoes, planos, primeiroPlano, contatos: contatosBelle, cards, fonesSdr, agora });
+  // todos os cards do painel (qualquer fase), pelo telefone — para a nota de compras fora do quadro
+  const fase = new Map(det.steps.map((s: { id: string; title: string }) => [s.id, s.title]));
+  const cardsPorFone = new Map<string, CardInfo[]>();
+  for (const c of todos) {
+    const f = foneCard(c.contactIds);
+    if (!f) continue;
+    const l = cardsPorFone.get(f) ?? cardsPorFone.set(f, []).get(f)!;
+    l.push({ id: c.id, key: c.key, fase: String(fase.get(c.stepId) ?? "fase removida"), convertido: venda.has(c.stepId), fechamento: hojeBr(new Date(c.updatedAt)) });
+  }
+  const r: Resultado = calcular({ sessoes, planos, primeiroPlano, contatos: contatosBelle, cards, fonesSdr, cardsPorFone, agora });
   // Cards casados com plano fora de ANO_INICIAL não existem (só há planos do ano); excluídos antigos saem da lista.
   r.excluidos = r.excluidos.filter((x) => x.fechamento >= `${ANO_INICIAL}-01-01`);
   await gravar("resultado.json", r);
