@@ -11,7 +11,8 @@
     "start": "tsx server/index.ts",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test src/lib/__tests__/*.test.ts",
-    "app": "npm run build && npm start"
+    "app": "npm run build && npm start",
+    "quadro:atualizar": "tsx server/avaliacaoCabine/cli.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.0",

@@ -1,0 +1,10 @@
+[Unit]
+Description=Atualização diária do quadro (produção) às 06:00 de Brasília
+
+[Timer]
+OnCalendar=*-*-* 09:00:00 UTC
+Persistent=true
+Unit=drenesse-quadro@producao.service
+
+[Install]
+WantedBy=timers.target

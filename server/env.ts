@@ -10,7 +10,9 @@ const DEFAULTS = {
 function read(name: keyof typeof DEFAULTS | "BELLE_API_TOKEN" | "LEVER_API_TOKEN"): string {
   const v = (process.env[name] ?? "").trim() || (DEFAULTS as Record<string, string>)[name];
   if (!v) {
-    const onde = process.env.VERCEL ? "em Vercel → Settings → Environment Variables (e faça um novo Deploy)" : "no arquivo .env na pasta do projeto (e reinicie o servidor)";
+    const onde = process.env.VERCEL ? "em Vercel → Settings → Environment Variables (e faça um novo Deploy)"
+      : process.env.APP_AMBIENTE ? "nos segredos do GitHub (Settings → Secrets and variables / Environments) e publique de novo"
+      : "no arquivo .env na pasta do projeto (e reinicie o servidor)";
     throw new Error(`${name} não configurada no servidor. Cadastre ${onde}.`);
   }
   return v;
@@ -35,6 +37,6 @@ export const configStatus = () => ({
   BELLE_API_URL: (process.env.BELLE_API_URL ?? "").trim() ? "definida" : "padrão",
   LEVER_API_URL: (process.env.LEVER_API_URL ?? "").trim() ? "definida" : "padrão",
   DASHBOARD_PASSWORD: !!process.env.DASHBOARD_PASSWORD,
-  ambiente: process.env.VERCEL ? "vercel" : "local",
-  versao: (process.env.VERCEL_GIT_COMMIT_SHA ?? "").slice(0, 7) || undefined,
+  ambiente: process.env.VERCEL ? "vercel" : process.env.APP_AMBIENTE || "local",
+  versao: (process.env.VERCEL_GIT_COMMIT_SHA || process.env.APP_VERSION || "").slice(0, 7) || undefined,
 });

@@ -1,0 +1,10 @@
+[Unit]
+Description=Atualização diária do quadro (homologação) às 06:30 de Brasília
+
+[Timer]
+OnCalendar=*-*-* 09:30:00 UTC
+Persistent=true
+Unit=drenesse-quadro@homologacao.service
+
+[Install]
+WantedBy=timers.target

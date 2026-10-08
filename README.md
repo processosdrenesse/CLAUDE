@@ -43,7 +43,38 @@ src/services (normalização) → src/domain (regras/indicadores) → src/pages 
 3. Parcerias = cards do funil SDRs, recortados pelo filtro de Etiquetas (as 24 etiquetas do painel, como no Lever).
 4. Equipe oficial de agendamento em `src/config/areas.ts` (`EQUIPE_OFICIAL`).
 
-## Publicar na Vercel
+## Ambientes e publicação (VPS)
+
+| Ambiente | Endereço | Atualiza quando |
+|---|---|---|
+| **Homologação** | https://homolog.painel.drenesse.com.br | a cada envio para a branch `claude/bold-feynman-5l91wk` (automático) |
+| **Produção** | https://painel.drenesse.com.br | alguém roda **Actions → Produção → Run workflow** e o responsável pelo VPS **aprova** |
+
+- **Testar:** envie para a branch, espere o Actions "Homologação" ficar verde e teste no endereço de
+  homologação. Ele mostra a faixa amarela HOMOLOGAÇÃO e, no rodapé do menu, a versão (commit).
+- **Levar para produção:** Actions → **Produção** → *Run workflow*. Se o campo ficar vazio, vai o último
+  commit da branch, que é o que está em homologação. O job fica parado em "Waiting" até o revisor do
+  Environment `producao` aprovar.
+- **Trocar a chave do Belle** (vence a cada 2 semanas):
+  1. Settings → Secrets and variables → Actions → `BELLE_API_TOKEN`;
+  2. rode de novo a publicação: Actions → Homologação → *Run workflow*, e Produção do mesmo jeito.
+- **Segredos no GitHub:**
+  - Repositório: `VPS_HOST`, `VPS_PORT`, `VPS_USER`, `VPS_KNOWN_HOSTS`, `BELLE_API_TOKEN`,
+    `LEVER_API_TOKEN`, `BELLE_BI_TOKEN`.
+  - Por Environment (`homologacao` e `producao`): `VPS_SSH_KEY` e `DASHBOARD_PASSWORD`.
+  - Cada ambiente tem a sua chave SSH, e a chave de produção só publica produção. Por isso produção não
+    tem como ser publicada sem a aprovação.
+- **No VPS** (montado uma vez com `sudo bash deploy/setup-vps.sh`):
+  - `/opt/drenesse/{producao,homologacao}`: serviços `drenesse-painel@producao` (porta 8787) e
+    `drenesse-painel@homologacao` (8788), só em 127.0.0.1, atrás do Caddy (`deploy/Caddyfile.exemplo`).
+  - Atualização diária do quadro Avaliação × Cabine: timers `drenesse-quadro-producao.timer` (06:00) e
+    `drenesse-quadro-homologacao.timer` (06:30). Para rodar na hora:
+    `sudo systemctl start drenesse-quadro@producao`.
+  - Logs: `journalctl -u drenesse-painel@producao -f`.
+  - Publicar à mão, como root: `drenesse-publicar producao <commit>`. Mantém os segredos do `.env` atual.
+- **Local, sem VPS:** `npm run quadro:atualizar` atualiza os dados do quadro em `.cache/avaliacao-cabine`.
+
+## Publicar na Vercel (antigo — substituído pelo VPS)
 
 1. Vercel → **Add New → Project** → importe o repositório `processosdrenesse/CLAUDE` (branch `claude/bold-feynman-5l91wk`). O `vercel.json` já configura build, frontend (`dist`) e a API (`api/index.ts`, `maxDuration` 300 s).
 2. Em **Environment Variables** cadastre (Production): `BELLE_API_TOKEN`, `LEVER_API_TOKEN`, `BELLE_BI_TOKEN` e **`DASHBOARD_PASSWORD`** (as URLs já têm padrão). Depois faça **Redeploy** — variáveis novas só valem em um novo deploy. Confira em `/api/config`.

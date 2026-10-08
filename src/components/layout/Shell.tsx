@@ -37,6 +37,11 @@ export function Shell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen lg:pl-[270px]">
+      {__BUILD__.ambiente === "homologacao" && (
+        <div className="sticky top-0 z-40 bg-warn px-4 py-1 text-center text-xs font-semibold tracking-wide text-white">
+          HOMOLOGAÇÃO — ambiente de teste (versão {__BUILD__.sha}); os dados são reais, mas esta não é a versão oficial do painel
+        </div>
+      )}
       <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-line bg-paper/90 px-4 py-3 backdrop-blur lg:hidden">
         <button aria-label="Abrir menu" onClick={() => setOpen(true)}><Menu className="size-6" /></button>
         <Logo />

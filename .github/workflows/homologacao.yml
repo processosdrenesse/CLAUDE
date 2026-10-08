@@ -1,0 +1,57 @@
+# Homologação: cada envio para a branch de trabalho é verificado e publicado em
+# https://homolog.painel.drenesse.com.br, sem aprovação.
+name: Homologação
+
+on:
+  push:
+    branches: [claude/bold-feynman-5l91wk]
+  workflow_dispatch:
+
+concurrency:
+  group: homologacao
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  publicar:
+    needs: verificar
+    runs-on: ubuntu-latest
+    environment:
+      name: homologacao
+      url: https://homolog.painel.drenesse.com.br
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: deploy
+      - name: Publicar no VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          BELLE_API_TOKEN: ${{ secrets.BELLE_API_TOKEN }}
+          LEVER_API_TOKEN: ${{ secrets.LEVER_API_TOKEN }}
+          BELLE_BI_TOKEN: ${{ secrets.BELLE_BI_TOKEN }}
+          DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+        run: |
+          if [ -z "$VPS_HOST$VPS_SSH_KEY" ]; then
+            echo "::warning::Segredos do VPS ainda não cadastrados no GitHub; nada foi publicado."
+            exit 0
+          fi
+          bash deploy/publicar-via-ssh.sh "$GITHUB_SHA"

@@ -1,0 +1,9 @@
+# Acrescentar ao Caddyfile do VPS (ex.: /etc/caddy/Caddyfile) e rodar: systemctl reload caddy
+# O Caddy emite o HTTPS sozinho (portas 80 e 443 abertas; DNS já apontado para o VPS).
+painel.drenesse.com.br {
+	reverse_proxy 127.0.0.1:8787
+}
+
+homolog.painel.drenesse.com.br {
+	reverse_proxy 127.0.0.1:8788
+}

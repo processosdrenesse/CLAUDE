@@ -1,0 +1,14 @@
+# Atualização diária do quadro Avaliação × Cabine (disparada pelos timers drenesse-quadro-*.timer)
+[Unit]
+Description=Atualização do quadro Avaliação x Cabine (%i)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=drenesse
+Group=drenesse
+WorkingDirectory=/opt/drenesse/%i
+ExecStart=/opt/drenesse/%i/node_modules/.bin/tsx server/avaliacaoCabine/cli.ts
+TimeoutStartSec=3600
+NoNewPrivileges=true

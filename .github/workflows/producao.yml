@@ -1,0 +1,70 @@
+# Produção: publicação manual de um commit já aprovado em homologação.
+# Actions → "Produção" → Run workflow. O job espera a aprovação do revisor do Environment "producao"
+# (responsável pelo VPS) e só então publica em https://painel.drenesse.com.br.
+name: Produção
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit aprovado em homologação (vazio = último da branch, o mesmo que está em homologação)"
+        required: false
+        default: ""
+
+concurrency:
+  group: producao
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.qual.outputs.commit }}
+    steps:
+      - name: Conferir o commit informado
+        env:
+          COMMIT: ${{ inputs.commit }}
+        run: |
+          if [ -n "$COMMIT" ] && ! [[ "$COMMIT" =~ ^[0-9a-f]{7,40}$ ]]; then
+            echo "::error::Informe só o hash do commit (7 a 40 caracteres hexadecimais)."; exit 1
+          fi
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit || github.sha }}
+      - id: qual
+        run: echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  publicar:
+    needs: verificar
+    runs-on: ubuntu-latest
+    environment:
+      name: producao
+      url: https://painel.drenesse.com.br
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: deploy
+      - name: Publicar no VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          BELLE_API_TOKEN: ${{ secrets.BELLE_API_TOKEN }}
+          LEVER_API_TOKEN: ${{ secrets.LEVER_API_TOKEN }}
+          BELLE_BI_TOKEN: ${{ secrets.BELLE_BI_TOKEN }}
+          DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+          COMMIT: ${{ needs.verificar.outputs.commit }}
+        run: bash deploy/publicar-via-ssh.sh "$COMMIT"
