@@ -15,8 +15,8 @@ case "$CHAVE" in
   ssh-ed25519*|ssh-rsa*|ecdsa-*)
     echo "::error::VPS_SSH_KEY contém a chave PÚBLICA (.pub). Cadastre a PRIVADA: no VPS, cat /root/drenesse-chave-<ambiente> (sem .pub), que começa com -----BEGIN OPENSSH PRIVATE KEY-----"; exit 1 ;;
 esac
-if ! grep -q -- '-----BEGIN OPENSSH PRIVATE KEY-----' <<<"$CHAVE" || ! grep -q -- '-----END OPENSSH PRIVATE KEY-----' <<<"$CHAVE"; then
-  echo "::error::VPS_SSH_KEY incompleta: precisa ter a linha -----BEGIN OPENSSH PRIVATE KEY----- no início e -----END OPENSSH PRIVATE KEY----- no fim"; exit 1
+if ! grep -Eq -- '-----BEGIN [A-Z ]*PRIVATE KEY-----' <<<"$CHAVE" || ! grep -Eq -- '-----END [A-Z ]*PRIVATE KEY-----' <<<"$CHAVE"; then
+  echo "::error::VPS_SSH_KEY incompleta: o conteúdo precisa começar na linha -----BEGIN OPENSSH PRIVATE KEY----- e terminar na linha -----END OPENSSH PRIVATE KEY----- (as duas linhas incluídas)"; exit 1
 fi
 if [ "$(grep -c . <<<"$CHAVE")" -lt 3 ]; then
   echo "::error::VPS_SSH_KEY foi colada em uma linha só; cole de novo mantendo as quebras de linha (várias linhas)"; exit 1
