@@ -12,6 +12,8 @@ import { rotaCron as avaliacaoCabineCron, rotaDados as avaliacaoCabineDados } fr
 
 const app = express();
 app.use(avaliacaoCabineCron); // quadro Avaliação × Cabine: cron autenticado por CRON_SECRET
+// Verificação de saúde (usada pela publicação no VPS): fica fora da senha e não expõe dados.
+app.get("/api/health", (_q, r) => r.json({ ok: true }));
 
 // Proteção opcional: defina DASHBOARD_PASSWORD para exigir login (usuário: qualquer; senha: o valor).
 if (process.env.DASHBOARD_PASSWORD) {
@@ -47,7 +49,6 @@ const range = (req: express.Request) => {
 };
 const force = (req: express.Request) => req.query.refresh === "1";
 
-app.get("/api/health", (_q, r) => r.json({ ok: true }));
 // Abra /api/config para ver se o servidor enxerga as variáveis (mostra só sim/não, nunca os valores).
 app.get("/api/config", (_q, r) => r.json(configStatus()));
 app.post("/api/refresh", (_q, r) => { clearCache(); r.json({ ok: true, epoch: cacheEpoch() }); });
