@@ -22,11 +22,33 @@ export const rotaCron = Router().get("/api/avaliacao-cabine/cron", async (req, r
   }
 });
 
+/**
+ * Resultado gravado antes da versão 4 (com a linha Cabine): as vendas de Cabine passam a Cabine SDR e os números
+ * da Cabine saem, até o recálculo (disparado uma vez, em segundo plano, ao encontrar um resultado antigo).
+ */
+let recalculoDisparado = false;
+function atualizarVersao(r: Resultado | null): Resultado | null {
+  if (!r || r.versao >= 4) return r;
+  if (!recalculoDisparado) {
+    recalculoDisparado = true;
+    executar({ limiteSegundos: 1800, recalcular: true })
+      .then((x) => console.log("[avaliacao-cabine] recálculo da versão 4", JSON.stringify({ ...x, feitos: x.feitos.length, pendentes: x.pendentes.length })))
+      .catch((e) => { recalculoDisparado = false; console.error("[avaliacao-cabine] recálculo da versão 4", e); });
+  }
+  const semC = <T extends unknown[]>(l: T[] | undefined) => l?.filter((x) => x[2] !== "C");
+  return {
+    ...r,
+    vendas: r.vendas.map((v) => (v.g === "C" ? { ...v, g: "S" } : v)),
+    agenda: semC(r.agenda)!, conversao: semC(r.conversao)!, comparecimento: semC(r.comparecimento),
+    cabineAtendidas: undefined, compras: r.compras?.filter((x) => x.g !== "C"),
+  };
+}
+
 /** Dados do quadro (protegido pela senha do painel, como as demais rotas). */
 export const rotaDados = Router().get("/api/avaliacao-cabine", async (req, res) => {
   try {
     const r = await memo("avaliacao-cabine:resultado", 5 * 60_000, () => ler<Resultado>("resultado.json"), req.query.refresh === "1");
-    res.json({ data: r, fetchedAt: new Date().toISOString(), epoch: cacheEpoch() });
+    res.json({ data: atualizarVersao(r), fetchedAt: new Date().toISOString(), epoch: cacheEpoch() });
   } catch (e) {
     res.status(502).json({ error: true, source: "belle", status: 502, message: String((e as Error).message ?? e) });
   }

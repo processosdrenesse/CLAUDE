@@ -1,8 +1,8 @@
-// Quadro "Avaliação × Cabine SDR × Cabine" (aba SDR — Novos → Faturamento).
+// Quadro "Avaliação × Cabine SDR" (aba SDR — Novos → Faturamento).
 // Regras puras (sem rede), seguindo o documento de handoff do Belle. Módulo isolado: pode ser removido
 // junto com server/avaliacaoCabine sem afetar o restante do sistema.
 
-export type Grupo = "A" | "S" | "C"; // Avaliação | Cabine SDR | Cabine
+export type Grupo = "A" | "S" | "C"; // Avaliação | Cabine SDR | Cabine ("C" só em resultados até a versão 3)
 export type TipoSessao = "AV" | "EXP" | "CAB";
 
 /** Serviços de sessão experimental (só contam como experimental quando fora de um plano). */
@@ -29,7 +29,7 @@ export interface Venda { d: string; u: string; g: Grupo; v: number; card: string
 export interface CardInfo { id: string; key: string; fase: string; convertido: boolean; fechamento: string }
 /**
  * Compra (planos aprovados > R$ 0 da cliente no dia, somados) que pode entrar na taxa de conversão:
- * Avaliação/Cabine SDR = só as que convertem uma sessão atendida do dia; Cabine = todas as de Cabine.
+ * Avaliação e Cabine SDR: só as que convertem uma sessão atendida do dia (avaliação ou experimental).
  */
 export interface Compra {
   c: number; nome: string; d: string; u: string; g: Grupo; v: number;
@@ -40,18 +40,17 @@ export interface Compra {
 }
 export interface Excluido { card: string; key: string; nome: string; fechamento: string; v: number; motivo: string }
 export interface Resultado {
-  versao: 1 | 2 | 3;
+  versao: 1 | 2 | 3 | 4;
   geradoEm: string;
   vendas: Venda[];
   /** [dia, unidade, grupo, agendamentos] — sessões dos clientes do funil SDR (todas as situações). */
   agenda: [string, string, Grupo, number][];
-  /** [dia, unidade, grupo, atendidas, convertidas] — Avaliação e Cabine SDR (cliente/dia). A Cabine (cliente/mês,
-   *  limitada aos dias do filtro) é calculada na tela a partir de `cabineAtendidas` e `compras`. */
+  /** [dia, unidade, grupo, atendidas, convertidas] — Avaliação e Cabine SDR (cliente/dia). */
   conversao: [string, string, Grupo, number, number][];
   excluidos: Excluido[];
   /** [dia, unidade, grupo, atendidos, faltas] — comparecimento (falta = "Falhou"; desmarcado/cancelado fora). */
   comparecimento?: [string, string, Grupo, number, number][];
-  /** [cliente, dia, unidade] — sessões de cabine atendidas dos clientes do funil SDR. */
+  /** [cliente, dia, unidade] — sessões de cabine atendidas (só até a versão 3, quando existia a linha Cabine). */
   cabineAtendidas?: [number, string, string][];
   compras?: Compra[];
 }
@@ -62,14 +61,12 @@ export const fone8 = (s: unknown) => { const d = String(s ?? "").replace(/\D/g, 
 export const normTxt = (s: unknown) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 const diasEntre = (a: string, b: string) => Math.abs(Date.parse(a) - Date.parse(b)) / 86_400_000;
 
-/** Classifica o dia de um cliente pelas sessões daquele dia (regras do documento). */
-export function classeDoDia(sessoes: { t: TipoSessao; s: string }[], primeiroPlano: string | undefined, dia: string): Grupo {
-  const av = sessoes.filter((x) => x.t === "AV").map((x) => x.s);
-  const ex = sessoes.filter((x) => x.t === "EXP").map((x) => x.s);
-  if (av.includes(ATENDIDO)) return "A";
-  if (av.length && ex.includes(ATENDIDO)) return "S"; // avaliação com falta/desmarcada + experimental atendida
-  if (ex.length && !av.length && (!primeiroPlano || primeiroPlano >= dia)) return "S"; // só experimental e nunca teve plano antes
-  return "C";
+/**
+ * Classifica o dia de um cliente pelas sessões daquele dia: Avaliação = avaliação atendida no dia; todo o resto é
+ * Cabine SDR (a antiga "Cabine" foi juntada à Cabine SDR a pedido da gestão, em 09/10/2026).
+ */
+export function classeDoDia(sessoes: { t: TipoSessao; s: string }[]): Grupo {
+  return sessoes.some((x) => x.t === "AV" && x.s === ATENDIDO) ? "A" : "S";
 }
 
 /** Casa um nome do Lever com os tokens do nome no Belle (subconjunto, ≥ 2 nomes, mesmo primeiro nome). */
@@ -83,7 +80,7 @@ function nomeCompativel(a: string, tb: string[]) {
 export interface Entrada {
   sessoes: Sessao[];
   planos: Plano[]; // planos de 2026 (todas as situações)
-  primeiroPlano: Map<number, string>; // cliente → data do 1º plano aprovado (histórico + 2026)
+  primeiroPlano: Map<number, string>; // cliente → data do 1º plano aprovado (histórico + 2026); sem uso desde a versão 4
   contatos: Map<number, ContatoBelle>;
   cards: CardSdr[]; // cards convertidos do painel SDR
   fonesSdr: Set<string>; // telefones (8 dígitos) de todos os cards do painel SDR
@@ -99,7 +96,7 @@ export function calcular(e: Entrada): Resultado {
   const classeDe = (c: number, d: string) => {
     const k = `${c}|${d}`;
     let g = classe.get(k);
-    if (!g) { g = classeDoDia(porDia.get(k) ?? [], e.primeiroPlano.get(c), d); classe.set(k, g); }
+    if (!g) { g = classeDoDia(porDia.get(k) ?? []); classe.set(k, g); }
     return g;
   };
 
@@ -164,7 +161,6 @@ export function calcular(e: Entrada): Resultado {
   const somaConv = (d: string, u: string, g: Grupo, ok: boolean) => {
     const k = `${d}|${u}|${g}`; const r = conv.get(k) ?? [0, 0]; r[0]++; if (ok) r[1]++; conv.set(k, r);
   };
-  const cabineAtendidas = new Set<string>(); // cliente|dia|unidade
   // ---- compras para a taxa de conversão e para a nota "compras fora do quadro"
   const vendaDoCard = new Map(vendas.map((v) => [v.card, v]));
   const vendaDoDia = new Map(vendas.map((v) => [`${v.c}|${v.d}`, v]));
@@ -189,36 +185,29 @@ export function calcular(e: Entrada): Resultado {
     if (!doFunil(c)) continue;
     const gDia = classeDe(c, d);
     for (const s of ss) {
-      const g: Grupo = s.t === "AV" ? "A" : s.t === "CAB" ? "C" : gDia;
+      if (s.t === "CAB") continue; // sessões de tratamento na cabine não entram em agendamentos/comparecimento/taxa
+      const g: Grupo = s.t === "AV" ? "A" : gDia;
       const ka = `${d}|${s.u}|${g}`; agenda.set(ka, (agenda.get(ka) ?? 0) + 1);
-      // comparecimento: Avaliação só sessões de avaliação; Cabine SDR as experimentais; Cabine as de cabine
-      // (e experimentais do dia classificado como Cabine)
+      // comparecimento: Avaliação só sessões de avaliação; Cabine SDR as experimentais
       if ((s.s === ATENDIDO || s.s === FALTA) && !(g === "A" && s.t !== "AV")) {
         const r = comp.get(ka) ?? [0, 0]; r[s.s === ATENDIDO ? 0 : 1]++; comp.set(ka, r);
       }
-      if (g === "C" && s.s === ATENDIDO) cabineAtendidas.add(`${c}|${d}|${s.u}`);
     }
     const av = ss.find((s) => s.t === "AV" && s.s === ATENDIDO);
     if (av) { somaConv(d, av.u, "A", planoNoDia.has(k)); if (planoNoDia.has(k)) compra(c, d, av.u, "A"); }
     const ex = ss.find((s) => s.t === "EXP" && s.s === ATENDIDO);
     if (gDia === "S" && ex) { somaConv(d, ex.u, "S", planoNoDia.has(k)); if (planoNoDia.has(k)) compra(c, d, ex.u, "S"); }
   }
-  // Cabine: toda compra de Cabine (> R$ 0) de cliente do funil; a tela cruza com as sessões do mês no período
-  for (const [k, ps] of doDia) {
-    const c = ps[0].c, d = ps[0].d;
-    if (doFunil(c) && planoNoDia.has(k) && classeDe(c, d) === "C") compra(c, d, ps[0].u, "C");
-  }
 
   const ord = <T extends unknown[]>(a: T, b: T) => String(a[0]).localeCompare(String(b[0]));
   return {
-    versao: 3,
+    versao: 4,
     geradoEm: (e.agora ?? new Date()).toISOString(),
     vendas: vendas.sort((a, b) => a.d.localeCompare(b.d)),
     agenda: [...agenda].map(([k, n]) => { const [d, u, g] = k.split("|"); return [d, u, g as Grupo, n] as [string, string, Grupo, number]; }).sort(ord),
     conversao: [...conv].map(([k, [n, ok]]) => { const [d, u, g] = k.split("|"); return [d, u, g as Grupo, n, ok] as [string, string, Grupo, number, number]; }).sort(ord),
     excluidos,
     comparecimento: [...comp].map(([k, [a, f]]) => { const [d, u, g] = k.split("|"); return [d, u, g as Grupo, a, f] as [string, string, Grupo, number, number]; }).sort(ord),
-    cabineAtendidas: [...cabineAtendidas].map((k) => { const [c, d, u] = k.split("|"); return [Number(c), d, u] as [number, string, string]; }).sort((a, b) => a[1].localeCompare(b[1]) || a[0] - b[0]),
     compras: compras.sort((a, b) => a.d.localeCompare(b.d) || a.c - b.c),
   };
 }

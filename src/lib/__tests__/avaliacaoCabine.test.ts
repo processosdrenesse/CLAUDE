@@ -14,13 +14,13 @@ test("avaliação×cabine: tipo da sessão", () => {
   assert.equal(tipoSessao("Serviço", "", 0), null);
 });
 
-test("avaliação×cabine: classe do dia", () => {
-  assert.equal(classeDoDia([{ t: "AV", s: "Atendido" }], undefined, "2026-05-01"), "A");
-  assert.equal(classeDoDia([{ t: "AV", s: "Falhou" }, { t: "EXP", s: "Atendido" }], "2025-01-01", "2026-05-01"), "S");
-  assert.equal(classeDoDia([{ t: "EXP", s: "Atendido" }], undefined, "2026-05-01"), "S");
-  assert.equal(classeDoDia([{ t: "EXP", s: "Atendido" }], "2026-05-01", "2026-05-01"), "S"); // 1º plano é o do próprio dia
-  assert.equal(classeDoDia([{ t: "EXP", s: "Atendido" }], "2025-03-01", "2026-05-01"), "C"); // já tinha plano
-  assert.equal(classeDoDia([], undefined, "2026-05-01"), "C"); // compra sem sessão no dia
+test("avaliação×cabine: classe do dia (a antiga Cabine faz parte da Cabine SDR)", () => {
+  assert.equal(classeDoDia([{ t: "AV", s: "Atendido" }]), "A");
+  assert.equal(classeDoDia([{ t: "AV", s: "Falhou" }, { t: "EXP", s: "Atendido" }]), "S");
+  assert.equal(classeDoDia([{ t: "EXP", s: "Atendido" }]), "S"); // mesmo quem já tinha plano
+  assert.equal(classeDoDia([{ t: "AV", s: "Confirmado" }, { t: "EXP", s: "Em Andamento" }]), "S"); // nada atendido no dia
+  assert.equal(classeDoDia([{ t: "CAB", s: "Atendido" }]), "S");
+  assert.equal(classeDoDia([]), "S"); // compra sem sessão no dia
 });
 
 const sess = (o: Partial<Sessao>): Sessao => ({ d: "2026-05-04", u: "Lagoa Nova", c: 1, t: "AV", s: "Atendido", ...o });
@@ -33,7 +33,7 @@ test("avaliação×cabine: casamento, exclusões e conversão", () => {
     sessoes: [
       sess({}), // cliente 1: avaliação atendida + compra no dia → Avaliação
       sess({ c: 2, t: "AV", s: "Falhou", d: "2026-05-05" }), sess({ c: 2, t: "EXP", d: "2026-05-05" }), // → Cabine SDR
-      sess({ c: 3, t: "CAB", d: "2026-05-10" }), // cabine, compra em outro dia do mês → Cabine
+      sess({ c: 3, t: "CAB", d: "2026-05-10" }), // sessão de cabine: fora das sessões; a compra em outro dia → Cabine SDR
       sess({ c: 9, t: "AV" }), // cliente fora do funil SDR: não conta nas sessões
     ],
     planos: [
@@ -51,12 +51,14 @@ test("avaliação×cabine: casamento, exclusões e conversão", () => {
     ],
     fonesSdr: new Set(["99990001", "99990002", "99990003"]),
   });
-  assert.deepEqual(r.vendas.map((v) => [v.key, v.g, v.v]), [["SDRS-1", "A", 1000], ["SDRS-2", "S", 500], ["SDRS-3", "C", 300]]);
+  assert.deepEqual(r.vendas.map((v) => [v.key, v.g, v.v]), [["SDRS-1", "A", 1000], ["SDRS-2", "S", 500], ["SDRS-3", "S", 300]]);
   assert.deepEqual(r.excluidos.map((x) => [x.key, x.motivo]).sort(), [["SDRS-4", "Card sem telefone"], ["SDRS-5", "Mesmo plano casado com mais de um card (plano ficou com SDRS-1)"]]);
   const soma = (g: string, i: 3 | 4) => r.conversao.filter((c) => c[2] === g).reduce((s, c) => s + c[i], 0);
   assert.deepEqual([soma("A", 3), soma("A", 4), soma("S", 3), soma("S", 4)], [1, 1, 1, 1]);
   const ag = (g: string) => r.agenda.filter((a) => a[2] === g).reduce((s, a) => s + a[3], 0);
-  assert.deepEqual([ag("A"), ag("S"), ag("C")], [2, 1, 1]); // a avaliação com falta vai para Avaliação; a experimental para Cabine SDR
+  assert.deepEqual([ag("A"), ag("S"), ag("C")], [2, 1, 0]); // a avaliação com falta vai para Avaliação; a experimental para Cabine SDR
+  assert.equal(r.versao, 4);
+  assert.equal(r.cabineAtendidas, undefined);
 
   // Quadro na tela: período, unidade e filtros que deixam o quadro em branco
   const res = r as unknown as ResultadoAC;
@@ -64,9 +66,9 @@ test("avaliação×cabine: casamento, exclusões e conversão", () => {
   const p = periodoDoQuadro(f, "2026-12-31");
   assert.ok(p.ok && p.modo === "padrao");
   const q = montarQuadro(res, p as Extract<typeof p, { ok: true }>, [], new Map());
-  assert.deepEqual(q.linhas.map((l) => [l.g, l.faturamento, l.quantidade]), [["A", 1000, 1], ["S", 500, 1], ["C", 300, 1], ["T", 1800, 1 + 1 + 1]]);
-  // Cabine e Total sem taxa de conversão; Cabine sem agendamentos/comparecimento; Total de sessões = Avaliação + Cabine SDR
-  assert.deepEqual(q.linhas.map((l) => [l.g, l.taxa, l.agendamentos, l.comparecimento?.atendidos ?? null]), [["A", 100, 2, 1], ["S", 100, 1, 1], ["C", null, null, null], ["T", null, 3, 2]]);
+  assert.deepEqual(q.linhas.map((l) => [l.g, l.faturamento, l.quantidade]), [["A", 1000, 1], ["S", 800, 2], ["T", 1800, 3]]);
+  // Total sem taxa de conversão; Total de sessões = Avaliação + Cabine SDR
+  assert.deepEqual(q.linhas.map((l) => [l.g, l.taxa, l.agendamentos, l.comparecimento?.atendidos ?? null]), [["A", 100, 2, 1], ["S", 100, 1, 1], ["T", null, 3, 2]]);
   const qz = montarQuadro(res, p as Extract<typeof p, { ok: true }>, ["Zona Norte"], new Map());
   assert.equal(qz.linhas.at(-1)!.faturamento, 0);
   const pf = periodoDoQuadro({ ...f, fechamento: { from: "2026-05-05", to: "2026-05-31" }, avaliacao: { from: "2026-01-01", to: "2026-01-02" } }, "2026-12-31");
@@ -114,17 +116,17 @@ test("avaliação×cabine: planos do mesmo dia somados, comparecimento e concili
   assert.match(c.itens[0].motivo, /fora do período \(25\/09\/2026\)/);
 });
 
-test("avaliação×cabine: conversão da Cabine só com compras no período, R$ 0 não converte e nota de compras fora do quadro", () => {
+test("avaliação×cabine: Cabine SDR com quem já tinha plano, R$ 0 não converte e nota de compras fora do quadro", () => {
   const contatos = new Map([[1, { f: "99990001", e: "" }], [2, { f: "99990002", e: "" }], [3, { f: "99990003", e: "" }], [4, { f: "99990004", e: "" }]]);
   const r = calcular({
     sessoes: [
-      sess({ c: 1, t: "CAB", d: "2026-09-29" }), // comprou em 14/09 (antes do período) → não converte
-      sess({ c: 2, t: "CAB", d: "2026-09-29" }), // renovação em 30/09 → converte, vai para a nota
-      sess({ c: 3, t: "CAB", d: "2026-09-29" }), // plano de R$ 0 → não converte
+      sess({ c: 1, t: "CAB", d: "2026-09-29" }), // sessão de tratamento na cabine → fora das sessões
+      sess({ c: 2, t: "EXP", d: "2026-09-30" }), // já tinha plano (março); experimental + renovação no dia → Cabine SDR, vai para a nota
+      sess({ c: 3, t: "EXP", d: "2026-09-29" }), // plano de R$ 0 → não converte
       sess({ c: 4, t: "AV", d: "2026-09-29" }), // avaliação atendida + compra; card em Negociação → converte, vai para a nota
     ],
     planos: [
-      plano({ c: 1, d: "2026-09-14", v: 98.7, orc: 1, nome: "Janyele" }),
+      plano({ c: 1, d: "2026-09-29", v: 98.7, orc: 1, nome: "Janyele" }),
       plano({ c: 2, d: "2026-03-10", v: 1000, orc: 2, nome: "Marysa" }), plano({ c: 2, d: "2026-09-30", v: 1691, orc: 3, nome: "Marysa" }),
       plano({ c: 3, d: "2026-09-29", v: 0, orc: 4, nome: "Girlania" }),
       plano({ c: 4, d: "2026-09-29", v: 1862.1, orc: 5, nome: "Beatrice" }),
@@ -138,12 +140,14 @@ test("avaliação×cabine: conversão da Cabine só com compras no período, R$ 
       ["99990004", [{ id: "b", key: "SDRS-12293", fase: "Negociação", convertido: false, fechamento: "2026-10-05" }]],
     ]),
   });
+  assert.ok(!r.agenda.some((a) => a[2] === "C") && !r.compras!.some((x) => x.g === "C"));
   const res = r as unknown as ResultadoAC;
   const p = { ok: true as const, modo: "fechamento" as const, r: { from: "2026-09-28", to: "2026-10-03" } };
   const q = montarQuadro(res, p, [], new Map());
-  const [av, , cab] = q.linhas;
+  const [av, sdr] = q.linhas;
+  assert.deepEqual(q.linhas.map((l) => l.g), ["A", "S", "T"]);
   assert.deepEqual([av.convertidas, av.atendidas], [1, 1]);
-  assert.deepEqual([cab.convertidas, cab.atendidas], [1, 3]); // só a renovação de 30/09
+  assert.deepEqual([sdr.convertidas, sdr.atendidas, sdr.agendamentos], [1, 2, 2]); // a sessão de cabine não entra
   assert.deepEqual(q.comprasFora.map((x) => [x.nome, x.d, x.v, x.cards, x.motivo]), [
     ["Beatrice", "2026-09-29", 1862.1, "SDRS-12293 (Negociação)", "card fora de Convertidos"],
     ["Marysa", "2026-09-30", 1691, "SDRS-6106 (Convertidos)", "renovação – card convertido em mar/2026"],

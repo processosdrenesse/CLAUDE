@@ -1,4 +1,4 @@
-// Quadro "Avaliação × Cabine SDR × Cabine" — aparece só em SDR — Novos → Faturamento.
+// Quadro "Avaliação × Cabine SDR" — aparece só em SDR — Novos → Faturamento.
 // Para remover: apague esta pasta, src/domain/avaliacaoCabine.ts e as 2 linhas em src/pages/LeverPages.tsx.
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -68,7 +68,7 @@ export function QuadroAvaliacaoCabine({ f, leads }: { f: LeadFilters; leads: Lea
   ];
 
   return (
-    <Section title="Avaliação × Cabine SDR × Cabine"
+    <Section title="Avaliação × Cabine SDR"
       hint="Vendas do funil SDR (Convertidos + Convertidos avulsos) casadas com os planos aprovados do Belle pelo telefone e classificadas pelas regras do Belle">
       {q.isLoading && <Loading label="Carregando quadro Avaliação × Cabine..." />}
       {q.error && <SourceError error={q.error} onRetry={() => q.refetch()} />}
@@ -87,10 +87,10 @@ export function QuadroAvaliacaoCabine({ f, leads }: { f: LeadFilters; leads: Lea
               {" "}• Atualizado em {new Date(q.data.geradoEm).toLocaleString("pt-BR")}
             </p>
             <p>
-              Faturamento e quantidade: valor da venda no Belle. Agendamentos: sessões (avaliação, experimental e cabine, todas as situações) dos clientes do funil SDR, pela data da sessão.
+              Faturamento e quantidade: valor da venda no Belle. Avaliação: venda no dia de uma avaliação atendida; Cabine SDR: todas as demais vendas (inclui a antiga Cabine).
+              Agendamentos: sessões de avaliação e experimentais (todas as situações) dos clientes do funil SDR, pela data da sessão; sessões de tratamento na cabine não entram.
               Comparecimento: atendidos ÷ (atendidos + faltas), com "atendidos de (atendidos + faltas)" ao lado (Avaliação: sessões de avaliação; Cabine SDR: experimentais).
               Taxa de conversão: atendidas com plano comprado (acima de R$ 0) no mesmo dia ÷ atendidas, por cliente/dia.
-              Na Cabine, agendamentos, comparecimento e taxa de conversão não são exibidos; no Total, agendamentos e comparecimento somam Avaliação + Cabine SDR.
               Planos aprovados da mesma cliente no mesmo dia contam como uma venda, com os valores somados.
             </p>
           </div>

@@ -1,11 +1,12 @@
-// Quadro "Avaliação × Cabine SDR × Cabine" (SDR — Novos → Faturamento). Agregação pura sobre o
+// Quadro "Avaliação × Cabine SDR" (SDR — Novos → Faturamento). Agregação pura sobre o
 // resultado pré-calculado pelo servidor (server/avaliacaoCabine). Módulo isolado e removível.
 import { inRange, type DateRange } from "@/lib/dates";
 import type { LeadFilters } from "./funil";
 
+/** "C" (Cabine) só existia até a versão 3; desde 09/10/2026 a Cabine faz parte da Cabine SDR. */
 export type Grupo = "A" | "S" | "C";
 export const GRUPOS: { g: Grupo; nome: string }[] = [
-  { g: "A", nome: "Avaliação" }, { g: "S", nome: "Cabine SDR" }, { g: "C", nome: "Cabine" },
+  { g: "A", nome: "Avaliação" }, { g: "S", nome: "Cabine SDR" },
 ];
 
 /** Compra que entra na taxa de conversão (ver server/avaliacaoCabine/regras.ts). */
@@ -15,7 +16,7 @@ export interface CompraAC {
 }
 
 export interface ResultadoAC {
-  versao: 1 | 2 | 3;
+  versao: 1 | 2 | 3 | 4;
   geradoEm: string;
   vendas: { d: string; u: string; g: Grupo; v: number; card: string; key: string; nome: string; vLever: number; planos?: number; c?: number }[];
   agenda: [string, string, Grupo, number][];
@@ -23,7 +24,7 @@ export interface ResultadoAC {
   excluidos: { card: string; key: string; nome: string; fechamento: string; v: number; motivo: string }[];
   /** [dia, unidade, grupo, atendidos, faltas] — ausente em resultados antigos (versão 1). */
   comparecimento?: [string, string, Grupo, number, number][];
-  /** [cliente, dia, unidade] das sessões de cabine atendidas — ausente antes da versão 3. */
+  /** [cliente, dia, unidade] das sessões de cabine atendidas — só na versão 3 (não usado mais). */
   cabineAtendidas?: [number, string, string][];
   compras?: CompraAC[];
 }
@@ -54,11 +55,9 @@ export function periodoDoQuadro(f: LeadFilters, hoje: string): Periodo {
 export interface LinhaAC {
   g: Grupo | "T"; nome: string;
   faturamento: number; pct: number; quantidade: number;
-  /** Cabine: agendamentos, comparecimento e taxa de conversão não são exibidos (null → "—").
-   *  No Total, agendamentos e comparecimento somam só Avaliação + Cabine SDR. */
   agendamentos: number | null;
   atendidas: number; convertidas: number;
-  /** null na linha Total: soma cliente/dia com cliente/mês e não tem significado */
+  /** null na linha Total ("—") */
   taxa: number | null;
   /** null quando o resultado gravado ainda não traz o comparecimento */
   comparecimento: { atendidos: number; faltas: number; taxa: number } | null;
@@ -75,28 +74,19 @@ export function montarQuadro(res: ResultadoAC, p: Extract<Periodo, { ok: true }>
   const agenda = res.agenda.filter(([d, u]) => un(u) && inRange(d, p.r));
   const conv = res.conversao.filter(([d, u]) => un(u) && inRange(d, p.r));
   const comp = res.comparecimento?.filter(([d, u]) => un(u) && inRange(d, p.r));
-  // Cabine: cliente/mês, limitado aos dias do filtro — atendida na cabine no período e compra de Cabine no período, no mesmo mês
-  const cabUnid = new Map<string, string>(); // cliente|mês → unidade da 1ª sessão atendida no período
-  for (const [c, d, u] of res.cabineAtendidas ?? []) if (un(u) && inRange(d, p.r) && !cabUnid.has(`${c}|${d.slice(0, 7)}`)) cabUnid.set(`${c}|${d.slice(0, 7)}`, u);
-  const comprasCab = (res.compras ?? []).filter((x) => x.g === "C" && inRange(x.d, p.r) && cabUnid.has(`${x.c}|${x.d.slice(0, 7)}`));
-  const cabConv = new Set(comprasCab.map((x) => `${x.c}|${x.d.slice(0, 7)}`));
-  const novaCabine = !!res.cabineAtendidas;
   const total = vendas.reduce((s, v) => s + v.v, 0);
   const linha = (g: Grupo | "T", nome: string): LinhaAC => {
-    const eh = (gx: Grupo) => g === "T" || gx === g;
-    const ehSessao = (gx: Grupo) => (g === "T" ? gx !== "C" : gx === g); // Total de sessões sem a Cabine
-    const semSessoes = g === "C";
+    const eh = (gx: Grupo) => (g === "T" ? gx !== "C" : gx === g);
     const vs = vendas.filter((v) => eh(v.g));
     const faturamento = vs.reduce((s, v) => s + v.v, 0);
-    let atendidas = conv.filter((c) => eh(c[2]) && !(novaCabine && c[2] === "C")).reduce((s, c) => s + c[3], 0);
-    let convertidas = conv.filter((c) => eh(c[2]) && !(novaCabine && c[2] === "C")).reduce((s, c) => s + c[4], 0);
-    if (novaCabine && eh("C")) { atendidas += cabUnid.size; convertidas += cabConv.size; }
+    const atendidas = conv.filter((c) => eh(c[2])).reduce((s, c) => s + c[3], 0);
+    const convertidas = conv.filter((c) => eh(c[2])).reduce((s, c) => s + c[4], 0);
     return {
       g, nome, faturamento, pct: total ? (faturamento / total) * 100 : 0, quantidade: vs.length,
-      agendamentos: semSessoes ? null : agenda.filter((a) => ehSessao(a[2])).reduce((s, a) => s + a[3], 0),
-      atendidas, convertidas, taxa: g === "T" || semSessoes ? null : atendidas ? (convertidas / atendidas) * 100 : 0,
-      comparecimento: comp && !semSessoes ? (() => {
-        const at = comp.filter((c) => ehSessao(c[2])).reduce((s, c) => s + c[3], 0), fa = comp.filter((c) => ehSessao(c[2])).reduce((s, c) => s + c[4], 0);
+      agendamentos: agenda.filter((a) => eh(a[2])).reduce((s, a) => s + a[3], 0),
+      atendidas, convertidas, taxa: g === "T" ? null : atendidas ? (convertidas / atendidas) * 100 : 0,
+      comparecimento: comp ? (() => {
+        const at = comp.filter((c) => eh(c[2])).reduce((s, c) => s + c[3], 0), fa = comp.filter((c) => eh(c[2])).reduce((s, c) => s + c[4], 0);
         return { atendidos: at, faltas: fa, taxa: at + fa ? (at / (at + fa)) * 100 : 0 };
       })() : null,
     };
@@ -105,10 +95,8 @@ export function montarQuadro(res: ResultadoAC, p: Extract<Periodo, { ok: true }>
   const excluidos = res.excluidos.filter((x) => inRange(dataExcl(x), p.r));
   // compras que estão na taxa de conversão mas não nas vendas do quadro (para a equipe corrigir os cards no Lever)
   const noQuadro = new Set(vendas.map((v) => `${v.c}|${v.d}`));
-  const comprasFora = [
-    ...(res.compras ?? []).filter((x) => x.g !== "C" && un(x.u) && inRange(x.d, p.r)),
-    ...comprasCab,
-  ].filter((x) => !noQuadro.has(`${x.c}|${x.d}`)).map((x) => ({ ...x, motivo: motivoCompra(x) }));
+  const comprasFora = (res.compras ?? []).filter((x) => x.g !== "C" && un(x.u) && inRange(x.d, p.r))
+    .filter((x) => !noQuadro.has(`${x.c}|${x.d}`)).map((x) => ({ ...x, motivo: motivoCompra(x) }));
   return { linhas: [...GRUPOS.map((x) => linha(x.g, x.nome)), linha("T", "Total")], vendas, excluidos, comprasFora };
 }
 
