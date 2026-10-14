@@ -26,9 +26,9 @@ src/services (normalização) → src/domain (regras/indicadores) → src/pages 
 
 ## Endpoints usados
 
-**Belle** (`Authorization: <token>`, 40 req/min): `estabelecimento` (unidades), `relatorios/relatorio_atendimentos` (fallback; 1 chamada por unidade × mês — a resposta não traz a unidade), `BI/v1.0/report/build` (opcional, relatório 241251330: Data de Inclusão e Data de Cadastro; unidade via `estab`, paginado por `offsetRecords`, mesmo ID de agendamento da API).
+**Belle** — documentação: https://documenter.getpostman.com/view/12548729/UzJHRHyh (`Authorization: <token>`, 40 req/min): `estabelecimento` (unidades), `relatorios/relatorio_atendimentos` (fallback; 1 chamada por unidade × mês — a resposta não traz a unidade), `BI/v1.0/report/build` (opcional, relatório 241251330: Data de Inclusão e Data de Cadastro; unidade via `estab`, paginado por `offsetRecords`, mesmo ID de agendamento da API).
 
-**Lever** (`Authorization: Bearer`): o Lever não publica documentação; as rotas foram lidas do próprio app web. `crm/v1/panel` (funis; `?includeDetails=Steps|Tags`), `crm/v1/panel/card?panelId&pageNumber&pageSize=100&includeDetails=CustomFields` (⚠ paginar com **`pageNumber`** — `page` é ignorado), `core/v1/agent`.
+**Lever** — endereço base: `https://api.app.leverconversas.com.br` (`Authorization: Bearer`): o Lever não publica documentação; as rotas foram lidas do próprio app web. `crm/v1/panel` (funis; `?includeDetails=Steps|Tags`), `crm/v1/panel/card?panelId&pageNumber&pageSize=100&includeDetails=CustomFields` (⚠ paginar com **`pageNumber`** — `page` é ignorado), `core/v1/agent`.
 
 ## Regras de negócio
 
