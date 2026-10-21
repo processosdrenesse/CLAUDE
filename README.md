@@ -2,6 +2,8 @@
 
 Dashboard executivo que **não usa mais Google Sheets**: operação vem do **Belle** (API de integração + relatório do BI) e o comercial da API do **Lever**.
 
+> Para sessões do Claude Code: leia primeiro o [`CLAUDE.md`](CLAUDE.md) (especificações, decisões, histórico e operação).
+
 ## Rodar
 
 ```bash
