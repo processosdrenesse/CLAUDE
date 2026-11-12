@@ -24,6 +24,7 @@ export const EQUIPE_OFICIAL = [
   "Maria Leanne Lopes Alves",
   "Thayane Luiza de Freitas Fernandes",
   "Anna Maria Baptista da Silva",
+  "Graziely Oliveira Da Silva",
 ];
 
 /** Campos que NÃO entram na análise de Qualidade do CRM de cada área. */

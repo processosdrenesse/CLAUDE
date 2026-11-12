@@ -437,6 +437,7 @@ A Vercel parou de publicar e o TI saiu dela. Em 08/10/2026 o painel foi para o *
 | 08/10 | `683e528` `aa22e29` `f74e55b` `8ef4468` `f18a977` | Migração para o VPS: homologação/produção com GitHub Actions, `/api/health` sem senha, Caddy no Docker |
 | 09/10 | `875dd8f` | Quadro: Cabine juntada à Cabine SDR (histórico e futuras); versão 4 do resultado |
 | 10/11 | — | Agendamentos: Anna Maria Baptista da Silva incluída na equipe oficial (`EQUIPE_OFICIAL`); começou a agendar em 06/11 |
+| 12/11 | — | Agendamentos: Graziely Oliveira Da Silva incluída na equipe oficial (`EQUIPE_OFICIAL`); começou a agendar em 12/11 |
 
 Consultas pontuais feitas sem mexer no site:
 - faturamento 2026 até 26/09;
