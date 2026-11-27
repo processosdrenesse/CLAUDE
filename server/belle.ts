@@ -138,6 +138,26 @@ async function agendamentosBiPorInclusao(inc: Rng, ag: Rng | undefined, force: b
 }
 
 /**
+ * Com a sessão encerrada, o BI responde 200 com 0 registros (sem erro). Quando o BI volta vazio, confere uma
+ * unidade no mês atual contra a API de integração: se a API tem agendamentos e o BI não, a sessão caiu.
+ */
+const biSessaoAtiva = (force: boolean) =>
+  memo("belle:bi-sessao", 10 * 60_000, async () => {
+    const [u] = await units(force);
+    if (!u) return true;
+    const hoje = new Date(), ini = new Date(Date.UTC(hoje.getUTCFullYear(), hoje.getUTCMonth(), 1));
+    const api = await get<Row[]>("relatorios/relatorio_atendimentos", { codEstab: u.cod, dtInicio: fmtBr(ini), dtFim: fmtBr(hoje) });
+    if (!Array.isArray(api) || api.length === 0) return true; // nada para comparar
+    return (await biPage(u.cod, { ag: { from: ini, to: hoje } }, 0, 1)).record_count > 0;
+  }, force);
+
+async function semSessaoVazia(rows: Row[], force: boolean): Promise<Row[]> {
+  if (rows.length === 0 && !(await biSessaoAtiva(force)))
+    throw new UpstreamError("belle", 401, "o BI devolveu 0 registros, mas a API de integração tem agendamentos (sessão do BI encerrada)");
+  return rows;
+}
+
+/**
  * Agendamentos. Janela de busca (nada é restringido em silêncio):
  *  - com Data de Inclusão → consulta o BI por inclusão (todas as datas de agendamento, a menos que `ag` seja informada);
  *  - só com Data de Agendamento → BI por mês de agendamento.
@@ -152,9 +172,9 @@ export async function agendamentos(q: BiSpec, force = false): Promise<{ rows: Ro
   };
   if (!env.BELLE_BI_TOKEN) return viaApi("BELLE_BI_TOKEN não configurado: Data de Inclusão e Data de Cadastro indisponíveis.");
   try {
-    if (q.inc) return { rows: await agendamentosBiPorInclusao(q.inc, q.ag, force) };
+    if (q.inc) return { rows: await semSessaoVazia(await agendamentosBiPorInclusao(q.inc, q.ag, force), force) };
     const ag = q.ag ?? mes;
-    return { rows: await agendamentosBiPorAgendamento(ag.from, ag.to, force) };
+    return { rows: await semSessaoVazia(await agendamentosBiPorAgendamento(ag.from, ag.to, force), force) };
   } catch (e) {
     const status = e instanceof UpstreamError ? e.status : 0;
     const why = status === 401 || status === 403 ? "token do BI inválido ou expirado" : "falha ao consultar o BI";
