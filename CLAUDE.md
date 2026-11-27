@@ -138,6 +138,9 @@ com `tsx`, TypeScript, testes com `node:test`.
   4. Atualize o Secret `BELLE_BI_TOKEN` e republique.
 - Sem o token, ou com ele expirado, a tela avisa e desabilita os filtros de Inclusão/Cadastro. Os
   agendamentos continuam vindo da API de integração, **sem data substituta**.
+- ⚠️ **Sessão encerrada não dá erro:** o BI responde 200 com `record_count: 0`. Quando o BI volta vazio, o
+  servidor confere uma unidade no mês atual contra a API de integração; se a API tem agendamentos, trata como
+  token expirado (`biSessaoAtiva` em `server/belle.ts`). Antes disso, a tela mostrava tudo zerado (27/11/2026).
 
 ### Lever
 - Base `https://api.app.leverconversas.com.br`, header `Authorization: Bearer <LEVER_API_TOKEN>`.
@@ -438,6 +441,7 @@ A Vercel parou de publicar e o TI saiu dela. Em 08/10/2026 o painel foi para o *
 | 09/10 | `875dd8f` | Quadro: Cabine juntada à Cabine SDR (histórico e futuras); versão 4 do resultado |
 | 10/11 | — | Agendamentos: Anna Maria Baptista da Silva incluída na equipe oficial (`EQUIPE_OFICIAL`); começou a agendar em 06/11 |
 | 12/11 | — | Agendamentos: Graziely Oliveira Da Silva incluída na equipe oficial (`EQUIPE_OFICIAL`); começou a agendar em 12/11 |
+| 27/11 | — | Agendamentos: sessão do BI encerrada (BI responde 0 registros sem erro) agora vira aviso de token expirado e cai para a API de integração, em vez de zerar a tela |
 
 Consultas pontuais feitas sem mexer no site:
 - faturamento 2026 até 26/09;
